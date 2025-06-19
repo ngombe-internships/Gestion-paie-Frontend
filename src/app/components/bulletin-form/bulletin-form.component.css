@@ -1,0 +1,113 @@
+form {
+  max-width: 100%;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin: 10px 0;
+}
+
+label {
+  font-size: small;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.ng-dirty.ng-invalid, .ng-touched.ng-invalid {
+  border-color: red;
+  border-width: 2px;
+}
+
+.error {
+  font-size: x-small;
+  color: red;
+  margin-top: 4px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+  width: 100%;
+}
+
+button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.container-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.form-container {
+  flex: 0 0 400px; /* Largeur fixe pour le formulaire */
+  min-width: 350px;
+  max-width: 450px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background-color: #fff;
+  order: 2; /* Formulaire à droite */
+}
+
+.preview-container {
+  flex: 1; /* Prend le reste de l'espace */
+  min-width: 600px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background-color: #fff;
+  overflow-x: auto;
+  order: 1; /* Prévisualisation à gauche */
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .container-flex {
+    flex-direction: column;
+  }
+
+  .form-container,
+  .preview-container {
+    order: unset;
+    max-width: 100%;
+    min-width: unset;
+  }
+
+  .form-container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}

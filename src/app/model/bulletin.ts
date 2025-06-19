@@ -1,0 +1,25 @@
+
+export interface BulletinPaie {
+  id? : number,
+  salaireBase?: number,
+  tauxHoraire:  number,
+  heuresNormal: number,
+  heuresSup1?: number,
+  heuresSup2 ?: number,
+  heuresFerie ?: number,
+  heuresNuit? : number,
+  primeTransport? : number,
+  primePonctualite? : number,
+  primeTechnicite ?: number,
+  primeAnciennete ?: number,
+  primeRendement ?: number,
+  autrePrimes ?: number,
+  avantageNature? : number,
+  salaireBrut ?: number,
+  salaireNet? : number,
+  totalChargesPatronales?: number,
+  cnpsVieillesse ?: number,
+  irpp?: number,
+  jourConge?:number,
+  dateEmbauche?: string;
+}

@@ -1,0 +1,1119 @@
+<div class="container-fluid py-4">
+  <!-- Titre avec style amélioré -->
+  <div class="text-center mb-5">
+    <h2 class="display-4 fw-bold text-primary mb-0">
+      <i class="bi bi-people-fill me-3"></i>
+      Liste des Employés
+    </h2>
+    <div class="mt-2">
+      <span class="badge bg-light text-dark fs-6">Gestion du personnel</span>
+    </div>
+  </div>
+
+  <!-- Section de recherche améliorée -->
+  <div class="card shadow-lg border-0 mb-4" style="border-radius: 15px;">
+    <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 15px 15px 0 0;">
+      <h3 class="card-title mb-0 fw-semibold">
+        <i class="bi bi-search me-2"></i>
+        Rechercher un employé
+      </h3>
+    </div>
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label for="searchText" class="form-label fw-semibold text-secondary">
+            <i class="bi bi-funnel-fill me-2 text-primary"></i>
+            Recherche globale (Nom, Prénom ou Matricule) :
+          </label>
+          <div class="input-group input-group-lg">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text"
+                   id="searchText"
+                   class="form-control border-start-0 shadow-sm"
+                   [(ngModel)]="searchText"
+                   (keyup.enter)="onSearch()"
+                   placeholder="Entrez le nom, prénom ou matricule..."
+                   style="border-radius: 0 8px 8px 0;">
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 text-center">
+        <button class="btn btn-primary btn-lg px-4 me-3 shadow-sm" (click)="onSearch()">
+          <i class="bi bi-search me-2"></i>
+          Rechercher
+        </button>
+        <button class="btn btn-outline-secondary btn-lg px-4 shadow-sm" (click)="clearSearch()">
+          <i class="bi bi-arrow-clockwise me-2"></i>
+          Réinitialiser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded-3 shadow-sm">
+    <div>
+      <h5 class="mb-0 text-secondary">
+        <i class="bi bi-clipboard-data me-2"></i>
+        Total des employés : <span class="badge bg-primary">{{employes.length}}</span>
+      </h5>
+    </div>
+    <button class="btn btn-success btn-lg shadow-sm" (click)="goToCreateEmploye()" style="border-radius: 25px;">
+      <i class="bi bi-person-plus me-2"></i>
+      Ajouter un nouvel employé
+    </button>
+  </div>
+
+  <!-- États conditionnels -->
+  @if (isLoading) {
+    <div class="alert alert-info text-center shadow-sm border-0" style="border-radius: 12px;">
+      <div class="spinner-border spinner-border-sm me-2 text-info" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <strong>Chargement des employés...</strong>
+    </div>
+  } @else if(errorMessage){
+    <div class="alert alert-danger text-center shadow-sm border-0" style="border-radius: 12px;">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>{{errorMessage}}</strong>
+    </div>
+  } @else if (employes.length === 0){
+    <div class="alert alert-warning text-center shadow-sm border-0" style="border-radius: 12px;">
+      <i class="bi bi-inbox me-2"></i>
+      <strong>Aucun employé trouvé</strong>
+    </div>
+  } @else {
+    <!-- Tableau des employés -->
+    <div class="card shadow-lg border-0" style="border-radius: 15px;">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead style="background: linear-gradient(135deg, #1f2937, #374151); color: white;">
+            <tr>
+              <th class="py-3 px-4 fw-semibold">
+                <i class="bi bi-hash me-2"></i>Matricule
+              </th>
+              <th class="py-3 px-4 fw-semibold">
+                <i class="bi bi-person me-2"></i>Nom
+              </th>
+              <th class="py-3 px-4 fw-semibold">
+                <i class="bi bi-person me-2"></i>Prénom
+              </th>
+              <th class="py-3 px-4 fw-semibold">
+                <i class="bi bi-briefcase me-2"></i>Poste
+              </th>
+              <th class="py-3 px-4 fw-semibold">
+                <i class="bi bi-building me-2"></i>Service
+              </th>
+              <th class="py-3 px-4 fw-semibold">
+                <i class="bi bi-calendar-date me-2"></i>Date d'embauche
+              </th>
+              <th class="py-3 px-4 fw-semibold text-center">
+                <i class="bi bi-gear me-2"></i>Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(employe of employes; track employe.id){
+              <tr class="border-0" style="border-bottom: 1px solid #e5e7eb !important;">
+                <td class="py-3 px-4 fw-semibold text-primary">{{employe.matricule}}</td>
+                <td class="py-3 px-4">{{employe.nom}}</td>
+                <td class="py-3 px-4">{{employe.prenom}}</td>
+                <td class="py-3 px-4">
+                  <span class="badge bg-light text-dark">{{employe.poste}}</span>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="badge bg-secondary">{{employe.service}}</span>
+                </td>
+                <td class="py-3 px-4 text-muted">{{employe.dateEmbauche | date: 'dd/MM/yyyy'}}</td>
+                <td class="py-3 px-4">
+                  <div class="btn-group" role="group">
+                    <button class="btn btn-outline-info btn-sm"
+                            (click)="viewEmployeDetails(employe.id)"
+                            title="Voir les détails">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-warning btn-sm"
+                            (click)="editEmploye(employe.id)"
+                            title="Modifier">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm"
+                            (click)="deleteEmploye(employe.id)"
+                            title="Supprimer">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
+<style>
+  .table-hover tbody tr:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+    transform: translateX(5px);
+    transition: all 0.2s ease;
+  }
+
+  .btn-group .btn {
+    margin: 0 2px;
+    border-radius: 6px !important;
+  }
+
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  .input-group-text {
+    border-radius: 8px 0 0 8px;
+  }
+
+  .badge {
+    font-size: 0.75em;
+    padding: 0.35em 0.65em;
+  }
+</style>
+
+
+
+
+
+
+//formulaire
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire Employé Simple</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 2rem;
+            background: white;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+
+        .btn {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .section-divider {
+            border-bottom: 2px solid #f8f9fa;
+            margin: 1.5rem 0;
+            padding-bottom: 1rem;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .is-invalid {
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Ajouter un nouvel employé</h2>
+            </div>
+
+            <div class="card-body">
+                <div id="alerts"></div>
+
+                <form id="employeeForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="section-divider">
+                                <div class="section-title">Informations personnelles</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="matricule" class="form-label">Matricule <span class="text-danger">*</span></label>
+                                <input type="text" id="matricule" class="form-control" required>
+                                <div class="invalid-feedback">Le matricule est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                                <input type="text" id="nom" class="form-control" required>
+                                <div class="invalid-feedback">Le nom est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="prenom" class="form-label">Prénom <span class="text-danger">*</span></label>
+                                <input type="text" id="prenom" class="form-control" required>
+                                <div class="invalid-feedback">Le prénom est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="numeroCnps" class="form-label">Numéro CNPS <span class="text-danger">*</span></label>
+                                <input type="text" id="numeroCnps" class="form-control" required>
+                                <div class="invalid-feedback">Le numéro CNPS est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="niu" class="form-label">NIU <span class="text-danger">*</span></label>
+                                <input type="text" id="niu" class="form-control" required>
+                                <div class="invalid-feedback">Le NIU est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="telephone" class="form-label">Téléphone</label>
+                                <input type="text" id="telephone" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="dateNaissance" class="form-label">Date Naissance <span class="text-danger">*</span></label>
+                                <input type="date" id="dateNaissance" class="form-control" required>
+                                <div class="invalid-feedback">La date de naissance est requise</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="section-divider">
+                                <div class="section-title">Informations professionnelles</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" id="email" class="form-control" required>
+                                <div class="invalid-feedback">L'email est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="adresse" class="form-label">Adresse</label>
+                                <input type="text" id="adresse" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="dateEmbauche" class="form-label">Date d'embauche <span class="text-danger">*</span></label>
+                                <input type="date" id="dateEmbauche" class="form-control" required>
+                                <div class="invalid-feedback">La date d'embauche est requise</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="poste" class="form-label">Poste <span class="text-danger">*</span></label>
+                                <input type="text" id="poste" class="form-control" required>
+                                <div class="invalid-feedback">Le poste est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="service" class="form-label">Service <span class="text-danger">*</span></label>
+                                <input type="text" id="service" class="form-control" required>
+                                <div class="invalid-feedback">Le service est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="statut" class="form-label">Statut <span class="text-danger">*</span></label>
+                                <select id="statut" class="form-select" required>
+                                    <option value="">Sélectionner un statut</option>
+                                    <option value="CADRE">Cadre</option>
+                                    <option value="EMPLOYE">Employé</option>
+                                    <option value="OUVRIER">Ouvrier</option>
+                                </select>
+                                <div class="invalid-feedback">Le statut est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="categorie" class="form-label">Catégorie <span class="text-danger">*</span></label>
+                                <select id="categorie" class="form-select" required>
+                                    <option value="">Sélectionner une catégorie</option>
+                                    <option value="A">Catégorie A</option>
+                                    <option value="B">Catégorie B</option>
+                                    <option value="C">Catégorie C</option>
+                                </select>
+                                <div class="invalid-feedback">La catégorie est requise</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="echelon" class="form-label">Échelon <span class="text-danger">*</span></label>
+                                <select id="echelon" class="form-select" required>
+                                    <option value="">Sélectionner un échelon</option>
+                                    <option value="1">Échelon 1</option>
+                                    <option value="2">Échelon 2</option>
+                                    <option value="3">Échelon 3</option>
+                                </select>
+                                <div class="invalid-feedback">L'échelon est requis</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="typeContrat" class="form-label">Type de Contrat <span class="text-danger">*</span></label>
+                                <select id="typeContrat" class="form-select" required>
+                                    <option value="">Sélectionner un type de contrat</option>
+                                    <option value="CDI">CDI</option>
+                                    <option value="CDD">CDD</option>
+                                    <option value="STAGE">Stage</option>
+                                </select>
+                                <div class="invalid-feedback">Le type de contrat est requis</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4 pt-3" style="border-top: 1px solid #dee2e6;">
+                        <button type="button" class="btn btn-secondary me-2">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer l'employé</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple validation
+        document.getElementById('employeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            if (isValid) {
+                document.getElementById('alerts').innerHTML =
+                    '<div class="alert alert-success">Employé enregistré avec succès !</div>';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+<!--Bulletin form-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulletin de Paie</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            background: white;
+        }
+
+        .container {
+            max-width: 21cm;
+            margin: 0 auto;
+            background: white;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            border: 1px solid #bdc3c7;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .info-box h2 {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 5px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 2px 0;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .info-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 30px 0 15px 0;
+            text-transform: uppercase;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 5px;
+        }
+
+        .payroll-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border: 1px solid #bdc3c7;
+        }
+
+        .payroll-table th {
+            background-color: #34495e;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+            border: 1px solid #2c3e50;
+        }
+
+        .payroll-table td {
+            padding: 10px 8px;
+            border: 1px solid #bdc3c7;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .payroll-table .text-left {
+            text-align: left;
+            padding-left: 12px;
+        }
+
+        .payroll-table .text-right {
+            text-align: right;
+            padding-right: 12px;
+        }
+
+        .payroll-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .payroll-table .total-row {
+            background-color: #ecf0f1;
+            font-weight: bold;
+        }
+
+        .payroll-table .total-row td {
+            border-top: 2px solid #34495e;
+        }
+
+        .summary-section {
+            margin-top: 40px;
+            border: 2px solid #2c3e50;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .summary-table th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 10px;
+            text-transform: uppercase;
+            border: 1px solid #2c3e50;
+        }
+
+        .summary-table td {
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            border: 1px solid #bdc3c7;
+            background-color: #f8f9fa;
+        }
+
+        .summary-table .net-pay {
+            background-color: #27ae60;
+            color: white;
+            font-size: 14px;
+        }
+
+        .amount {
+            font-family: 'Arial', monospace;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #bdc3c7;
+            text-align: center;
+            font-size: 10px;
+            color: #7f8c8d;
+        }
+
+        .no-border {
+            border: none !important;
+            background: transparent !important;
+        }
+
+        .generate-pdf-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .generate-pdf-btn:hover {
+            background-color: #2980b9;
+        }
+
+        @media print {
+            body {
+                font-size: 10px;
+            }
+
+            .container {
+                max-width: none;
+            }
+
+            .payroll-table th,
+            .payroll-table td {
+                font-size: 9px;
+                padding: 6px 4px;
+            }
+
+            .summary-table th,
+            .summary-table td {
+                font-size: 10px;
+                padding: 10px 6px;
+            }
+
+            .generate-pdf-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Bulletin de Paie</h1>
+            <p class="subtitle">Fiche de rémunération</p>
+        </header>
+
+        <div class="info-section">
+            <div class="info-box">
+                <h2>Informations de l'Employé</h2>
+                <div class="info-row">
+                    <span class="info-label">Nom:</span>
+                    <span class="info-value">{{ employeData?.nom }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Prénom:</span>
+                    <span class="info-value">{{ employeData?.prenom }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Poste:</span>
+                    <span class="info-value">{{ employeData?.poste }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Numéro CNPS:</span>
+                    <span class="info-value">{{ employeData?.numeroCnps }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">NIU:</span>
+                    <span class="info-value">{{ employeData?.niu }}</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h2>Période de Paie</h2>
+                <div class="info-row">
+                    <span class="info-label">Heures normales:</span>
+                    <span class="info-value">{{ formatNumber(bulletinData?.heuresNormal) }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Taux horaire:</span>
+                    <span class="info-value">{{ formatNumber(bulletinData?.tauxHoraire) }} FCFA</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Base CNPS:</span>
+                    <span class="info-value">{{ formatNumber(bulletinData?.baseCnps) }} FCFA</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Salaire imposable:</span>
+                    <span class="info-value">{{ formatNumber(bulletinData?.salaireImposable) }} FCFA</span>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="section-title">Détail des Éléments de Paie</h3>
+
+        <main class="main-content">
+            <table class="payroll-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Désignation</th>
+                        <th>Nombre</th>
+                        <th>Base</th>
+                        <th>Taux</th>
+                        <th>Gain</th>
+                        <th>Retenue</th>
+                        <th>Charges patronales</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>100</td>
+                        <td class="text-left">Salaire de base</td>
+                        <td>{{ formatNumber(bulletinData?.heuresNormal) }}</td>
+                        <td>{{ formatNumber(bulletinData?.tauxHoraire) }}</td>
+                        <td>100%</td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.salaireBase) }}</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                    </tr>
+                    <tr>
+                        <td>107</td>
+                        <td class="text-left">Prime de transport</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.primeTransport) }}</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                    </tr>
+                    <tr>
+                        <td>115</td>
+                        <td class="text-left">Prime de ponctualité</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.primePonctualite) }}</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                    </tr>
+                    <tr>
+                        <td>117</td>
+                        <td class="text-left">Prime de technicité</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.primeTechnicite) }}</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                    </tr>
+                    <tr>
+                        <td>118</td>
+                        <td class="text-left">Prime d'ancienneté</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.primeAnciennete) }}</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                    </tr>
+                    <tr>
+                        <td>119</td>
+                        <td class="text-left">Prime de rendement</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.primeRendement) }}</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                    </tr>
+
+                    <tr class="total-row">
+                        <td colspan="5"><strong>Salaire Brut</strong></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.salaireBrut) }}</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                    </tr>
+
+                    <tr>
+                        <td>200</td>
+                        <td class="text-left">Impôt sur le revenu des personnes physiques (IRPP)</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+                        <td>Barème</td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.irpp) }}</td>
+                        <td class="no-border"></td>
+                    </tr>
+
+                    <tr>
+                        <td>201</td>
+                        <td class="text-left">Centimes additionnels et communaux (CAC)</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.irpp) }}</td>
+                        <td>10%</td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.cac) }}</td>
+                        <td class="no-border"></td>
+                    </tr>
+
+                    <tr>
+                        <td>202</td>
+                        <td class="text-left">Taxe Communale</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.salaireBase) }}</td>
+                        <td>Barème</td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.taxeCommunale) }}</td>
+                        <td class="no-border"></td>
+                    </tr>
+
+                    <tr>
+                        <td>203</td>
+                        <td class="text-left">Redevance audio Visuelle</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+                        <td>Barème</td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.redevanceAudioVisuelle) }}</td>
+                        <td class="no-border"></td>
+                    </tr>
+
+                    <tr>
+                        <td>204</td>
+                        <td class="text-left">Credit foncier salarial</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+                        <td>1%</td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.creditFoncierSalarie) }}</td>
+                        <td class="no-border"></td>
+                    </tr>
+
+                    <tr>
+                        <td>205</td>
+                        <td class="text-left">Credit foncier patronales</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+                        <td>1.5%</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.creditFoncierPatronal) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>206</td>
+                        <td class="text-left">Fond national de l'emploie</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+                        <td>1%</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.fnePatronal) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>207</td>
+                        <td class="text-left">Pension vieillesse CNPS</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.baseCnps) }}</td>
+                        <td>4,20%</td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.cnpsVieillesseSalarie) }}</td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.cnpsVieillesseEmployeur) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>208</td>
+                        <td class="text-left">Allocation familiale CNPS</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.baseCnps) }}</td>
+                        <td>3,70%</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.cnpsAllocationsFamiliales) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>209</td>
+                        <td class="text-left">Accident de travail CNPS</td>
+                        <td class="no-border"></td>
+                        <td class="text-right">{{ formatNumber(bulletinData?.baseCnps) }}</td>
+                        <td>2,50%</td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.cnpsAccidentsTravail) }}</td>
+                    </tr>
+                </tbody>
+
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="5"><strong>TOTAUX</strong></td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.salaireBrut) }}</td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.totalRetenues) }}</td>
+                        <td class="text-right amount">{{ formatNumber(bulletinData?.totalChargesPatronales) }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </main>
+
+        <footer class="bulletin-footer">
+            <div class="summary-section">
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Brut Imposable</th>
+                            <th>Retenues sur salaire</th>
+                            <th>Cotisations CNPS</th>
+                            <th>Charges patronales</th>
+                            <th>Salaire Brut</th>
+                            <th>Coût réel salarié</th>
+                            <th>Net à payer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="amount">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+                            <td class="amount">{{ formatNumber(bulletinData?.totalRetenues) }}</td>
+                            <td class="amount">{{ formatNumber(bulletinData?.cotisationCnps) }}</td>
+                            <td class="amount">{{ formatNumber(bulletinData?.totalChargesPatronales) }}</td>
+                            <td class="amount">{{ formatNumber(bulletinData?.salaireBrut) }}</td>
+                            <td class="amount">{{ formatNumber(bulletinData?.coutTotalEmployeur) }}</td>
+                            <td class="net-pay amount">{{ formatNumber(bulletinData?.salaireNet) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="generate-pdf-btn" onclick="generatePdf()">Genere PDF</button>
+
+            <div class="footer">
+                <p>Document officiel à conserver - Émis le <span id="current-date"></span></p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Fonction pour formater les nombres (simulée)
+        function formatNumber(value) {
+            if (!value) return '0,00';
+            return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+
+        // Fonction pour générer le PDF (simulée)
+        function generatePdf() {
+            window.print();
+        }
+
+        // Afficher la date actuelle
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR');
+
+        // Données d'exemple pour la prévisualisation
+        const exampleData = {
+            employeData: {
+                nom: 'DUPONT',
+                prenom: 'Jean',
+                poste: 'Développeur',
+                numeroCnps: '123456789',
+                niu: 'ABC123456'
+            },
+            bulletinData: {
+                heuresNormal: 173.33,
+                tauxHoraire: 2500,
+                salaireBase: 433325,
+                primeTransport: 25000,
+                primePonctualite: 15000,
+                primeTechnicite: 20000,
+                primeAnciennete: 10000,
+                primeRendement: 5000,
+                salaireBrut: 508325,
+                salaireImposable: 458325,
+                baseCnps: 433325,
+                irpp: 45833,
+                cac: 4583,
+                taxeCommunale: 2167,
+                redevanceAudioVisuelle: 1200,
+                creditFoncierSalarie: 4583,
+                creditFoncierPatronal: 6875,
+                fnePatronal: 4583,
+                cnpsVieillesseSalarie: 18200,
+                cnpsVieillesseEmployeur: 36400,
+                cnpsAllocationsFamiliales: 16033,
+                cnpsAccidentsTravail: 10833,
+                totalRetenues: 76566,
+                totalChargesPatronales: 74724,
+                cotisationCnps: 18200,
+                coutTotalEmployeur: 583049,
+                salaireNet: 431759
+            }
+        };
+
+        // Remplacer les variables Angular par les données d'exemple
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cette fonction simule le binding des données Angular
+            const elements = document.querySelectorAll('*');
+            elements.forEach(el => {
+                if (el.textContent.includes('{{')) {
+                    let content = el.textContent;
+
+                    // Remplacer les données employé
+                    content = content.replace('{{ employeData?.nom }}', exampleData.employeData.nom);
+                    content = content.replace('{{ employeData?.prenom }}', exampleData.employeData.prenom);
+                    content = content.replace('{{ employeData?.poste }}', exampleData.employeData.poste);
+                    content = content.replace('{{ employeData?.numeroCnps }}', exampleData.employeData.numeroCnps);
+                    content = content.replace('{{ employeData?.niu }}', exampleData.employeData.niu);
+
+                    // Remplacer les données du bulletin
+                    Object.keys(exampleData.bulletinData).forEach(key => {
+                        const regex = new RegExp(`{{ formatNumber\\(bulletinData\\?\\.${key}\\) }}`, 'g');
+                        content = content.replace(regex, formatNumber(exampleData.bulletinData[key]));
+                    });
+
+                    el.textContent = content;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

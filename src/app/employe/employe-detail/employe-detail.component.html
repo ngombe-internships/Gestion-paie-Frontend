@@ -1,0 +1,62 @@
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h2 class="card-title mb-0">Détails de l'Employé</h2>
+      <button class="btn btn-light btn-sm" (click)="goBackToList()">
+        <i class="bi bi-arrow-left"></i> Retour à la liste
+      </button>
+    </div>
+    <div class="card-body">
+
+      @if (isLoading) {
+        <div class="alert alert-info text-center" role="alert">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          Chargement des détails de l'employé...
+        </div>
+      } @else if (errorMessage) {
+        <div class="alert alert-danger" role="alert">
+          <strong>Erreur :</strong> {{ errorMessage }}
+          <p class="mt-2">Veuillez réessayer plus tard ou contacter l'administrateur.</p>
+        </div>
+      } @else if (employe) {
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <p><strong>Matricule :</strong> {{ employe.matricule }}</p>
+            <p><strong>Nom :</strong> {{ employe.nom }}</p>
+            <p><strong>Prénom :</strong> {{ employe.prenom }}</p>
+            <p><strong>Numéro CNPS :</strong> {{ employe.numeroCnps || 'N/A' }}</p>
+            <p><strong>NIU :</strong> {{ employe.niu || 'N/A' }}</p>
+            <p><strong>Téléphone :</strong> {{ employe.telephone || 'N/A' }}</p>
+            <p><strong>Email :</strong> {{ employe.email || 'N/A' }}</p>
+            <p><strong>Adresse :</strong> {{ employe.adresse || 'N/A' }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <p><strong>Date d'embauche :</strong> {{ employe.dateEmbauche | date: 'dd/MM/yyyy' }}</p>
+            <p><strong>Poste :</strong> {{ employe.poste }}</p>
+            <p><strong>Service :</strong> {{ employe.service }}</p>
+            <p><strong>Statut :</strong> {{ employe.classificationProfessionnelle }}</p>
+            <p><strong>Catégorie :</strong> {{ employe.categorie || 'N/A' }}</p>
+            <p><strong>Échelon :</strong> {{ employe.echelon || 'N/A' }}</p>
+            <p><strong>Type de Contrat :</strong> {{ employe.typeContratEnum|| 'N/A' }}</p>
+          </div>
+        </div>
+
+        <div class="mt-4 border-top pt-3 d-flex justify-content-end">
+          <button class="btn btn-warning me-2" (click)="editEmploye(employe.id)">
+            <i class="bi bi-pencil"></i> Modifier l'employé
+          </button>
+          <!-- <button class="btn btn-danger" (click)="deleteEmploye(employe.id)">
+            <i class="bi bi-trash"></i> Supprimer l'employé
+          </button> -->
+          
+        </div>
+      } @else {
+        <div class="alert alert-info text-center" role="alert">
+          Aucun employé trouvé pour cet ID.
+        </div>
+      }
+    </div>
+  </div>
+</div>

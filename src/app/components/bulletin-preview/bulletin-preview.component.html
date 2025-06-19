@@ -1,0 +1,267 @@
+ <!-- Message quand pas de données -->
+  <!-- <div *ngIf="!hasData()" class="no-data-message">
+    <div class="alert alert-info text-center">
+      <h4> Prévisualisation du Bulletin</h4>
+      <p>Remplissez le formulaire et cliquez sur "Calculer" pour voir la prévisualisation du bulletin de paie.</p>
+    </div>
+  </div> -->
+
+  <!-- Bulletin de paie *ngIf="hasData()" -->
+  <div >
+    <header class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-4">
+      <div class="header-left">
+        <h1 class="h3 text-uppercase">Bulletin de Paie</h1>
+       <div class="p-2 border rounded bg-light mb-2">
+                <h2 class="h6 text-secondary border-bottom pb-1 mb-2">Informations de l'Employé</h2>
+                <p class="mb-0">Nom: <span class="fw-bold">{{ employeData?.nom }}</span></p>
+                <p class="mb-0">Prénom: <span class="fw-bold">{{ employeData?.prenom }}</span></p>
+                <p class="mb-0">Poste: <span class="fw-bold">{{ employeData?.poste }}</span></p>
+                <p class="mb-0">Numéro CNPS: <span class="fw-bold">{{ employeData?.numeroCnps }}</span></p>
+                <p class="mb-0">NIU: <span class="fw-bold">{{ employeData?.niu }}</span></p>
+            </div>
+            <!-- <div class="p-2 border rounded bg-light mb-2">
+                <h2 class="h6 text-secondary border-bottom pb-1 mb-2">Période de la paie</h2>
+                <p class="mb-0">Du: <span class="fw-bold">[Date Début Période]</span></p>
+                <p class="mb-0">Au: <span class="fw-bold">[Date Fin Période]</span></p>
+                <p class="mb-0">Paiement le: <span class="fw-bold">[Date Paiement]</span></p>
+                <p class="mb-0">Paiement par: <span class="fw-bold">[Moyen Paiement]</span></p>
+            </div> -->
+      </div>
+    </header>
+
+    <main class="main-content mb-4">
+      <table class="table table-bordered table-sm payroll-table">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="text-center">Code</th>
+            <th scope="col" class="text-center">Désignation</th>
+            <th scope="col" class="text-center">Nombre</th>
+            <th scope="col" class="text-center">Base</th>
+            <th scope="col" class="text-center">Taux</th>
+            <th scope="col" class="text-center">Gain</th>
+            <th scope="col" class="text-center">Retenue</th>
+            <th scope="col" class="text-center">Charges patronales</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-center">100</td>
+            <td>Salaire de base</td>
+            <td class="text-center">{{ formatNumber(bulletinData?.heuresNormal) }}</td>
+            <td class="text-center">{{ formatNumber(bulletinData?.tauxHoraire) }}</td>
+            <td class="text-center">100%</td>
+            <td class="text-end">{{ formatNumber(bulletinData?.salaireBase) }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="text-center">107</td>
+            <td>Prime de transport</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.primeTransport) }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="text-center">115</td>
+            <td>Prime de ponctualité</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.primePonctualite) }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="text-center">117</td>
+            <td>Prime de technicité</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.primeTechnicite) }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="text-center">118</td>
+            <td>Prime d'ancienneté</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.primeAnciennete) }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="text-center">119</td>
+            <td>Prime de rendement</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.primeRendement) }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+
+          <tr class="fw-bold table-active">
+            <td colspan="5">Salaire Brut</td>
+            <td class="text-end">{{ formatNumber(bulletinData?.salaireBrut) }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+
+          <tr >
+            <td class="text-center" >200</td>
+            <td>Impôt sur le revenu des personnes physiques (IRPP)</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+            <td class="text-center">Barème</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.irpp) }}</td>
+            <td></td>
+          </tr>
+
+          <tr>
+            <td class="text-center">201</td>
+            <td>Centimes additionnels et communaux (CAC)</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.irpp) }}</td>
+            <td class="text-center" >10%</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.cac) }}</td>
+            <td></td>
+          </tr>
+
+
+           <tr>
+            <td class="text-center">202</td>
+            <td>Taxe Communale</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.salaireBase) }}</td>
+            <td class="text-center">Barème</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.taxeCommunale) }}</td>
+            <td ></td>
+          </tr>
+
+          <tr>
+            <td class="text-center">203</td>
+            <td>Redevance audio Visuelle</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+            <td class="text-center">Barème</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.redevanceAudioVisuelle) }}</td>
+            <td ></td>
+          </tr>
+
+          <tr>
+            <td class="text-center">204</td>
+            <td>Credit foncier salarial</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+            <td class="text-center">1%</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.creditFoncierSalarie) }}</td>
+            <td ></td>
+          </tr>
+
+          <tr>
+            <td class="text-center">205</td>
+            <td>Credit foncier patronales</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+            <td class="text-center">1.5%</td>
+            <td></td>
+            <td ></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.creditFoncierPatronal) }}</td>
+          </tr>
+
+          <tr>
+            <td class="text-center">206</td>
+            <td>Fond national de l'emploie</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+            <td class="text-center">1%</td>
+            <td></td>
+            <td ></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.fnePatronal) }}</td>
+          </tr>
+
+          <tr>
+            <td class="text-center">207</td>
+            <td>Pension vieillesse CNPS</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.baseCnps) }}</td>
+            <td class="text-center">4,20%</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.cnpsVieillesseSalarie) }}</td>
+            <td class="text-end">{{ formatNumber(bulletinData?.cnpsVieillesseEmployeur) }}</td>
+          </tr>
+
+          <tr>
+            <td class="text-center">208</td>
+            <td>Allocation familiale CNPS</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.baseCnps) }}</td>
+            <td class="text-center">3,70%</td>
+            <td></td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.cnpsAllocationsFamiliales) }}</td>
+          </tr>
+
+          <tr>
+            <td >209</td>
+            <td>Accident de travail CNPS</td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.baseCnps) }}</td>
+            <td class="text-center">2,50%</td>
+            <td></td>
+            <td></td>
+            <td class="text-end">{{ formatNumber(bulletinData?.cnpsAccidentsTravail) }}</td>
+          </tr>
+        </tbody>
+
+        <tfoot class="table-group-divider">
+          <tr class="fw-bold table-secondary">
+            <td colspan="5">TOTAUX</td>
+            <td class="text-end">{{ formatNumber(bulletinData?.salaireBrut) }}</td>
+            <td class="text-end">{{ formatNumber(bulletinData?.totalRetenues) }}</td>
+            <td class="text-end">{{ formatNumber(bulletinData?.totalChargesPatronales) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </main>
+
+    <footer class="bulletin-footer pt-3 mt-4 border-top">
+      <table class="table table-bordered table-sm text-center final-summary-table">
+        <thead class="table-primary">
+          <tr>
+            <th scope="col">Brut Imposable</th>
+            <th scope="col">Retenues sur salaire</th>
+            <th scope="col">Cotisations CNPS</th>
+            <th scope="col">Charges patronales</th>
+            <th scope="col">Salaire Brut</th>
+            <th scope="col">Coût réel salarié</th>
+            <th scope="col">Net à payer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fw-bold">{{ formatNumber(bulletinData?.salaireImposable) }}</td>
+            <td class="fw-bold">{{ formatNumber(bulletinData?.totalRetenues) }}</td>
+            <td class="fw-bold">{{ formatNumber(bulletinData?.cotisationCnps) }}</td>
+            <td class="fw-bold">{{ formatNumber(bulletinData?.totalChargesPatronales) }}</td>
+            <td class="fw-bold">{{ formatNumber(bulletinData?.salaireBrut) }}</td>
+            <td class="fw-bold">{{ formatNumber(bulletinData?.coutTotalEmployeur) }}</td>
+            <td class="fw-bold text-success">{{ formatNumber(bulletinData?.salaireNet) }}</td>
+          </tr>
+        </tbody>
+      </table>
+        <button  (click)="generatePdf()"> Genere PDF</button>
+
+    </footer>
+  </div>
+

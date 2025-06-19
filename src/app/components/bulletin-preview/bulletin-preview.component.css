@@ -1,0 +1,16 @@
+
+
+button{
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+  width: 100%;
+  background-color: #3674B5;
+}
+
+button:hover:not(:disabled) {
+  background-color: #0056b3;
+}

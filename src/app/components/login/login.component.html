@@ -1,0 +1,53 @@
+<div class="container mt-5">
+   <div class="row justify-content-center">
+    <div class="col-md-6" col-lg-4>
+      <div class="card shadow-sw p-4">
+          <h2 class="card-title text-center mb-4">Connexion</h2>
+
+          @if(errorMessage) {
+          <div  class="alert alert-danger mb-3" role="alert" >
+            {{errorMessage}}
+          </div>}
+
+          <form [formGroup]="loginForm" (ngSubmit) ="onSubmit()">
+            <div class="mb-3">
+              <label for="username" class="form-label">Nom d'utilisateur</label>
+              <input type="text" id="username" formControlName="username" class="form-control"
+              [class.is-invalid]="isFieldInvalid('username')">
+              @if(isFieldInvalid('username')){
+                <div class="invalid-feedback">
+                  {{getErrorMessage('username')}}
+                </div>}
+            </div>
+
+            <div class="mb-4">
+              <label for="password" class="form-label">
+                Mot de passe
+              </label>
+              <input type="password" id="password" formControlName="password" class="form-control"
+              [class.is-invalid]="isFieldInvalid('password')">
+              @if(isFieldInvalid('password')){
+                <div class="invalid-feedback">
+                  {{getErrorMessage('password')}}
+                </div>
+              }
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid || isLoading">
+              @if(isLoading){
+                <span class="spinner-border spinner-border-sm " role="status" aria-hidden="true"></span>
+              }
+              {{isLoading ? 'Connexion en cour...': 'Se connecter'}}
+            </button>
+         </form>
+            <div class="text-center mt-3">
+              <p>Pas encore de compte ? <a routerlink="/register"> Signaler ici </a></p>
+
+            </div>
+
+
+
+      </div>
+    </div>
+   </div>
+</div>

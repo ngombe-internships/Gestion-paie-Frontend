@@ -48,7 +48,7 @@ export class EmployeFormComponent implements OnInit {
   private initForm(): void {
     this.employeForm = this.fb.group({
 
-      
+
       matricule : ['', [Validators.required]],
       nom :['', [Validators.required]],
       prenom :['', [Validators.required]],
@@ -114,7 +114,7 @@ export class EmployeFormComponent implements OnInit {
         this.employeService.uptadeEmploye(this.employeId, employeData).subscribe ({
           next: () => {
             this.sucessMessage = 'Employe mis a jour avec succes!';
-            this.router.navigate([`/employes`]);
+            this.router.navigate([`/dashboard/employes`]);
           },
           error: (err) => {
             this.errorMessage = 'Erreur lors de la mise a jour de l\'employe.';
@@ -126,7 +126,7 @@ export class EmployeFormComponent implements OnInit {
           next: () => {
             this.sucessMessage = 'Employé créé avec succès!';
             this.employeForm.reset();
-            this.router.navigate(['/employes']);
+            this.router.navigate(['/dashboard/employes']);
           },
           error: (err) => {
             this.errorMessage = 'Erreur lors de la création de l\'employé.';
@@ -169,7 +169,7 @@ export class EmployeFormComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/employes']);
+    this.router.navigate(['/dashboard/employes']);
   }
 
 }

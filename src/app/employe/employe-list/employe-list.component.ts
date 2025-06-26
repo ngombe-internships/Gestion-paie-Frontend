@@ -71,7 +71,7 @@ export class EmployeListComponent implements OnInit {
 
   viewEmployeDetails (id: number | undefined) : void {
     if(id){
-      this.router.navigate (['/employes',id])
+      this.router.navigate (['/dashboard/employes',id])
     }
   }
 
@@ -79,7 +79,7 @@ export class EmployeListComponent implements OnInit {
     if (id) {
       console.log('Navigation vers édition employé ID:', id);
       console.log('Route utilisée:', '/employes/edit/' + id);
-      this.router.navigate(['/employes/edit', id])
+      this.router.navigate(['/dashboard/employes/edit', id])
         .then(success => {
           console.log('Navigation réussie:', success);
         })
@@ -92,7 +92,7 @@ export class EmployeListComponent implements OnInit {
   }
 
   goToCreateEmploye(): void {
-    this.router.navigate([`/employes/create`]);
+    this.router.navigate([`/dashboard/employes/create`]);
   }
 
 
@@ -114,7 +114,7 @@ export class EmployeListComponent implements OnInit {
   generateBulletin(employeId: number | undefined): void {
     if (employeId) {
 
-      this.router.navigate(['/bulletins'], { queryParams: { employeId: employeId } });
+      this.router.navigate(['/dashboard/bulletins'], { queryParams: { employeId: employeId } });
     } else {
       console.error('Employee ID is undefined, cannot generate bulletin.');
     }

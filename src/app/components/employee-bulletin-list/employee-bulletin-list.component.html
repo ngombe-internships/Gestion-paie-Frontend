@@ -1,0 +1,57 @@
+<div class="container-fluid py-4">
+  <div class="text-center mb-5">
+    <h2 class="display-4 fw-bold text-primary mb-0">
+      <i class="bi bi-file-earmark-text-fill me-3"></i>
+      Mes Bulletins de Paie
+    </h2>
+    <div class="mt-2">
+      <span class="badge bg-light text-dark fs-6">Historique des envois</span>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    } @else if (error) {
+    } @else if (bulletins.length === 0) {
+    <div class="alert alert-warning text-center">
+      <strong>Vous n'avez aucun bulletin de paie envoyé.</strong>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-hover table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Période de Paie</th>
+            <th>Date de Paiement</th>
+            <th>Salaire Net</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (bulletin of bulletins; track bulletin.id) {
+            <tr>
+              <td>{{ bulletin.id }}</td>
+              <td>{{ bulletin.periodePaie }}</td>
+              <td>{{ bulletin.datePaiement }}</td>
+              <td>{{ bulletin.salaireNet | number:'1.2-2' }} FCFA</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-success': bulletin.statusBulletin=== 'ENVOYÉ',
+                  'bg-secondary': bulletin.statusBulletin === 'ARCHIVÉ'
+                }">
+                  {{ bulletin.statusBulletin }}
+                </span>
+              </td>
+              <td>
+                <button (click)="downloadPdf(bulletin.id!)" class="btn btn-success btn-sm" title="Télécharger le PDF">
+                  <i class="bi bi-file-earmark-pdf"></i> PDF
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

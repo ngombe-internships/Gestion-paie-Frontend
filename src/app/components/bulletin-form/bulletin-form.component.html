@@ -2,6 +2,7 @@
   <!-- Prévisualisation à gauche -->
   <div class="preview-container">
     <app-bulletin-preview [bulletinData]="bulletinCalcule" [employeData]="selectedEmploye"></app-bulletin-preview>
+
   </div>
 
   <!-- Formulaire à droite -->
@@ -85,7 +86,7 @@
         }
       </div>
 
-       <div class="form-field">
+       <!-- <div class="form-field">
         <label for="jourConge">Nombre de Jours Conge</label>
         <input id="jourConge" name="jourConge" type="number" formControlName="jourConge">
         @if (isFieldValid('jourConge')) {
@@ -96,7 +97,7 @@
             <div class="error">Ce champ doit être supérieur à 0</div>
           }
         }
-      </div>
+      </div> -->
 
       <div class="form-field">
         <label for="primeTransport">Prime Transport</label>
@@ -190,13 +191,264 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn-calculate" [disabled]="formGroup.invalid">
-           Calculer le Bulletin
+
+          <button type="submit" class="btn-calculate" [disabled]="formGroup.invalid">
+          {{ isBulletinCalculated ? 'Sauvegarder le Bulletin' : 'Calculer le Bulletin' }}
         </button>
         <button type="button" class="btn-reset" (click)="resetForm()">
-           Réinitialiser
+          Réinitialiser
         </button>
       </div>
     </form>
   </div>
 </div>
+
+<!--
+<div class="container-flex">
+
+    <div class="preview-container">
+        <app-bulletin-preview [bulletinData]="bulletinCalcule" [employeData]="selectedEmploye"></app-bulletin-preview>
+    </div>
+
+     Formulaire à droite
+    <div class="form-container">
+        <div class="form-header">
+            <h3>Calculateur de Bulletin de Paie</h3>
+        </div>
+
+        <form [formGroup]="formGroup" (submit)="submit($event)">
+            <div class="form-field">
+                <label for="tauxHoraire">Taux Horaire *</label>
+                <div class="input-group">
+                    <input id="tauxHoraire" name="tauxHoraire" type="number" formControlName="tauxHoraire" placeholder="0.00" step="0.01">
+                    <span class="input-suffix">Fcfa/h</span>
+                </div>
+                @if (isFieldValid('tauxHoraire')) {
+                @if (formGroup.get('tauxHoraire')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('tauxHoraire')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="heuresNormal">Heures Normales *</label>
+                <div class="input-group">
+                    <input id="heuresNormal" name="heuresNormal" type="number" formControlName="heuresNormal" placeholder="0">
+                    <span class="input-suffix">h</span>
+                </div>
+                @if (isFieldValid('heuresNormal')) {
+                @if (formGroup.get('heuresNormal')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('heuresNormal')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="heuresSup1">Heures Sup 1</label>
+                <div class="input-group">
+                    <input id="heuresSup1" name="heuresSup1" type="number" formControlName="heuresSup1" placeholder="0">
+                    <span class="input-suffix">h</span>
+                </div>
+                @if (isFieldValid('heuresSup1')) {
+                @if (formGroup.get('heuresSup1')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('heuresSup1')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="heuresSup2">Heures Sup 2</label>
+                <div class="input-group">
+                    <input id="heuresSup2" name="heuresSup2" type="number" formControlName="heuresSup2" placeholder="0">
+                    <span class="input-suffix">h</span>
+                </div>
+                @if (isFieldValid('heuresSup2')) {
+                @if (formGroup.get('heuresSup2')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('heuresSup2')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="heuresFerie">Heures Férié</label>
+                <div class="input-group">
+                    <input id="heuresFerie" name="heuresFerie" type="number" formControlName="heuresFerie" placeholder="0">
+                    <span class="input-suffix">h</span>
+                </div>
+                @if (isFieldValid('heuresFerie')) {
+                @if (formGroup.get('heuresFerie')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('heuresFerie')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="heuresNuit">Heures Nuit</label>
+                <div class="input-group">
+                    <input id="heuresNuit" name="heuresNuit" type="number" formControlName="heuresNuit" placeholder="0">
+                    <span class="input-suffix">h</span>
+                </div>
+                @if (isFieldValid('heuresNuit')) {
+                @if (formGroup.get('heuresNuit')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('heuresNuit')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="jourConge">Nombre de Jours Congé</label>
+                <div class="input-group">
+                    <input id="jourConge" name="jourConge" type="number" formControlName="jourConge" placeholder="0">
+                    <span class="input-suffix">jours</span>
+                </div>
+                @if (isFieldValid('jourConge')) {
+                @if (formGroup.get('jourConge')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('jourConge')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="primeTransport">Prime Transport</label>
+                <div class="input-group">
+                    <input id="primeTransport" name="primeTransport" type="number" formControlName="primeTransport" placeholder="0.00" step="0.01">
+                    <span class="input-suffix">Fcfa</span>
+                </div>
+                @if (isFieldValid('primeTransport')) {
+                @if (formGroup.get('primeTransport')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('primeTransport')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="primePonctualite">Prime Ponctualité</label>
+                <div class="input-group">
+                    <input id="primePonctualite" name="primePonctualite" type="number" formControlName="primePonctualite" placeholder="0.00" step="0.01">
+                    <span class="input-suffix">Fcfa</span>
+                </div>
+                @if (isFieldValid('primePonctualite')) {
+                @if (formGroup.get('primePonctualite')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('primePonctualite')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="primeTechnicite">Prime Technicité</label>
+                <div class="input-group">
+                    <input id="primeTechnicite" name="primeTechnicite" type="number" formControlName="primeTechnicite" placeholder="0.00" step="0.01">
+                    <span class="input-suffix">Fcfa</span>
+                </div>
+                @if (isFieldValid('primeTechnicite')) {
+                @if (formGroup.get('primeTechnicite')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('primeTechnicite')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="primeAnciennete">Prime Ancienneté</label>
+                <div class="input-group">
+                    <input id="primeAnciennete" name="primeAnciennete" type="number" formControlName="primeAnciennete" placeholder="0.00" step="0.01">
+                    <span class="input-suffix">Fcfa</span>
+                </div>
+                @if (isFieldValid('primeAnciennete')) {
+                @if (formGroup.get('primeAnciennete')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('primeAnciennete')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="primeRendement">Prime Rendement</label>
+                <div class="input-group">
+                    <input id="primeRendement" name="primeRendement" type="number" formControlName="primeRendement" placeholder="0.00" step="0.01">
+                    <span class="input-suffix">Fcfa</span>
+                </div>
+                @if (isFieldValid('primeRendement')) {
+                @if (formGroup.get('primeRendement')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('primeRendement')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="autrePrimes">Autres Primes</label>
+                <div class="input-group">
+                    <input id="autrePrimes" name="autrePrimes" type="number" formControlName="autrePrimes" placeholder="0.00" step="0.01">
+                    <span class="input-suffix">Fcfa</span>
+                </div>
+                @if (isFieldValid('autrePrimes')) {
+                @if (formGroup.get('autrePrimes')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('autrePrimes')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-field">
+                <label for="avantageNature">Avantages en Nature</label>
+                <div class="input-group">
+                    <input id="avantageNature" name="avantageNature" type="number" formControlName="avantageNature" placeholder="0.00" step="0.01">
+                    <span class="input-suffix">Fcfa</span>
+                </div>
+                @if (isFieldValid('avantageNature')) {
+                @if (formGroup.get('avantageNature')?.hasError('required')) {
+                <div class="error">Ce champ est requis</div>
+                }
+                @if(formGroup.get('avantageNature')?.hasError('min')) {
+                <div class="error">Ce champ doit être supérieur à 0</div>
+                }
+                }
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-calculate" [disabled]="formGroup.invalid">
+                    Calculer le Bulletin
+                </button>
+                <button type="button" class="btn-reset" (click)="resetForm()">
+                    Réinitialiser
+                </button>
+            </div>
+        </form>
+    </div>
+    -->

@@ -1,0 +1,58 @@
+ .table-hover tbody tr:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+    transform: translateX(5px);
+    transition: all 0.2s ease;
+  }
+
+  .btn-group .btn {
+    margin: 0 2px;
+    border-radius: 6px !important;
+  }
+
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  .input-group-text {
+    border-radius: 8px 0 0 8px;
+  }
+
+  .badge {
+    font-size: 0.75em;
+    padding: 0.35em 0.65em;
+  }
+
+
+
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+  font-size: 0.75em;
+  min-width: 80px; /* Assure une largeur minimale pour tous les badges */
+  text-align: center;
+}
+
+.status-généré { background-color: #6c757d; } /* Gris */
+.status-validé { background-color: #007bff; } /* Bleu */
+.status-envoyé { background-color: #28a745; } /* Vert */
+.status-archivé { background-color: #17a2b8; } /* Cyan */
+.status-annulé { background-color: #dc3545; } /* Rouge */
+
+/* Styles supplémentaires pour les boutons si vous utilisez Bootstrap */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+.me-2 {
+    margin-right: 0.5rem !important;
+}

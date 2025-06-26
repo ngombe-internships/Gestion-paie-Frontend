@@ -1,6 +1,8 @@
+import { Entreprise } from "./entreprise";
 
 export interface BulletinPaie {
   id? : number,
+  entreprise?: {id?: number},
   salaireBase?: number,
   tauxHoraire:  number,
   heuresNormal: number,
@@ -22,4 +24,16 @@ export interface BulletinPaie {
   irpp?: number,
   jourConge?:number,
   dateEmbauche?: string;
+
+  periodePaie?: string;
+  dateCreationBulletin?: string; // Utilisez string pour la compatibilité avec les dates ISO 8601
+  statusBulletin?: 'GÉNÉRÉ' | 'VALIDÉ' | 'ENVOYÉ' | 'ARCHIVÉ' | 'ANNULÉ';
+  datePaiement?: string;
+
+  employe?: {
+    id?: number;
+    nom?: string;
+    prenom?: string;
+    matricule?: string;
+  };
 }

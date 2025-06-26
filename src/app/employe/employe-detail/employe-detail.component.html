@@ -1,60 +1,192 @@
 <div class="container mt-4">
-  <div class="card shadow-sm">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-      <h2 class="card-title mb-0">Détails de l'Employé</h2>
-      <button class="btn btn-light btn-sm" (click)="goBackToList()">
-        <i class="bi bi-arrow-left"></i> Retour à la liste
-      </button>
+  <div class="card shadow-lg border-0">
+    <div class="card-header bg-gradient-primary text-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-person-badge-fill me-2 fs-4"></i>
+          <h2 class="card-title mb-0 fw-bold">Détails de l'Employé</h2>
+        </div>
+        <button class="btn btn-outline-light btn-sm px-3" (click)="goBackToList()">
+          <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+        </button>
+      </div>
     </div>
-    <div class="card-body">
 
+    <div class="card-body p-4">
       @if (isLoading) {
-        <div class="alert alert-info text-center" role="alert">
-          <div class="spinner-border text-primary" role="status">
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
             <span class="visually-hidden">Chargement...</span>
           </div>
-          Chargement des détails de l'employé...
+          <p class="text-muted fs-5">Chargement des informations...</p>
         </div>
       } @else if (errorMessage) {
-        <div class="alert alert-danger" role="alert">
-          <strong>Erreur :</strong> {{ errorMessage }}
-          <p class="mt-2">Veuillez réessayer plus tard ou contacter l'administrateur.</p>
+        <div class="alert alert-danger border-0 shadow-sm" role="alert">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+            <div>
+              <strong>Erreur de chargement</strong>
+              <p class="mb-0 mt-1">{{ errorMessage }}</p>
+              <small class="text-muted">Veuillez réessayer plus tard ou contacter l'administrateur.</small>
+            </div>
+          </div>
         </div>
       } @else if (employe) {
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <p><strong>Matricule :</strong> {{ employe.matricule }}</p>
-            <p><strong>Nom :</strong> {{ employe.nom }}</p>
-            <p><strong>Prénom :</strong> {{ employe.prenom }}</p>
-            <p><strong>Numéro CNPS :</strong> {{ employe.numeroCnps || 'N/A' }}</p>
-            <p><strong>NIU :</strong> {{ employe.niu || 'N/A' }}</p>
-            <p><strong>Téléphone :</strong> {{ employe.telephone || 'N/A' }}</p>
-            <p><strong>Email :</strong> {{ employe.email || 'N/A' }}</p>
-            <p><strong>Adresse :</strong> {{ employe.adresse || 'N/A' }}</p>
+        <!-- Informations personnelles -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-person-fill text-primary me-2 fs-5"></i>
+            <h4 class="mb-0 text-primary fw-semibold">Informations Personnelles</h4>
           </div>
-          <div class="col-md-6 mb-3">
-            <p><strong>Date d'embauche :</strong> {{ employe.dateEmbauche | date: 'dd/MM/yyyy' }}</p>
-            <p><strong>Poste :</strong> {{ employe.poste }}</p>
-            <p><strong>Service :</strong> {{ employe.service }}</p>
-            <p><strong>Statut :</strong> {{ employe.classificationProfessionnelle }}</p>
-            <p><strong>Catégorie :</strong> {{ employe.categorie || 'N/A' }}</p>
-            <p><strong>Échelon :</strong> {{ employe.echelon || 'N/A' }}</p>
-            <p><strong>Type de Contrat :</strong> {{ employe.typeContratEnum|| 'N/A' }}</p>
+          <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">MATRICULE</label>
+                <div class="fw-semibold">{{ employe.matricule }}</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">NOM COMPLET</label>
+                <div class="fw-semibold">{{ employe.nom }} {{ employe.prenom }}</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">TÉLÉPHONE</label>
+                <div class="fw-semibold">
+                  @if (employe.telephone) {
+                    <a href="tel:{{ employe.telephone }}" class="text-decoration-none">
+                      <i class="bi bi-telephone me-1"></i>{{ employe.telephone }}
+                    </a>
+                  } @else {
+                    <span class="text-muted">Non renseigné</span>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">EMAIL</label>
+                <div class="fw-semibold">
+                  @if (employe.email) {
+                    <a href="mailto:{{ employe.email }}" class="text-decoration-none">
+                      <i class="bi bi-envelope me-1"></i>{{ employe.email }}
+                    </a>
+                  } @else {
+                    <span class="text-muted">Non renseigné</span>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-8 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">ADRESSE</label>
+                <div class="fw-semibold">{{ employe.adresse || 'Non renseignée' }}</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="mt-4 border-top pt-3 d-flex justify-content-end">
-          <button class="btn btn-warning me-2" (click)="editEmploye(employe.id)">
-            <i class="bi bi-pencil"></i> Modifier l'employé
-          </button>
-          <!-- <button class="btn btn-danger" (click)="deleteEmploye(employe.id)">
-            <i class="bi bi-trash"></i> Supprimer l'employé
-          </button> -->
-          
+        <!-- Informations administratives -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-building text-primary me-2 fs-5"></i>
+            <h4 class="mb-0 text-primary fw-semibold">Informations Administratives</h4>
+          </div>
+          <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">N° CNPS</label>
+                <div class="fw-semibold">{{ employe.numeroCnps || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">NIU</label>
+                <div class="fw-semibold">{{ employe.niu || 'Non renseigné' }}</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">DATE D'EMBAUCHE</label>
+                <div class="fw-semibold">
+                  <i class="bi bi-calendar3 me-1 text-primary"></i>
+                  {{ employe.dateEmbauche | date: 'dd/MM/yyyy' }}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- Informations professionnelles -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-briefcase-fill text-primary me-2 fs-5"></i>
+            <h4 class="mb-0 text-primary fw-semibold">Informations Professionnelles</h4>
+          </div>
+          <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">POSTE</label>
+                <div class="fw-semibold">{{ employe.poste }}</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">SERVICE</label>
+                <div class="fw-semibold">{{ employe.service }}</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">STATUT</label>
+                <div class="fw-semibold">{{ employe.classificationProfessionnelle }}</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">CATÉGORIE</label>
+                <div class="fw-semibold">{{ employe.categorie || 'Non définie' }}</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">ÉCHELON</label>
+                <div class="fw-semibold">{{ employe.echelon || 'Non défini' }}</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">TYPE DE CONTRAT</label>
+                <div class="fw-semibold">{{ employe.typeContratEnum || 'Non spécifié' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="border-top pt-4">
+          <div class="d-flex justify-content-end gap-2">
+            @if(currentUserRole !== 'EMPLOYE'){
+              <button class="btn btn-outline-primary px-4" (click)="editEmploye(employe.id)">
+              <i class="bi bi-pencil-square me-2"></i>
+              Modifier les informations
+              </button>
+            }
+
+            <!-- <button class="btn btn-outline-danger px-4" (click)="deleteEmploye(employe.id)">
+              <i class="bi bi-trash3 me-2"></i>
+              Supprimer l'employé
+            </button> -->
+          </div>
+        </div>
+
       } @else {
-        <div class="alert alert-info text-center" role="alert">
-          Aucun employé trouvé pour cet ID.
+        <div class="text-center py-5">
+          <i class="bi bi-person-x text-muted mb-3" style="font-size: 4rem;"></i>
+          <h5 class="text-muted">Employé introuvable</h5>
+          <p class="text-muted mb-0">Aucun employé ne correspond à cet identifiant.</p>
         </div>
       }
     </div>

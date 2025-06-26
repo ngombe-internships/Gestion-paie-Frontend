@@ -18,5 +18,5 @@ export interface Employe {
   echelon : EchelonEnum;
   typeContratEnum : TypeContratEnum;
   dateNaissance : string;
-  civilite : CiviliteEnum
+  sexe : CiviliteEnum
 }

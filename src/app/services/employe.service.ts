@@ -3,12 +3,13 @@ import { HttpClient, HttpParams, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { EmployeCreate } from '../model/employeCreate';
+import { environment } from '../../environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmployeService {
-  private readonly baseUrl = 'http://localhost:8081/api/employes';
+  private readonly baseUrl = environment.apiUrl + '/api/employes';
   private readonly http = inject(HttpClient);
 
   constructor() { }
@@ -24,6 +25,11 @@ export class EmployeService {
     return this.http.get<ApiResponse<Employe>> (`${this.baseUrl}/${id}`).pipe(
       map(response => response.data)
     );
+  }
+  getMyEmployeProfile(): Observable<Employe> {
+    return this.http.get<ApiResponse<Employe>>(`${this.baseUrl}/my-profile`).pipe(
+      map (response => response.data)
+    )
   }
 
   createEmploye (employe: EmployeCreate): Observable <Employe> {

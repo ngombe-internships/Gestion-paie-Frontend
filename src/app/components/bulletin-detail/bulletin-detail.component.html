@@ -1,1 +1,51 @@
-<p>bulletin-detail works!</p>
+<button  (click)="goBackToList()" class="btn btn-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Retour à la liste
+</button>
+<div class="container mx-auto p-4">
+
+
+  <h2 class="text-2xl font-bold mb-4 text-center">Prévisualisation du Bulletin de Paie
+
+   <ng-container *ngIf="bulletinId !== null"> (ID: {{ bulletinId }})</ng-container>
+
+
+
+
+
+  </h2>
+   @if(bulletinId !== null){
+    <div class="text-center mb-6">
+      <button
+       (click)="downloadPdf()"
+       [disabled]="loading"
+      class="btn btn-success text-white shadow mb-2" >
+         <i class="bi bi-file-earmark-pdf"></i> Telecharger PDF
+
+      </button>
+
+    </div>
+   }
+
+
+
+
+  <!--
+   <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <strong class="font-bold">Erreur !</strong>
+    <span class="block sm:inline"> {{ errorMessage }}</span>
+  </div> -->
+
+  <div *ngIf="loading" class="text-center text-gray-600 text-lg">
+    Chargement du bulletin...
+  </div>
+
+  <div *ngIf="bulletinHtml" class="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
+    <!-- Utilisation de innerHTML pour afficher le HTML du backend -->
+    <div [innerHTML]="bulletinHtml"></div>
+  </div>
+
+  <div *ngIf="!bulletinHtml && !loading && !errorMessage && bulletinId === null" class="text-center text-gray-500 text-lg mt-8">
+    Aucun ID de bulletin spécifié. Naviguez depuis la liste pour prévisualiser un bulletin.
+  </div>
+
+  </div>

@@ -1,1 +1,111 @@
-<p>bulletin-list works!</p>
+<div class="container-fluid py-4">
+  <div class="text-center mb-5">
+    <h2 class="display-4 fw-bold text-primary mb-0">
+      <i class="bi bi-file-earmark-text-fill me-3"></i>
+      Vos Bulletins de Paie (Employeur)
+    </h2>
+    <div class="mt-2">
+      <span class="badge bg-light text-dark fs-6">Gestion des bulletins</span>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="alert alert-info text-center shadow-sm border-0" style="border-radius: 12px;">
+      <div class="spinner-border spinner-border-sm me-2 text-info" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <strong>Chargement des bulletins...</strong>
+    </div>
+  } @else if (error) {
+    <div class="alert alert-danger text-center shadow-sm border-0" style="border-radius: 12px;">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>{{ error }}</strong>
+    </div>
+  } @else if (bulletins.length === 0) {
+    <div class="alert alert-warning text-center shadow-sm border-0" style="border-radius: 12px;">
+      <i class="bi bi-inbox me-2"></i>
+      <strong>Aucun bulletin de paie généré pour votre entreprise.</strong>
+    </div>
+  } @else {
+    <div class="card shadow-lg border-0" style="border-radius: 15px;">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead style="background: linear-gradient(135deg, #1f2937, #374151); color: white;">
+            <tr>
+              <th class="py-3 px-4 fw-semibold">
+                <i class="bi bi-hash me-2"></i>ID Bulletin
+              </th>
+              <th class="py-3 px-4 fw-semibold">
+                <i class="bi bi-person me-2"></i>Employé
+              </th>
+              <th class="py-3 px-4 fw-semibold text-center">
+                <i class="bi bi-calendar-range me-2"></i>Période
+              </th>
+              <th class="py-3 px-4 fw-semibold text-center">
+                <i class="bi bi-calendar-plus me-2"></i>Date Création 
+              </th>
+              <th class="py-3 px-4 fw-semibold text-center">
+                <i class="bi bi-cash-stack me-2"></i>Paiement
+              </th>
+              <th class="py-3 px-4 fw-semibold text-center">
+                <i class="bi bi-info-circle me-2"></i>Statut
+              </th>
+              <th class="py-3 px-4 fw-semibold text-center" style="width: 35%;">
+                <i class="bi bi-gear me-2"></i>Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bulletin of bulletins; track bulletin.id) {
+              <tr class="border-0" style="border-bottom: 1px solid #e5e7eb !important;">
+                <td class="py-3 px-4 fw-semibold text-primary">{{ bulletin.id }}</td>
+                <td class="py-3 px-4">
+                  {{ bulletin.employe?.nom }} {{ bulletin.employe?.prenom }} ({{ bulletin.employe?.matricule }})
+                </td>
+                <td class="py-3 px-4 text-center">{{ bulletin.periodePaie || 'N/A' }}</td>
+                <td class="py-3 px-4 text-center">
+                  {{ (bulletin.dateCreationBulletin && bulletin.dateCreationBulletin.length > 0) ? (bulletin.dateCreationBulletin | date:'shortDate') : 'N/A' }}
+                </td>
+                <td class="py-3 px-4 text-center">
+                  {{ (bulletin.datePaiement && bulletin.datePaiement.length > 0) ? (bulletin.datePaiement | date:'shortDate') : 'N/A' }}
+                </td> <td class="py-3 px-4 text-center">
+                  <span class="status-badge status-{{ bulletin.statusBulletin | lowercase }}">
+                    {{ bulletin.statusBulletin }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <button (click)="viewBulletin(bulletin.id!)" class="btn btn-outline-info btn-sm me-2" title="Voir le bulletin">
+                    <i class="bi bi-eye"></i> Voir
+                  </button>
+
+                  <button *ngIf="canValidate(bulletin)" (click)="validerBulletin(bulletin.id!)" class="btn btn-primary btn-sm me-2" title="Valider le bulletin">
+                    <i class="bi bi-check-circle"></i> Valider
+                  </button>
+
+                  <button *ngIf="canSend(bulletin)" (click)="envoyerBulletin(bulletin.id!)" class="btn btn-info btn-sm me-2" title="Envoyer le bulletin à l'employé">
+                    <i class="bi bi-send"></i> Envoyer
+                  </button>
+
+                  <button *ngIf="canArchive(bulletin)" (click)="archiverBulletin(bulletin.id!)" class="btn btn-secondary btn-sm me-2" title="Archiver le bulletin">
+                    <i class="bi bi-archive"></i> Archiver
+                  </button>
+
+                  <button *ngIf="canCancel(bulletin)" (click)="annulerBulletin(bulletin.id!)" class="btn btn-warning btn-sm me-2" title="Annuler le bulletin">
+                    <i class="bi bi-x-circle"></i> Annuler
+                  </button>
+
+                  <button *ngIf="canDownload(bulletin)" (click)="downloadPdf(bulletin.id!)" class="btn btn-success btn-sm" title="Télécharger le PDF">
+                    <i class="bi bi-file-earmark-pdf"></i> PDF
+                  </button>
+
+                  </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
+
+

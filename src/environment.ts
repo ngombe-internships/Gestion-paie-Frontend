@@ -6,5 +6,5 @@
 // src/environments/environment.prod.ts
 export const environment = {
   production: true,
-  apiUrl: 'https://votre-backend-render.onrender.com/api' // <-- URL de votre Back-end sur Render
+  apiUrl: 'https://gestion-de-paie-backend.onrender.com' // <-- URL de votre Back-end sur Render
 };

@@ -5,10 +5,11 @@ import { Router } from '@angular/router';
 import { ApiResponse } from '../../model/ApiResponse';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-bulletin-list',
-  imports: [CommonModule],
+  imports: [CommonModule,ReactiveFormsModule,FormsModule],
   templateUrl: './bulletin-list.component.html',
   styleUrl: './bulletin-list.component.css'
 })
@@ -16,6 +17,13 @@ export class BulletinListComponent implements OnInit {
   bulletins: BulletinPaieEmployeurDto[] = [];
   isLoading: boolean = true;
   error: string | null = null;
+  searchText: string = '';
+
+  //variable de pagination
+  currentPage: number = 0;
+  pageSize: number = 10;
+  totalPages: number = 10;
+  pages: number[] = [];
 
   private readonly bulletinService = inject(BulletinService);
   private readonly authService = inject(AuthService);
@@ -33,25 +41,26 @@ export class BulletinListComponent implements OnInit {
   }
   }
 
-    fetchEmployeurBulletins(): void {
+    fetchEmployeurBulletins(searchTem: string = ''): void {
     this.isLoading = true;
      // S'assurer que le service retourne bien une ApiResponse<BulletinPaieEmployeurDto[]>
-     this.bulletinService.getBulletinsForEmployeur().subscribe({
-      next: (data ) => { // Utilisez response.data
-      // IMPORTANT: Assurez-vous d'assigner response.data et non la response entière si votre service renvoie ApiResponse
-      this.bulletins = data; // Assignation directe des données du backend
-      console.log('Bulletins reçus:', this.bulletins);
-      this.isLoading = false;
-        console.log('Bulletins pour Employeur:', this.bulletins);
-       },
-        error: (err) => {
-       this.error = 'Erreur lors du chargement des bulletins: ' + (err.error?.message || err.message || 'Une erreur inconnue est survenue.');
-       this.isLoading = false;
-       console.error('Erreur de service:', err);
-       }
+
+     this.bulletinService.getBulletinsForEmployeur(this.searchText).subscribe({
+      next:(response) => {
+         this.bulletins = response.data;
+         this.isLoading= false;
+      },
+      error: (err)=>{
+         console.error('Erreur lors du chargement des bulletins:', err);
+        this.error = 'Une erreur est survenue lors du chargement des bulletins. Veuillez réessayer.';
+        this.isLoading = false;
+      }
      });
    }
 
+   searchBulletins(): void {
+    this.fetchEmployeurBulletins(this.searchText);
+  }
   // Méthodes d'action existantes (viewBulletin, validerBulletin, etc.)
   viewBulletin(id: number): void {
     this.router.navigate(['/dashboard/bulletins', id]);
@@ -181,6 +190,24 @@ export class BulletinListComponent implements OnInit {
           console.error(err);
         }
       });
+    }
+  }
+
+  goToPage(page: number): void {
+    if(page >= 0 && page < this.totalPages && page !== this.currentPage) {
+      this.currentPage = page;
+    }
+  }
+
+  previousPage(): void {
+    if(this.currentPage > 0){
+      this.goToPage(this.currentPage -1)
+    }
+  }
+
+  nextPage(): void {
+    if(this.currentPage < this.totalPages - 1) {
+      this.goToPage(this.currentPage + 1);
     }
   }
 

@@ -9,6 +9,39 @@
     </div>
   </div>
 
+  <!-- Section de recherche améliorée -->
+  <div class="card shadow-lg border-0 mb-4" style="border-radius: 15px;">
+    <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 15px 15px 0 0;">
+      <h3 class="card-title mb-0 fw-semibold">
+        <i class="bi bi-search me-2"></i>
+        Rechercher un employé
+      </h3>
+    </div>
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label for="searchText" class="form-label fw-semibold text-secondary">
+            <i class="bi bi-funnel-fill me-2 text-primary"></i>
+            Recherche globale (Nom, Prénom ) :
+          </label>
+          <div class="input-group input-group-lg">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text"
+                   id="searchText"
+                   class="form-control border-start-0 shadow-sm"
+                   [(ngModel)]="searchText"
+                   (input)="searchBulletins()"
+                   placeholder="Entrez le nom, prénom..."
+                   style="border-radius: 0 8px 8px 0;">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   @if (isLoading) {
     <div class="alert alert-info text-center shadow-sm border-0" style="border-radius: 12px;">
       <div class="spinner-border spinner-border-sm me-2 text-info" role="status">
@@ -42,7 +75,7 @@
                 <i class="bi bi-calendar-range me-2"></i>Période
               </th>
               <th class="py-3 px-4 fw-semibold text-center">
-                <i class="bi bi-calendar-plus me-2"></i>Date Création 
+                <i class="bi bi-calendar-plus me-2"></i>Date Création
               </th>
               <th class="py-3 px-4 fw-semibold text-center">
                 <i class="bi bi-cash-stack me-2"></i>Paiement
@@ -73,36 +106,52 @@
                     {{ bulletin.statusBulletin }}
                   </span>
                 </td>
-                <td class="py-3 px-4 text-center">
-                  <button (click)="viewBulletin(bulletin.id!)" class="btn btn-outline-info btn-sm me-2" title="Voir le bulletin">
-                    <i class="bi bi-eye"></i> Voir
-                  </button>
+            <td class="py-3 px-4 text-muted">
+  <button (click)="viewBulletin(bulletin.id!)" class="btn btn-outline-info btn-sm-lg me-1" title="Voir le bulletin">
+    <i class="bi bi-eye"></i> Voir
+  </button>
 
-                  <button *ngIf="canValidate(bulletin)" (click)="validerBulletin(bulletin.id!)" class="btn btn-primary btn-sm me-2" title="Valider le bulletin">
-                    <i class="bi bi-check-circle"></i> Valider
-                  </button>
+  <button *ngIf="canValidate(bulletin)" (click)="validerBulletin(bulletin.id!)" class="btn btn-primary btn-sm-lg me-1" title="Valider le bulletin">
+    <i class="bi bi-check-circle"></i> Valider
+  </button>
 
-                  <button *ngIf="canSend(bulletin)" (click)="envoyerBulletin(bulletin.id!)" class="btn btn-info btn-sm me-2" title="Envoyer le bulletin à l'employé">
-                    <i class="bi bi-send"></i> Envoyer
-                  </button>
+  <button *ngIf="canCancel(bulletin)" (click)="annulerBulletin(bulletin.id!)" class="btn btn-warning btn-sm-lg me-1" title="Annuler le bulletin">
+    <i class="bi bi-x-circle"></i> Annuler
+  </button>
 
-                  <button *ngIf="canArchive(bulletin)" (click)="archiverBulletin(bulletin.id!)" class="btn btn-secondary btn-sm me-2" title="Archiver le bulletin">
-                    <i class="bi bi-archive"></i> Archiver
-                  </button>
+  <button *ngIf="canSend(bulletin)" (click)="envoyerBulletin(bulletin.id!)" class="btn btn-info btn-sm-lg me-1" title="Envoyer le bulletin à l'employé">
+    <i class="bi bi-send"></i> Envoyer
+  </button>
 
-                  <button *ngIf="canCancel(bulletin)" (click)="annulerBulletin(bulletin.id!)" class="btn btn-warning btn-sm me-2" title="Annuler le bulletin">
-                    <i class="bi bi-x-circle"></i> Annuler
-                  </button>
+  <button *ngIf="canArchive(bulletin)" (click)="archiverBulletin(bulletin.id!)" class="btn btn-secondary btn-sm-lg me-1" title="Archiver le bulletin">
+    <i class="bi bi-archive"></i> Archiver
+  </button>
 
-                  <button *ngIf="canDownload(bulletin)" (click)="downloadPdf(bulletin.id!)" class="btn btn-success btn-sm" title="Télécharger le PDF">
-                    <i class="bi bi-file-earmark-pdf"></i> PDF
-                  </button>
-
-                  </td>
+  <button *ngIf="canDownload(bulletin)" (click)="downloadPdf(bulletin.id!)" class="btn btn-success btn-sm-lg me-1" title="Télécharger le PDF">
+    <i class="bi bi-file-earmark-pdf"></i> PDF
+  </button>
+</td>
               </tr>
             }
           </tbody>
         </table>
+        @if(totalPages > 1) {
+          <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center flex-wrap">
+              <li class="page-item" [class.disabled]="currentPage ===0 ">
+                <a class="page-link" href="#" (click)="previousPage()">Précedent</a>
+              </li>
+              @for (page of pages; track page){
+                <li class="page-item" [class.active]="currentPage === page">
+                  <a href="#" class="page-link" (click)="goToPage(page)">{{page + 1}}</a>
+                </li>
+              }
+              <li class="page-item" [class.disable]="currentPage === totalPages - 1">
+               <a href="#" class="page-link" (click)="nextPage()">Suivant</a>
+              </li>
+            </ul>
+          </nav>
+        }
       </div>
     </div>
   }

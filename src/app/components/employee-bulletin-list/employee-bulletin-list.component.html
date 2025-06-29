@@ -44,9 +44,13 @@
                 </span>
               </td>
               <td>
-                <button (click)="downloadPdf(bulletin.id!)" class="btn btn-success btn-sm" title="Télécharger le PDF">
+                <button (click)="downloadPdf(bulletin.id!)" class="btn btn-success btn-sm-lg me-2" title="Télécharger le PDF">
                   <i class="bi bi-file-earmark-pdf"></i> PDF
                 </button>
+
+                 <button (click)="viewBulletin(bulletin.id!)" class="btn btn-outline-info btn-sm-lg me-2" title="Voir le bulletin">
+                   <i class="bi bi-eye"></i> Voir
+                 </button>
               </td>
             </tr>
           }

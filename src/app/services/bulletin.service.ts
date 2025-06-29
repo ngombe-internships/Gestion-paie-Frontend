@@ -51,11 +51,14 @@ export class BulletinService {
   }
 
   //methode pour employeur
-  getBulletinsForEmployeur(): Observable<BulletinPaieEmployeurDto[]> {
-    return this.http.get<ApiResponse<BulletinPaieEmployeurDto[]>>(`${this.baseUrl}/employeur`).pipe(
-      map(response => response.data)
-    );
+  getBulletinsForEmployeur(searchTerm: string= ''): Observable<ApiResponse<BulletinPaieEmployeurDto[]>> {
+    let url = `${this.baseUrl}/employeur`;
+      if (searchTerm) {
+          url += `?searchTerm=${encodeURIComponent(searchTerm)}`;
+      }
+      return this.http.get<ApiResponse<BulletinPaieEmployeurDto[]>>(url);
   }
+  
   //methode pour employe
   getMyBulletins(): Observable<BulletinPaieResponseDto[]> {
     return this.http.get<ApiResponse<BulletinPaieResponseDto[]>>(`${this.baseUrl}/my-bulletins`).pipe(
@@ -154,6 +157,7 @@ export interface BulletinPaieResponseDto {
   periodePaie?: string;
   dateCreationBulletin?: string;
   datePaiement?: string;
+  methodePaiement?: string
 }
 
 export interface BulletinPaieEmployeurDto   {
@@ -210,6 +214,7 @@ export interface BulletinPaieEmployeurDto   {
   periodePaie?: string;
   dateCreationBulletin?: string;
   datePaiement?: string;
+  methodePaiement?: string
 
 }
 

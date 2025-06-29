@@ -23,6 +23,14 @@ export class BulletinFormComponent implements OnInit {
   isBulletinCalculated: boolean = false;
   calculatedBulletinData: BulletinPaie | null =null;
   currentEntrepriseId: number | null = null;
+   methodePaiementOptions: string[] = [
+    'VIREMENT',
+    'CHEQUE',
+    'ESPECES',
+    'OM',
+    'MOBILE_MONEY',
+    'AUTRE'
+  ];
 
   private readonly fb = inject (FormBuilder) ;
   private readonly bulletinService = inject(BulletinService) ;
@@ -73,7 +81,10 @@ export class BulletinFormComponent implements OnInit {
       primeAnciennete: [0, [Validators.min(0)]],
       primeRendement: [0, [Validators.min(0)]],
       autrePrimes: [0, [Validators.min(0)]],
-      avantageNature: [0, [Validators.min(0)]]
+      avantageNature: [0, [Validators.min(0)]],
+      datePaiement: [null, Validators.required], // Rendre obligatoire la date de paiement
+      methodePaiement: [this.methodePaiementOptions[0], Validators.required] // Rendre obligatoire la méthode de paiement
+
     });
   }
 
@@ -121,6 +132,9 @@ export class BulletinFormComponent implements OnInit {
         primeRendement: this.formGroup.get('primeRendement')?.value || 0,
         autrePrimes: this.formGroup.get('autrePrimes')?.value || 0,
         avantageNature: this.formGroup.get('avantageNature')?.value || 0,
+         datePaiement: this.formGroup.get('datePaiement')?.value,
+        methodePaiement: this.formGroup.get('methodePaiement')?.value
+
       };
 
       if(!this.isBulletinCalculated){
@@ -207,7 +221,9 @@ export class BulletinFormComponent implements OnInit {
       primeAnciennete: 0,
       primeRendement: 0,
       autrePrimes: 0,
-      avantageNature: 0
+      avantageNature: 0,
+      methodePaiement:undefined,
+      datePaiement:undefined,
     });
   }
 }

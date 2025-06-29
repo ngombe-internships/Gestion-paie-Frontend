@@ -45,7 +45,12 @@ export class DasboardComponent implements OnInit {
     }
 
     console.log('Dashboard initial load (ngOnInit end) - Name:', this.displayName, 'Role:', this.userRole);
+   setTimeout(() => {
+      this.handleInitalDashboardRedirect();
+    }, 0);
   }
+
+  
 
 
   // pour la redirection

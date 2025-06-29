@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { BulletinPaieResponseDto, BulletinService } from '../../services/bulletin.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-employee-bulletin-list',
@@ -19,6 +20,7 @@ export class EmployeeBulletinListComponent implements OnInit {
   private readonly bulletinService = inject(BulletinService);
   private readonly authService = inject (AuthService);
   private readonly router = inject (Router);
+  private readonly toastrService = inject(ToastrService);
 
 
   ngOnInit(): void {
@@ -49,6 +51,27 @@ export class EmployeeBulletinListComponent implements OnInit {
   }
 
   downloadPdf(id: number): void {
+     this.bulletinService.downloadBulletinPdf(id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `bulletin_paie_${id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        this.toastrService.success('Téléchargement du PDF réussi.');
+      },
+      error: (err) => {
+       this.toastrService.error('Erreur lors du téléchargement du PDF: ' + (err.error?.message || err.message || 'Le fichier PDF n\'a pas pu être généré ou trouvé.'));
+        console.error(err);
+      }
+    });
     }
+
+     viewBulletin(id: number): void {
+    this.router.navigate(['/dashboard/bulletins', id]);
+  }
 
 }

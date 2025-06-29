@@ -29,6 +29,7 @@ export interface BulletinPaie {
   dateCreationBulletin?: string; // Utilisez string pour la compatibilité avec les dates ISO 8601
   statusBulletin?: 'GÉNÉRÉ' | 'VALIDÉ' | 'ENVOYÉ' | 'ARCHIVÉ' | 'ANNULÉ';
   datePaiement?: string;
+  methodePaiement?: string
 
   employe?: {
     id?: number;

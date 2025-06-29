@@ -190,6 +190,35 @@
         }
       </div>
 
+       <div class="form-field">
+        <label for="datePaiement">Date de Paiement</label>
+        <input id="datePaiement" name="datePaiement" type="date" formControlName="datePaiement">
+        @if (isFieldValid('datePaiement')) {
+          @if (formGroup.get('datePaiement')?.hasError('required')) {
+            <div class="error">Ce champ est requis</div>
+          }
+          @if(formGroup.get('datePaiement')?.hasError('futureDate')) {
+            <div class="error">Ce champ doit ne doit pas etre dans le futur</div>
+          }
+        }
+      </div>
+
+      <div class="mb-3">
+            <label for="methodePaiement" class="form-label"> Methode de Paiement <span class="text-danger">*</span></label>
+            <select id="methodePaiement" formControlName="methodePaiement" class="form-select"
+                    [class.is-invalid]="isFieldValid('methodePaiement')">
+              <option value="">Sélectionner un statut</option>
+              @for (methodePaiement of methodePaiementOptions; track methodePaiement) {
+                <option [value]="methodePaiement">{{ methodePaiement }}</option>
+              }
+            </select>
+            @if (isFieldValid(' methodePaiement')) {
+              <div class="error">Ce champ est requis </div>
+            }
+    </div>
+
+
+
       <div class="form-actions">
 
           <button type="submit" class="btn-calculate" [disabled]="formGroup.invalid">

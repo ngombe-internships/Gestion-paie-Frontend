@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BulletinPaieResponseDto } from '../../services/bulletin.service';
+import { BulletinPaieResponseDto, BulletinService } from '../../services/bulletin.service';
 import { Employe } from '../../model/employe';
 import {  ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service';
@@ -17,9 +17,12 @@ export class BulletinPreviewComponent implements OnChanges {
   private readonly http = inject (HttpClient);
   private readonly toastrService = inject(ToastrService);
   private readonly authService = inject(AuthService);
+  private readonly bulletinService = inject(BulletinService);
 
   @Input() bulletinData: BulletinPaieResponseDto | null = null;
   @Input() employeData: Employe | null = null;
+  
+  errorMessage: string | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['bulletinData'] && changes['bulletinData'].currentValue) {
@@ -45,55 +48,45 @@ export class BulletinPreviewComponent implements OnChanges {
   // }
 
   generatePdf(): void {
-   if(!this.bulletinData || this.bulletinData.id === undefined || this.bulletinData.id === null){
-    console.error("Impossible de generer le PDF: l'ID du bulletin est manquant.");
-    this.toastrService.warning("Impossible de geneer le pdf: le bulletin doit d'abord etre calculer et avoir un ID.");
-    return;
-  }
+    if (!this.bulletinData || this.bulletinData.id === undefined || this.bulletinData.id === null) {
+      console.error("Impossible de télécharger le PDF : l'ID du bulletin est manquant.");
+      this.toastrService.warning("Impossible de télécharger le PDF : le bulletin doit d'abord être calculé et avoir un ID.");
+      this.errorMessage = "Impossible de télécharger le PDF : l'ID du bulletin est manquant.";
+      return;
+    }
 
-  const bulletinId = this.bulletinData.id;
-  const apiUrl = `http://localhost:8081/api/bulletins/pdf/${bulletinId}`;
+    const bulletinId = this.bulletinData.id;
+    this.errorMessage = null;
 
-  //recupere le token
-  const authToken = this.authService.getToken();
-  if(!authToken) {
-    this.toastrService.error('vous n\'etes pas authentifie. veuillez vous connecter.','Acces refuse');
-  }
+    this.bulletinService.downloadBulletinPdf(bulletinId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `bulletin_paie_${bulletinId}.pdf`;
 
-  //cree en tete en incluant le token
-  const headers = new HttpHeaders ({
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
 
-      'Accept': 'application/pdf',
-      'Authorization': `Bearer &${authToken}`
-  });
+        console.log('PDF téléchargé avec succès.');
+        this.toastrService.success('Le bulletin de paie a été téléchargé avec succès.', 'Téléchargement réussi');
+      },
+      error: (err) => {
+        console.error("Erreur lors du téléchargement du PDF: ", err);
+        const status = err.status || 'unknown';
+        const message = err.message || 'Le fichier PDF n\'a pas pu être généré ou trouvé.';
+        this.errorMessage = `Erreur lors du téléchargement du PDF: ${status} - ${message}`;
 
-
-  this.http.get(apiUrl,{
-    responseType: 'blob',
-    headers: headers
-  }).subscribe(
-    (response: Blob) => {
-      const fileUrl = URL.createObjectURL(response);
-      const a = document.createElement('a');
-      a.href = fileUrl;
-      a.download = `bulletin_paie_${bulletinId}.pdf`;
-
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(fileUrl);
-      console.log('PDF genere et telecharge avec succes.')
-    },
-    (error) => {
-      console.error('Erreur lors de la generation du pdf :', error);
-
-      if (error.status === 403) {
-            this.toastrService.error('Accès non autorisé au PDF. Vérifiez vos permissions.', 'Accès refusé');
+        if (err.status === 403) {
+          this.toastrService.error('Accès non autorisé au PDF. Vérifiez vos permissions.', 'Accès refusé');
+        } else if (err.status === 404) {
+          this.toastrService.error('Le PDF demandé n\'a pas été trouvé.', 'Fichier non trouvé');
         } else {
-            this.toastrService.error('Erreur lors de la génération du PDF. Vérifiez la console et les logs du serveur.', 'Erreur PDF');
+          this.toastrService.error('Une erreur est survenue lors du téléchargement du PDF.', 'Erreur PDF');
         }
       }
-  );
-
+    });
   }
 }

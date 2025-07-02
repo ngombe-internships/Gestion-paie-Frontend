@@ -138,18 +138,7 @@
         }
       </div>
 
-      <div class="form-field">
-        <label for="primeAnciennete">Prime Ancienneté</label>
-        <input id="primeAnciennete" name="primeAnciennete" type="number" formControlName="primeAnciennete">
-        @if (isFieldValid('primeAnciennete')) {
-          @if (formGroup.get('primeAnciennete')?.hasError('required')) {
-            <div class="error">Ce champ est requis</div>
-          }
-          @if(formGroup.get('primeAnciennete')?.hasError('min')) {
-            <div class="error">Ce champ doit être supérieur à 0</div>
-          }
-        }
-      </div>
+      
 
       <div class="form-field">
         <label for="primeRendement">Prime Rendement</label>
@@ -185,6 +174,19 @@
             <div class="error">Ce champ est requis</div>
           }
           @if(formGroup.get('avantageNature')?.hasError('min')) {
+            <div class="error">Ce champ doit être supérieur à 0</div>
+          }
+        }
+      </div>
+
+       <div class="form-field">
+        <label for="avancesSurSalaires">Avances Sur Salaires</label>
+        <input id="avancesSurSalaires" name="avancesSurSalaires" type="number" formControlName="avancesSurSalaires">
+        @if (isFieldValid('avancesSurSalaires')) {
+          @if (formGroup.get('avancesSurSalaires')?.hasError('required')) {
+            <div class="error">Ce champ est requis</div>
+          }
+          @if(formGroup.get('avancesSurSalaires')?.hasError('min')) {
             <div class="error">Ce champ doit être supérieur à 0</div>
           }
         }

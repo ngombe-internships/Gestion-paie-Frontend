@@ -21,7 +21,7 @@ export class BulletinPreviewComponent implements OnChanges {
 
   @Input() bulletinData: BulletinPaieResponseDto | null = null;
   @Input() employeData: Employe | null = null;
-  
+
   errorMessage: string | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {

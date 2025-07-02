@@ -1,0 +1,76 @@
+<div class="container-fluid py-4">
+  <!-- Titre avec style amélioré -->
+  <div class="text-center mb-5">
+    <h2 class="display-4 fw-bold text-primary mb-0">
+      <i class="bi bi-people-fill me-3"></i>
+        Liste des Employeurs
+    </h2>
+     <div class="mt-2">
+      <span class="badge bg-light text-dark fs-6">Gestion des Employeurs et leurs Entreprise</span>
+    </div>
+  </div>
+
+  @if(isLoading) {
+    <div class="alert alert-info text-center shadow-sm border-0" style="border-radius: 12px;">
+      <div class="spinner-border spinner-border-sm me-2 text-ingo">
+        <span class="visually-hidden">Loadind...</span>
+      </div>
+      <strong>Chargement des employeur</strong>
+    </div>
+  }
+  @else if (errorMessage){
+    <div class="alert alert-danger text-center shadow-sm border-0 "style="border-radius: 12px">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>{{errorMessage}}</strong>
+    </div>
+  } @else if (employeurs.length === 0){
+    <div class="alert alert-warning text-center shadow-sm border-0" style="border-radius:12px ;">
+      <i class="bi bi-inbox me-2"></i>
+      <strong>Aucun employeur trouvé</strong>
+    </div>
+  }@else{
+      <div class="card shadow-lg border-0" style="border-radius: 15px;">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+          <thead style="background: linear-gradient(135deg, #1f2937, #374151); color: white;">
+          <tr>
+            <th class="py-3 px-4 fw-semibold">
+              <i class="bi bi-hash me-2"></i>Matricle
+            </th>
+            <th class="py-3 px-4 fw-semibold">
+              <i class="bi bi-person me-2">Nom de utilisateur</i>
+            </th>
+            <th>
+               <i class="bi bi-person me-2">Nom de Entreprise</i>
+            </th>
+             <th>
+               <i class="bi bi-calendar-date me-2">Année de creation</i>
+            </th>
+             <th>
+               <i class="bi bi-gear me-2">Actions</i>
+            </th>
+          </tr>
+         </thead>
+          <tbody>
+            @for(employeur of employeurs; track employeur.entrepriseId ){
+              <tr class="border-0" style="border-bottom: 1px solid #e5e7eb !important;">
+              <td class="py-3 px-4  text-primary">{{employeur.entrepriseId}}</td>
+              <td class="py-3 px-4  ">{{employeur.usernameEmployeur}}</td>
+              <td class="py-3 px-4 fw ">{{employeur.nomEntreprise}}</td>
+              <td class="py-3 px-4 fw text-muted">{{employeur.dateCreationEntreprise | date: 'dd-MM-yyyy' }}</td>
+              <td class="py-3 px-4 fw ">
+                <button class="btn btn-outline-info btn-sm"
+                  (click)="goBackToList(employeur.entrepriseId)"
+                  title="voir Details">
+                  <i class="bi bi-eye"></i>Details
+                </button>
+              </td>
+
+            }
+          </tbody>
+          </table>
+        </div>
+      </div>
+  }
+
+</div>

@@ -64,6 +64,20 @@
             <input type="text" id="telephone" formControlName="telephone" class="form-control">
           </div>
 
+            <div class="mb-3">
+            <label for="sexe" class="form-label">Sexe <span class="text-danger">*</span></label>
+            <select id="sexe" formControlName="sexe" class="form-select"
+                    [class.is-invalid]="isFieldInvalid('sexe')">
+              <option value="">Sélectionner Votre Sexe</option>
+              @for (sexe of SexeEnum; track sexe) {
+                <option [value]="sexe">{{ sexe }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('classificationProfessionnelle')) {
+              <div class="invalid-feedback">{{ getErrorMessage('classificationProfessionnelle') }}</div>
+            }
+          </div>
+
           <div class="mb-3">
             <label for="dateNaissance" class="form-label">Date Naissance <span class="text-danger">*</span></label>
             <input type="date" id="dateNaissance" formControlName="dateNaissance" class="form-control"

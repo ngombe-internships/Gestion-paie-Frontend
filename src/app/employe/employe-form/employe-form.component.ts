@@ -25,7 +25,7 @@ export class EmployeFormComponent implements OnInit {
   categorieEnum: string [] = ['I','II','III','IV','V'];
   echelonEnum : string [] = ['A','B','C','D'];
   typeContratEnum : string [] = ['CDD', 'CDI','STAGE'];
-  civiliteEnum  : string [] = ['M', 'F'];
+  SexeEnum  : string [] = ['M', 'F'];
 
   private readonly fb = inject (FormBuilder) ;
   private readonly employeService = inject(EmployeService);
@@ -65,7 +65,7 @@ export class EmployeFormComponent implements OnInit {
       echelon :['', [Validators.required]],
       typeContratEnum :['', [Validators.required]],
       dateNaissance :['', [Validators.required]],
-      // civilite :['', [Validators.required]]
+      sexe :['', [Validators.required]]
     })
   }
 
@@ -92,7 +92,8 @@ export class EmployeFormComponent implements OnInit {
           categorie: employe.categorie,
           echelon: employe.echelon,
           typeContratEnum: employe.typeContratEnum,
-          dateNaissance : employe.dateNaissance
+          dateNaissance : employe.dateNaissance,
+          sexe: employe.sexe
       });
     },
     error: (err) => {

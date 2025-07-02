@@ -1,9 +1,9 @@
 <div class="container mt-4">
   <div class="card shadow-lg border-0">
-    <div class="card-header bg-gradient-primary text-white">
+    <div class="card-header bg-gradient-primary text-white" style="background: linear-gradient(135deg, #007bff, #6610f2);">
       <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
-          <i class="bi bi-person-badge-fill me-2 fs-4"></i>
+          <i class="bi bi-building-fill me-2 fs-4"></i>
           <h2 class="card-title mb-0 fw-bold">Détails de l'Employé</h2>
         </div>
         <button class="btn btn-outline-light btn-sm px-3" (click)="goBackToList()">
@@ -51,6 +51,14 @@
                 <div class="fw-semibold">{{ employe.nom }} {{ employe.prenom }}</div>
               </div>
             </div>
+
+            <div class="col-lg-4 col-md-6">
+              <div class="info-item p-3 bg-light rounded-3">
+                <label class="form-label text-muted mb-1 small fw-medium">Sexe</label>
+                <div class="fw-semibold">{{ employe.sexe }} </div>
+              </div>
+            </div>
+
             <div class="col-lg-4 col-md-6">
               <div class="info-item p-3 bg-light rounded-3">
                 <label class="form-label text-muted mb-1 small fw-medium">TÉLÉPHONE</label>
@@ -79,7 +87,8 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-8 col-md-6">
+
+            <div class="col-lg-4 col-md-6">
               <div class="info-item p-3 bg-light rounded-3">
                 <label class="form-label text-muted mb-1 small fw-medium">ADRESSE</label>
                 <div class="fw-semibold">{{ employe.adresse || 'Non renseignée' }}</div>

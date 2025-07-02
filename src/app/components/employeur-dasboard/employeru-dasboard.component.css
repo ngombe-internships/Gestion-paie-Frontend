@@ -1,0 +1,61 @@
+.dashboard-card {
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  overflow: hidden; /* Ensures borders are clean with content */
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.employees-card {
+  background: linear-gradient(145deg, #e0f7fa, #b2ebf2); /* Light blue gradient */
+}
+
+.bulletins-card {
+  background: linear-gradient(145deg, #e8f5e9, #c8e6c9); /* Light green gradient */
+}
+
+.card-title {
+  color: #4a4a4a;
+  font-size: 1.25rem;
+}
+
+.card-text {
+  margin-top: 15px;
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Icons styling */
+.bi {
+  font-size: 4rem; /* Larger icons */
+  margin-bottom: 1rem;
+}
+
+.text-primary {
+  color: #6366f1 !important; /* Consistent with your other components */
+}
+
+.text-success {
+  color: #28a745 !important;
+}
+
+/* Spinner styling */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  margin-top: 1rem;
+}
+
+.container-fluid {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.display-4 {
+  font-size: 2.5rem; /* Adjust as needed */
+}

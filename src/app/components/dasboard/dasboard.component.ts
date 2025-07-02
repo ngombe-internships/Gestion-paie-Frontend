@@ -50,18 +50,21 @@ export class DasboardComponent implements OnInit {
     }, 0);
   }
 
-  
+
 
 
   // pour la redirection
   handleInitalDashboardRedirect(): void{
 
     if (this.userRole && this.router.url === '/dashboard') {
-      if(this.userRole == 'EMPLOYE') {
+      if(this.userRole == 'ADMIN') {
+        this.router.navigate(['/dashboard/overview'])
+      }
+      else  if(this.userRole == 'EMPLOYE') {
         this.router.navigate(['/dashboard/employeBulletin']);
 
       } else if (this.userRole === 'EMPLOYEUR' || this.userRole === 'ADMIN'){
-              this.router.navigate(['/dashboard/employes']);
+              this.router.navigate(['/dashboard/dashEmployeur']);
       }
     }
   }

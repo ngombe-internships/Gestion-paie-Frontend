@@ -13,6 +13,10 @@ import { DasboardComponent } from './components/dasboard/dasboard.component';
 import { BulletinListComponent } from './components/bulletin-list/bulletin-list.component';
 import { BulletinDetailComponent } from './components/bulletin-detail/bulletin-detail.component';
 import { EmployeeBulletinListComponent } from './components/employee-bulletin-list/employee-bulletin-list.component';
+import { EmployeurListComponent } from './components/employeur-list/employeur-list.component';
+import { EntrepriseDetailsComponent } from './components/entreprise-details/entreprise-details.component';
+import { DasboardOveriewComponent } from './components/dasboard-overiew/dasboard-overiew.component';
+import { EmployeurDasboardComponent } from './components/employeur-dasboard/employeur-dasboard.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -22,6 +26,10 @@ export const routes: Routes = [
     component: DasboardComponent,
     canActivate: [authGuard],
     children:[
+
+
+      {path: 'overview', component: DasboardOveriewComponent, canActivate:[authGuard]},
+
 
      {path: 'register/employer-company', component: RegisterEmployerComponent },
      {path:'register/employer', component: RegisterComponent},
@@ -37,6 +45,9 @@ export const routes: Routes = [
 
 
      {path:  'employeBulletin', component: EmployeeBulletinListComponent , canActivate: [authGuard]},
+     {path: 'employeur', component:EmployeurListComponent, canActivate: [authGuard]},
+     {path: 'entrepriseDetail/:id', component: EntrepriseDetailsComponent , canActivate:[authGuard]},
+     {path: 'dashEmployeur', component:EmployeurDasboardComponent, canActivate:[authGuard]}
     ]
    },
 

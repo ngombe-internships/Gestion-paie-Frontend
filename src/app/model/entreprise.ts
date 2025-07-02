@@ -1,7 +1,7 @@
 // src/app/model/entreprise.ts
 
 export interface Entreprise {
-  id?: number; 
+  id?: number;
   nom?: string;
   adresseEntreprise?: string;
   emailEntreprise?: string;
@@ -9,4 +9,6 @@ export interface Entreprise {
   numeroSiret?: string;
   dateCreation?: string;
 
+
 }
+

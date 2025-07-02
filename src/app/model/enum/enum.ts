@@ -29,7 +29,7 @@ export enum StatutEmployeEnum {
   STAGIAIRE = 'STAGIAIRE'
 }
 
-export enum CiviliteEnum {
+export enum SexeEnum {
   M = 'M',
   F = 'F'
 }

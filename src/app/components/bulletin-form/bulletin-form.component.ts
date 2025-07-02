@@ -68,7 +68,7 @@ export class BulletinFormComponent implements OnInit {
   private initForm(): void {
     this.formGroup = this.fb.group({
 
-      tauxHoraire: [0.01, [Validators.required, Validators.min(0.01)]],
+      tauxHoraire: [173.3333, [Validators.required, Validators.min(0.01)]],
       heuresNormal: [0, [Validators.required, Validators.min(0)]],
       heuresSup1: [0, [Validators.min(0)]],
       heuresSup2: [0, [Validators.min(0)]],
@@ -82,6 +82,7 @@ export class BulletinFormComponent implements OnInit {
       primeRendement: [0, [Validators.min(0)]],
       autrePrimes: [0, [Validators.min(0)]],
       avantageNature: [0, [Validators.min(0)]],
+      avancesSurSalaires:[0,[Validators.min(0)]],
       datePaiement: [null, Validators.required], // Rendre obligatoire la date de paiement
       methodePaiement: [this.methodePaiementOptions[0], Validators.required] // Rendre obligatoire la méthode de paiement
 
@@ -128,11 +129,12 @@ export class BulletinFormComponent implements OnInit {
         primeTransport: this.formGroup.get('primeTransport')?.value || 0,
         primePonctualite: this.formGroup.get('primePonctualite')?.value || 0,
         primeTechnicite: this.formGroup.get('primeTechnicite')?.value || 0,
-        primeAnciennete: this.formGroup.get('primeAnciennete')?.value || 0,
+        //primeAnciennete: this.formGroup.get('primeAnciennete')?.value || 0,
         primeRendement: this.formGroup.get('primeRendement')?.value || 0,
         autrePrimes: this.formGroup.get('autrePrimes')?.value || 0,
         avantageNature: this.formGroup.get('avantageNature')?.value || 0,
-         datePaiement: this.formGroup.get('datePaiement')?.value,
+        avancesSurSalaires:this.formGroup.get('avancesSurSalaires')?.value || 0,
+        datePaiement: this.formGroup.get('datePaiement')?.value,
         methodePaiement: this.formGroup.get('methodePaiement')?.value
 
       };
@@ -209,7 +211,7 @@ export class BulletinFormComponent implements OnInit {
     // this.selectedEmploye = null;
     // Réinitialiser avec des valeurs par défaut
     this.formGroup.patchValue({
-      tauxHoraire: 0.01,
+      tauxHoraire: 173.3333,
       heuresNormal: 0,
       heuresSup1: 0,
       heuresSup2: 0,
@@ -218,10 +220,11 @@ export class BulletinFormComponent implements OnInit {
       primeTransport: 0,
       primePonctualite: 0,
       primeTechnicite: 0,
-      primeAnciennete: 0,
+      //primeAnciennete: 0,
       primeRendement: 0,
       autrePrimes: 0,
       avantageNature: 0,
+      avancesSurSalaires: 0,
       methodePaiement:undefined,
       datePaiement:undefined,
     });

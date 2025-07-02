@@ -1,0 +1,35 @@
+
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default; /* Indique que la carte n'est pas cliquable par défaut */
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Effet de léger soulèvement au survol */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; /* Ombre plus prononcée */
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.card-text {
+  font-size: 2.5rem; /* Taille de police plus grande pour les chiffres */
+}
+
+/* Couleurs personnalisées pour les icônes/texte pour correspondre aux dégradés */
+/* Assurez-vous que ces couleurs correspondent à vos variables Bootstrap ou à votre palette */
+.text-primary {
+    color: #0d6efd !important; /* Couleur primaire Bootstrap par défaut */
+}
+.text-success {
+    color: #198754 !important; /* Couleur succès Bootstrap par défaut */
+}
+.text-warning {
+    color: #ffc107 !important; /* Couleur warning Bootstrap par défaut */
+}
+
+/* Important: Assurez-vous que les icônes Bootstrap sont bien importées dans votre projet */
+/* Cela se fait généralement dans styles.css ou angular.json */
+/* @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"); */

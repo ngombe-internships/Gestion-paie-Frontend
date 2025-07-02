@@ -4,6 +4,7 @@ import { BulletinPaie } from '../model/bulletin';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../environment';
 import { Employe } from '../model/employe';
+import { DashboardMetric } from './dashboard.service';
 
 @Injectable({
   providedIn: 'root'
@@ -58,7 +59,7 @@ export class BulletinService {
       }
       return this.http.get<ApiResponse<BulletinPaieEmployeurDto[]>>(url);
   }
-  
+
   //methode pour employe
   getMyBulletins(): Observable<BulletinPaieResponseDto[]> {
     return this.http.get<ApiResponse<BulletinPaieResponseDto[]>>(`${this.baseUrl}/my-bulletins`).pipe(
@@ -92,6 +93,10 @@ export class BulletinService {
   getBulletinPreviewHtml(id: number): Observable<string> {
     return this.http.get(`${this.baseUrl}/${id}/previews`, {responseType: 'text'});
   }
+
+  getBulletinCountForEmployer(): Observable<ApiResponse<number>>{
+      return this.http.get<ApiResponse<number>>(`${this.baseUrl}/count`)
+    }
 
 }
 
@@ -158,6 +163,8 @@ export interface BulletinPaieResponseDto {
   dateCreationBulletin?: string;
   datePaiement?: string;
   methodePaiement?: string
+  avancesSurSalaires?:number
+
 }
 
 export interface BulletinPaieEmployeurDto   {
@@ -214,7 +221,8 @@ export interface BulletinPaieEmployeurDto   {
   periodePaie?: string;
   dateCreationBulletin?: string;
   datePaiement?: string;
-  methodePaiement?: string
+  methodePaiement?: string;
+  avancesSurSalaires?:number;
 
 }
 

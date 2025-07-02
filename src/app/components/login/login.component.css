@@ -1,0 +1,279 @@
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+            background: #f8f9fa;
+            min-height: 100vh;
+            margin: 0; /* Assurez-vous qu'il n'y a pas de marge par défaut */
+            display: flex; /* Utilisation de flexbox pour centrer le contenu */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            /* Pas besoin de min-height: 100vh; ici car le body gère le centrage global */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            width: 100%; /* Permet au conteneur de prendre toute la largeur disponible */
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 800px;
+            width: 700px;
+            min-height: 500px; /* Conservez une hauteur minimale pour le design */
+            display: flex; /* Permet aux panneaux d'être flexibles à l'intérieur */
+        }
+
+        .left-panel {
+            background: linear-gradient(135deg, #6610f2 0%, #00A7E1 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            flex: 1; /* Permet au panneau de gauche de grandir */
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            animation: float 20s ease-in-out infinite;
+            z-index: 1; /* Assure que le grain est en arrière-plan */
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .logo-container {
+            position: relative;
+            z-index: 2; /* Assure que le logo est au-dessus du grain */
+            margin-bottom: 30px;
+        }
+
+        .logo-placeholder {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .logo-placeholder i {
+            font-size: 48px;
+            color: white;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .right-panel {
+            padding: 80px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+            flex: 1; /* Permet au panneau de droite de grandir */
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+           white-space: nowrap;
+           margin-right: -20px;
+        }
+
+        .form-subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1rem;
+        }
+
+        .form-floating {
+            margin-bottom: 20px;
+        }
+
+        .form-floating > .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            height: 60px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-floating > .form-control:focus {
+            /* border-color: #6610f2;
+            box-shadow: 0 0 0 0.2rem rgba(102, 16, 242, 0.25); */
+        }
+
+        .form-floating > label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #6610f2 0%, #00A7E1 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            color: white; /* Assurez-vous que le texte du bouton est blanc */
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 16, 242, 0.3);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: not-allowed; /* Indique que le bouton est désactivé */
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-weight: 500;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+        }
+
+        .register-link a {
+            color: #6610f2;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: #4c0bce;
+            text-decoration: underline;
+        }
+
+        /* Angular specific classes (handled by Angular, but for visual representation) */
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .invalid-feedback {
+            display: block; /* S'assurer qu'il est visible quand il est là */
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+    .w{
+      width: 250px;
+    }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-card {
+                flex-direction: column; /* Empile les panneaux verticalement sur mobile */
+                margin: 20px;
+                border-radius: 15px;
+                min-height: auto; /* Laisse la hauteur s'adapter au contenu */
+            }
+
+            .left-panel, .right-panel {
+                flex: none; /* Désactive flex-grow sur mobile pour éviter les problèmes de hauteur */
+                width: 100%; /* Prend toute la largeur disponible */
+            }
+
+            .left-panel {
+                padding: 20px 20px;
+                border-radius: 15px 15px 0 0; /* Coins arrondis en haut */
+            }
+
+            .right-panel {
+                padding: 10px 30px;
+                border-radius: 0 0 15px 15px; /* Coins arrondis en bas */
+                margin-left: 15px;
+              }
+
+            .brand-title {
+                font-size: 2rem;
+            }
+
+            .form-title {
+                font-size: 1.75rem;
+            }
+
+            .logo-placeholder {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 15px;
+            }
+
+            .logo-placeholder i {
+                font-size: 32px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .left-panel {
+                padding: 20px 25px;
+                min-height: 200px;
+            }
+
+            .right-panel {
+                padding: 30px 20px;
+            }
+
+            .brand-title {
+                font-size: 1.5rem;
+            }
+
+            .brand-subtitle {
+                font-size: 0.9rem;
+            }
+        }
+

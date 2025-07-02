@@ -1,0 +1,56 @@
+<div class="container-fluid py-4">
+  <div class="text-center mb-5">
+    <h2 class="display-4 fw-bold text-primary mb-0">
+      <i class="bi bi-speedometer2 me-3"></i>
+      Tableau de Bord Employeur
+    </h2>
+    <div class="mt-2">
+      <span class="badge bg-light text-dark fs-6">Vue d'ensemble de votre entreprise</span>
+    </div>
+  </div>
+
+  @if(errorMessage){
+    <div class="alert alert-danger mb-3" role="alert">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <div class="row g-4 justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow-sm border-0 h-100 dashboard-card employees-card">
+        <div class="card-body p-4 text-center">
+          <i class="bi bi-people-fill display-3 mb-3 text-primary"></i>
+          <h5 class="card-title fw-semibold text-muted">Nombre Total d'Employés</h5>
+          @if(isLoadingEmployees){
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          } @else if (numberOfEmployees !== null) {
+            <p class="card-text display-4 fw-bold text-dark">{{ numberOfEmployees }}</p>
+          } @else {
+            <p class="card-text text-danger">N/A</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow-sm border-0 h-100 dashboard-card bulletins-card">
+        <div class="card-body p-4 text-center">
+          <i class="bi bi-file-earmark-ruled-fill display-3 mb-3 text-success"></i>
+          <h5 class="card-title fw-semibold text-muted">Bulletins de Paie Émis</h5>
+          @if(isLoadingBulletins){
+            <div class="spinner-border text-success" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          } @else if (numberOfBulletins !== null) {
+            <p class="card-text display-4 fw-bold text-dark">{{ numberOfBulletins }}</p>
+          } @else {
+            <p class="card-text text-danger">N/A</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>

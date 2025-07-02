@@ -8,15 +8,18 @@
   <nav class="sidebar-nav">
     <ul>
       @if(userRole === 'ADMIN'){
+         <li><a routerLink="/dashboard/overview" class="nav-link"><i class="bi bi-bar-chart-fill me-2"></i>Aperçu Global</a></li>
         <li><a routerLink ="/dashboard/register/employer-company" class="nav-link">Enregistrer un Employeur</a></li>
-        <li><a routerLink ="/dashboard/employes" class="nav-link">Liste des employes</a></li>
+        <li><a routerLink ="/dashboard/employeur" class="nav-link">Liste des employeur</a></li>
+
+
         <!-- <li><a routerLink ="/dashboard/employe" class="nav-link">Previsualiser un bulletins</a></li> -->
         <!-- <li><a routerLink ="/employe" class="nav-link">Liste des employes</a></li> -->
 
       }
 
     @if (userRole === 'EMPLOYEUR') {
-
+         <li><a routerLink="/dashboard/dashEmployeur" class="nav-link"><i class="bi bi-bar-chart-fill me-2"></i>Aperçu Global</a></li>
           <li><a routerLink="/dashboard/employes/create" class="nav-link">Ajout d'un Employe</a></li>
           <li><a routerLink="/dashboard/register/employer" class="nav-link">Créer le compte d'un Employe</a></li>
           <li><a routerLink="/dashboard/employes" class="nav-link">Mes Employés</a></li>

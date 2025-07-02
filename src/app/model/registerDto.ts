@@ -2,6 +2,7 @@ export interface RegisterDto {
   username: string;
   password: string;
   employeId?: number;
+  
 
   nomEntreprise:string;
   adresseEntreprise:string;

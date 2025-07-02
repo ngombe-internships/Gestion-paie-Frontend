@@ -1,4 +1,4 @@
-import { CategorieEnum, CiviliteEnum, EchelonEnum, StatutEmployeEnum, TypeContratEnum } from "./enum/enum";
+import { CategorieEnum,  EchelonEnum, SexeEnum, StatutEmployeEnum, TypeContratEnum } from "./enum/enum";
 
 export interface Employe {
   id? : number;
@@ -18,5 +18,5 @@ export interface Employe {
   echelon : EchelonEnum;
   typeContratEnum : TypeContratEnum;
   dateNaissance : string;
-  sexe : CiviliteEnum
+  sexe : SexeEnum
 }

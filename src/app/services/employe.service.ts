@@ -1,3 +1,4 @@
+import { DashboardMetric } from './dashboard.service';
 import { Employe } from './../model/employe';
 import { HttpClient, HttpParams, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
@@ -59,6 +60,11 @@ export class EmployeService {
       map (response => response.data)
     );
   }
+
+  getEmployeurCountForEmployer(): Observable<ApiResponse<number>>{
+    return this.http.get<ApiResponse<number>>(`${this.baseUrl}/count`)
+  }
+
 }
 
 
@@ -68,3 +74,6 @@ interface ApiResponse <T> {
   data : T;
   statut : HttpStatusCode;
 }
+
+
+

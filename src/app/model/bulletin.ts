@@ -30,6 +30,7 @@ export interface BulletinPaie {
   statusBulletin?: 'GÉNÉRÉ' | 'VALIDÉ' | 'ENVOYÉ' | 'ARCHIVÉ' | 'ANNULÉ';
   datePaiement?: string;
   methodePaiement?: string
+  avancesSurSalaires?:number
 
   employe?: {
     id?: number;

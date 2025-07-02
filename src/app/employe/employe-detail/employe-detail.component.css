@@ -1,0 +1,289 @@
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6610f2 0%, #00A7E1 100%);
+            --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 20px 40px rgba(102, 16, 242, 0.1);
+            --card-hover-shadow: 0 25px 50px rgba(102, 16, 242, 0.15);
+            --info-card-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-card {
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            border: none;
+            overflow: hidden;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .main-card:hover {
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-2px);
+        }
+
+        .gradient-header {
+            background: var(--primary-gradient);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .gradient-header * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        .section-title {
+            color: #1e293b;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 24px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        .section-title i {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-right: 0.5rem;
+        }
+
+        .info-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--info-card-shadow);
+            border: 1px solid rgba(102, 16, 242, 0.05);
+            transition: var(--transition);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(102, 16, 242, 0.1);
+        }
+
+        .info-card:hover::before {
+            opacity: 1;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+
+        .info-value a {
+            color: inherit;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .info-value a:hover {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .loading-container {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 4rem;
+            height: 4rem;
+            border: 4px solid rgba(102, 16, 242, 0.1);
+            border-left: 4px solid #6610f2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-alert {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #ef4444;
+        }
+
+        .action-buttons {
+            border-top: 1px solid rgba(102, 16, 242, 0.1);
+            padding-top: 2rem;
+            margin-top: 2rem;
+        }
+
+        .btn-primary-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(102, 16, 242, 0.3);
+        }
+
+        .btn-primary-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 16, 242, 0.4);
+            color: white;
+        }
+
+        .btn-outline-gradient {
+            background: transparent;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            color: #6610f2;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .btn-outline-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50px;
+            padding: 2px;
+            background: var(--primary-gradient);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+        }
+
+        .btn-outline-gradient:hover {
+            color: white;
+            background: var(--primary-gradient);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 16, 242, 0.3);
+        }
+
+        .not-found {
+            text-align: center;
+            padding: 4rem 0;
+            color: #64748b;
+        }
+
+        .not-found i {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        .section-spacing {
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .gradient-header {
+                padding: 1.5rem;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .info-card {
+                padding: 1.25rem;
+            }
+        }
+

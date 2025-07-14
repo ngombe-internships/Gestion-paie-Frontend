@@ -53,18 +53,30 @@ export class EmployeConfigComponent implements OnInit {
      this.employePaieConfigForm.patchValue({ montant: null, taux: null });
     // Validation dynamique
     if (this.selectedFormula === 'MONTANT_FIXE') {
-    this.employePaieConfigForm.get('montant')?.setValidators([Validators.required, Validators.min(0)]);
-    this.employePaieConfigForm.get('taux')?.clearValidators();
-    } else if (this.selectedFormula === 'POURCENTAGE_BASE') {
-    this.employePaieConfigForm.get('taux')?.setValidators([Validators.required, Validators.min(0)]);
-    this.employePaieConfigForm.get('montant')?.clearValidators();
-    } else {
-    this.employePaieConfigForm.get('montant')?.clearValidators();
-    this.employePaieConfigForm.get('taux')?.clearValidators();
-    }
-    this.employePaieConfigForm.get('montant')?.updateValueAndValidity();
-    this.employePaieConfigForm.get('taux')?.updateValueAndValidity();
-   });
+  this.employePaieConfigForm.get('montant')?.setValidators([Validators.required, Validators.min(0)]);
+  this.employePaieConfigForm.get('taux')?.clearValidators();
+  this.employePaieConfigForm.get('nombre')?.clearValidators();
+} else if (this.selectedFormula === 'POURCENTAGE_BASE') {
+  this.employePaieConfigForm.get('taux')?.setValidators([Validators.required, Validators.min(0)]);
+  this.employePaieConfigForm.get('montant')?.clearValidators();
+  this.employePaieConfigForm.get('nombre')?.clearValidators();
+} else if (this.selectedFormula === 'TAUX_DEFAUT_X_MONTANT_DEFAUT') {
+  this.employePaieConfigForm.get('taux')?.setValidators([Validators.required, Validators.min(0)]);
+  this.employePaieConfigForm.get('montant')?.setValidators([Validators.required, Validators.min(0)]);
+  this.employePaieConfigForm.get('nombre')?.clearValidators();
+} else if (this.selectedFormula === 'NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT') {
+  this.employePaieConfigForm.get('nombre')?.setValidators([Validators.required, Validators.min(0)]);
+  this.employePaieConfigForm.get('taux')?.setValidators([Validators.required, Validators.min(0)]);
+  this.employePaieConfigForm.get('montant')?.setValidators([Validators.required, Validators.min(0)]);
+} else {
+  this.employePaieConfigForm.get('montant')?.clearValidators();
+  this.employePaieConfigForm.get('taux')?.clearValidators();
+  this.employePaieConfigForm.get('nombre')?.clearValidators();
+  }
+  this.employePaieConfigForm.get('montant')?.updateValueAndValidity();
+ this.employePaieConfigForm.get('taux')?.updateValueAndValidity();
+ this.employePaieConfigForm.get('nombre')?.updateValueAndValidity();
+ });
  }
 
   initForm(): void {
@@ -73,6 +85,7 @@ export class EmployeConfigComponent implements OnInit {
        elementPaie:[{value:'', disable: !!this.configId}, Validators.required],
        montant:[null],
        taux:[null],
+       nombre: [null],
        dateDebut:['',Validators.required],
        dateFin:['']
       });
@@ -99,6 +112,7 @@ export class EmployeConfigComponent implements OnInit {
           elementPaie: config.elementPaie,
           montant:[null],
           taux:[null],
+          nombre: [null],
           dateDebut:config.dateDebut,
           dateFin: config.dateFin || ''
         });
@@ -116,6 +130,7 @@ export class EmployeConfigComponent implements OnInit {
         elementPaie: formValue.elementPaie,
         montant: this.selectedFormula === 'MONTANT_FIXE' ? formValue.montant : null,
         taux: this.selectedFormula === 'POURCENTAGE_BASE' ? formValue.taux : null,
+        nombre:formValue.nombre,
         dateDebut:formValue.dateDebut,
         dateFin: formValue.dateFin || null
       };

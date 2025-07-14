@@ -15,8 +15,9 @@ export interface TemplateElementPaieConfig {
   elementPaie?: ElementPaie;
   elementPaieId: number;
   active: boolean;
-  montantDefaut?: number | null; 
+  montantDefaut?: number | null;
   tauxDefaut?: number | null;
-  formuleCalculOverride?: string;
+    nombreDefaut?: number |null;
+  formuleCalculOverride?: string | undefined;
   affichageOrdre?: number;
 }

@@ -39,6 +39,8 @@ export class ElementPaieListComponent implements OnInit {
       type: ['', Validators.required],
       formuleCalcul: ['', Validators.required],
       tauxDefaut: [null],
+      montantDefaut: [null],
+      nombreDefaut: [null],
       categorie: ['', Validators.required],
       designation: ['', Validators.required],
       impacteSalaireBrut: [false],
@@ -79,7 +81,13 @@ export class ElementPaieListComponent implements OnInit {
   }
 
   submit() {
-    if (this.form.invalid) return;
+     this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      this.error = "Veuillez remplir tous les champs obligatoires correctement";
+      return;
+    }
+
     const value = this.form.value as ElementPaie;
     if (this.editing) {
       // Modification
@@ -110,4 +118,10 @@ export class ElementPaieListComponent implements OnInit {
       error: () => this.error = "Erreur lors de la suppression"
     });
   }
+
+ hasError(controlName: string, errorType: string): boolean {
+    const control = this.form.get(controlName);
+    return (control?.errors?.[errorType] && (control?.touched || control?.dirty)) ?? false;
+}
+
 }

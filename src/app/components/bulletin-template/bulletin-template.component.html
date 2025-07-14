@@ -30,34 +30,7 @@
     </div>
 
     <div class="config-panel">
-      <!-- Configuration des heures -->
-      <!-- <div class="heures-config-section">
-        <h3>Configuration des Heures</h3>
-        <div class="heures-config">
-          <label>
-            <input type="checkbox"
-                   [(ngModel)]="selectedTemplate.heuresConfig.heuresNormalesActive"
-                   (change)="saveHeuresConfig()">
-            Heures normales actives
-          </label>
-          <label>
-            <input type="checkbox"
-                   [(ngModel)]="selectedTemplate.heuresConfig.heuresSup1Active"
-                   (change)="saveHeuresConfig()">
-            Heures supplémentaires actives
-          </label>
-          <div *ngIf="selectedTemplate.heuresConfig.heuresSup1Active">
-            <label>
-              Taux heures sup. 1:
-              <input type="number"
-                     step="0.01"
-                     [(ngModel)]="selectedTemplate.heuresConfig.tauxSup1"
-                     (change)="saveHeuresConfig()"
-                     placeholder="1.20">
-            </label>
-          </div>
-        </div>
-      </div> -->
+
 
       <!-- Configuration des éléments -->
       <div class="elements-panel">
@@ -92,6 +65,46 @@
                </label>
               </div>
 
+              <!-- NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT -->
+              <div *ngIf="cfg.formuleCalculOverride === 'NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT'">
+                  <label>
+                    Nombre par défaut :
+                    <input type="number" step="1"
+                    [(ngModel)]="cfg.nombreDefaut"
+                     (change)="updateElementConfig(cfg)">
+                 </label>
+                 <label>
+                   Taux par défaut :
+                   <input type="number" step="0.0001"
+                   [(ngModel)]="cfg.tauxDefaut"
+                   (change)="updateElementConfig(cfg)">
+                  </label>
+                  <label>
+                     Montant par défaut :
+                  <input type="number" step="0.01"
+                    [(ngModel)]="cfg.montantDefaut"
+                    (change)="updateElementConfig(cfg)">
+                    </label>
+                </div>
+
+                <!-- TAUX_DEFAUT_X_MONTANT_DEFAUT -->
+<div *ngIf="cfg.formuleCalculOverride === 'TAUX_DEFAUT_X_MONTANT_DEFAUT'">
+  <label>
+    Taux par défaut :
+    <input type="number" step="0.0001"
+           [(ngModel)]="cfg.tauxDefaut"
+           (change)="updateElementConfig(cfg)">
+  </label>
+  <label>
+    Montant par défaut :
+    <input type="number" step="0.01"
+           [(ngModel)]="cfg.montantDefaut"
+           (change)="updateElementConfig(cfg)">
+  </label>
+</div>
+
+
+
                 <!-- Pour Pourcentage base -->
                <div *ngIf="cfg.formuleCalculOverride === 'POURCENTAGE_BASE'">
                <label>
@@ -105,9 +118,14 @@
             </div>
 
             <!-- Pour les autres formules, rien ou un texte d'info -->
-            <div *ngIf="cfg.formuleCalculOverride !== 'MONTANT_FIXE' && cfg.formuleCalculOverride !== 'POURCENTAGE_BASE'">
-               <small class="text-muted">Pas de valeur à définir</small>
-            </div>
+            <div *ngIf="[
+  'MONTANT_FIXE',
+  'POURCENTAGE_BASE',
+  'TAUX_DEFAUT_X_MONTANT_DEFAUT',
+  'NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT'
+].indexOf(cfg.formuleCalculOverride || '') === -1">
+  <small class="text-muted">Pas de valeur à définir</small>
+</div>
         </div>
 
               <div class="config-row">
@@ -115,10 +133,14 @@
                   Formule de calcul:
                   <select [(ngModel)]="cfg.formuleCalculOverride"
                           (change)="updateElementConfig(cfg)">
-                    <option value="NOMBRE_BASE_TAUX">Nombre × Base × Taux</option>
+                    <option value="POURCENTAGE_BASE">Pourcentage de la base</option>
                     <option value="MONTANT_FIXE">Montant fixe</option>
                     <option value="BAREME">Barème</option>
-                    <option value="POURCENTAGE_BASE">Pourcentage de la base</option>
+                    <option value="NOMBRE_BASE_TAUX">Nombre × Base × Taux</option>
+                    <option value="TAUX_DEFAUT_X_MONTANT_DEFAUT">Taux par défaut × Montant par défaut</option>
+                    <option value="NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT">Nombre × Taux par défaut × Montant par défaut</option>
+
+
                   </select>
                 </label>
               </div>

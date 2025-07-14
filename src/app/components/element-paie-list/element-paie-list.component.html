@@ -14,36 +14,41 @@
     </div>
     <div class="card-body">
       <form [formGroup]="form" (ngSubmit)="submit()" #elementForm>
-        <!-- Ligne 1 : 4 champs -->
-        <div class="row mb-3">
-          <div class="col-md-3">
-            <label class="form-label">Code*:</label>
-            <input class="form-control" formControlName="code">
-          </div>
+       <!-- Pour le Code -->
+     <div class="row mb-3">
+       <div class="col-md-3">
+         <label class="form-label">Code*:</label>
+          <input class="form-control" formControlName="code"
+         [class.is-invalid]="form.get('code')?.invalid && form.get('code')?.touched">
+        <div class="invalid-feedback" *ngIf="form.get('code')?.invalid && form.get('code')?.touched">
+           Le code est obligatoire
+        </div>
+      </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Désignation*:</label>
-            <input class="form-control" formControlName="designation">
-          </div>
-
-           <div class="col-md-3">
-            <label class="form-label">Type*:</label>
-            <select class="form-select" formControlName="type">
-              <option value="GAIN">GAIN</option>
-              <option value="RETENUE">RETENUE</option>
-              <option value="CHARGE_PATRONALE">CHARGE_PATRONALE</option>
-            </select>
+      <!-- Pour la Désignation -->
+        <div class="col-md-3">
+           <label class="form-label">Désignation*:</label>
+           <input class="form-control" formControlName="designation"
+          [class.is-invalid]="form.get('designation')?.invalid && form.get('designation')?.touched">
+          <div class="invalid-feedback" *ngIf="form.get('designation')?.invalid && form.get('designation')?.touched">
+            La désignation est obligatoire
           </div>
         </div>
-          <!-- <div class="col-md-3">
-            <label class="form-label">Intitulé*:</label>
-            <input class="form-control" formControlName="intitule">
-          </div> -->
-          <!-- <div class="col-md-3">
-            <label class="form-label">Memo:</label>
-            <input class="form-control" formControlName="memo">
-          </div> -->
 
+       <!-- Pour le Type -->
+        <div class="col-md-3">
+          <label class="form-label">Type*:</label>
+          <select class="form-select" formControlName="type"
+            [class.is-invalid]="form.get('type')?.invalid && form.get('type')?.touched">
+            <option value="">Sélectionner un type</option>
+            <option value="GAIN">GAIN</option>
+            <option value="RETENUE">RETENUE</option>
+            <option value="CHARGE_PATRONALE">CHARGE_PATRONALE</option>
+          </select>
+         <div class="invalid-feedback" *ngIf="form.get('type')?.invalid && form.get('type')?.touched">
+              Le type est obligatoire
+         </div>
+        </div>
 
 
         <!-- Ligne 2 : 4 champs -->
@@ -55,13 +60,13 @@
               <option value="NOMBRE_BASE_TAUX">NOMBRE_BASE_TAUX</option>
               <option value="POURCENTAGE_BASE">POURCENTAGE_BASE</option>
               <option value="BAREME">BAREME</option>
+               <option value="TAUX_DEFAUT_X_MONTANT_DEFAUT">TAUX_DEFAUT_X_MONTANT_DEFAUT</option>
+              <option value="NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT">NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT</option>
               <option value="AUTRE">AUTRE</option>
+
             </select>
           </div>
-          <div class="col-md-3">
-            <label class="form-label">Taux défaut:</label>
-            <input type="number" class="form-control" formControlName="tauxDefaut" step="0.0001">
-          </div>
+
 
           <div class="col-md-3">
             <label class="form-label">Catégorie*:</label>
@@ -80,7 +85,7 @@
         </div>
 
 
-
+ </div>
 
         <!-- Ligne 4 : Checkboxes - 4 par ligne -->
         <div class="row mb-3">

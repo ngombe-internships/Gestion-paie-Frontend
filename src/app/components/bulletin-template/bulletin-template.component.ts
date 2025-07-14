@@ -88,6 +88,9 @@ loadTemplates() {
         if (cfg.active === undefined) cfg.active = true;
         if (cfg.affichageOrdre === undefined) cfg.affichageOrdre = 100;
         if (cfg.formuleCalculOverride === undefined) cfg.formuleCalculOverride = 'NOMBRE_BASE_TAUX';
+         if (cfg.nombreDefaut === undefined || cfg.nombreDefaut === null) {
+        cfg.nombreDefaut = 1;
+      }
       });
     }
   }
@@ -100,9 +103,19 @@ loadTemplates() {
   }
 
   selectTemplate(tpl: BulletinTemplate) {
-    this.enrichTemplateWithElements(tpl, this.elements);
-    this.initializeDefaultConfigs(tpl);
-    this.selectedTemplate = tpl;
+     this.selectedTemplate = tpl;
+  // Correction : initialise la formule si non définie
+  if (tpl && tpl.elementsConfig) {
+    tpl.elementsConfig.forEach(cfg => {
+      if (!cfg.formuleCalculOverride && cfg.elementPaie && cfg.elementPaie.formuleCalcul) {
+        cfg.formuleCalculOverride = cfg.elementPaie.formuleCalcul;
+      }
+
+       if (cfg.nombreDefaut === undefined || cfg.nombreDefaut === null) {
+        cfg.nombreDefaut = 1;
+      }
+    });
+  }
   }
 
   createTemplate() {
@@ -144,14 +157,17 @@ loadTemplates() {
 }
 
   addElementToTemplate(element: ElementPaie) {
+
+
     if (!this.selectedTemplate || !this.selectedTemplate.id || !element) return;
     const config: TemplateElementPaieConfig = {
       elementPaie: element,
       elementPaieId: element.id!,
       active: true,
+      nombreDefaut: 1,
       tauxDefaut: null,
       montantDefaut:null,
-      formuleCalculOverride: 'NOMBRE_BASE_TAUX',
+       formuleCalculOverride: element.formuleCalcul,
       affichageOrdre: 100
     };
     this.templateService.addElement(this.selectedTemplate.id, config).subscribe({
@@ -160,6 +176,7 @@ loadTemplates() {
       },
       error: () => this.error = "Erreur lors de l'ajout de l'élément"
     });
+   
   }
 
   removeElementFromTemplate(config: TemplateElementPaieConfig) {
@@ -172,6 +189,13 @@ loadTemplates() {
 
   updateElementConfig(cfg: TemplateElementPaieConfig) {
   if (!this.selectedTemplate || !this.selectedTemplate.id) return;
+
+   console.log('=== DEBUG updateElementConfig ===');
+  console.log('Config reçue:', cfg);
+  console.log('nombreDefaut présent?', cfg.nombreDefaut);
+  console.log('Objet complet:', JSON.stringify(cfg, null, 2));
+
+
   this.templateService.addElement(this.selectedTemplate.id, cfg).subscribe({
     next: () => this.reloadTemplate(this.selectedTemplate!.id!),
     error: () => this.error = "Erreur lors de la mise à jour de la configuration"
@@ -192,8 +216,15 @@ loadTemplates() {
   reloadTemplate(id: number) {
     this.templateService.getById(id).subscribe({
       next: tpl => {
+
+        console.log('Template reçu du serveur:', tpl);
+      console.log('Elements config:', tpl.elementsConfig);
+
         this.enrichTemplateWithElements(tpl, this.elements);
         this.initializeDefaultConfigs(tpl);
+
+          console.log('Après initializeDefaultConfigs:', tpl.elementsConfig);
+
         this.selectedTemplate = tpl;
         // Recharge la liste pour rester synchro
         this.loadTemplates();
@@ -248,35 +279,42 @@ fakeBulletinFromTemplate(template: BulletinTemplate): BulletinPaieResponseDto {
     .filter(cfg => !!cfg.elementPaie && cfg.active)
     .sort((a, b) => (a.affichageOrdre || 0) - (b.affichageOrdre || 0))
     .map(cfg => {
-      // Récupère la formule
       const formule = cfg.formuleCalculOverride || cfg.elementPaie?.formuleCalcul;
       let baseCalcul = 0;
       let tauxApplique = 0;
       let montantFinal = 0;
 
-      // Cas MONTANT_FIXE
       if (formule === 'MONTANT_FIXE') {
         montantFinal = cfg.montantDefaut ?? 0;
         tauxApplique = 0;
         baseCalcul = 0;
       }
-      // Cas POURCENTAGE_BASE
       else if (formule === 'POURCENTAGE_BASE') {
-        // Simule une base (par exemple le salaire de base de l'employé factice)
         baseCalcul = this.fakeEmploye.salaireBase ?? 100000;
         tauxApplique = cfg.tauxDefaut ?? 0;
         montantFinal = baseCalcul * tauxApplique;
       }
-      // Cas NOMBRE_BASE_TAUX
       else if (formule === 'NOMBRE_BASE_TAUX') {
-        // Simule nombre * taux
-        const nombre = 173.33; // exemple
-        const taux = 467.62;   // exemple
+        const nombre = cfg.nombreDefaut ?? 1;
+        const taux = cfg.tauxDefaut ?? 1;
         baseCalcul = nombre * taux;
         montantFinal = baseCalcul;
         tauxApplique = taux;
       }
-      // Cas BAREME ou autre
+      // AJOUTE ICI LA GESTION DES NOUVELLES FORMULES :
+      else if (formule === 'TAUX_DEFAUT_X_MONTANT_DEFAUT') {
+        tauxApplique = cfg.tauxDefaut ?? 0;
+        montantFinal = tauxApplique * (cfg.montantDefaut ?? 0);
+        baseCalcul = 0; // ou montantFinal si tu veux l'afficher comme base
+      }
+      else if (formule === 'NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT') {
+        const nombre = cfg.nombreDefaut ?? 1;
+        const taux = cfg.tauxDefaut ?? 0;
+        const montant = cfg.montantDefaut ?? 0;
+        montantFinal = nombre * taux * montant;
+        baseCalcul = montantFinal; // ou nombre * taux si tu veux l'afficher comme base
+        tauxApplique = taux;
+      }
       else {
         montantFinal = 0;
         tauxApplique = 0;
@@ -288,7 +326,7 @@ fakeBulletinFromTemplate(template: BulletinTemplate): BulletinPaieResponseDto {
         type: ["GAIN", "RETENUE", "CHARGE_PATRONALE"].includes(cfg.elementPaie?.type ?? "GAIN")
           ? cfg.elementPaie?.type as "GAIN" | "RETENUE" | "CHARGE_PATRONALE"
           : "GAIN",
-        nombre: 1,
+        nombre: cfg.nombreDefaut ?? 1,
         baseCalcul,
         tauxApplique,
         montantFinal,

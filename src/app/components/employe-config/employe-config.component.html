@@ -45,27 +45,36 @@
 
          <div class="col-md-4">
              <!-- Montant pour MONTANT_FIXE -->
-           <div *ngIf="selectedFormula === 'MONTANT_FIXE'">
-             <label for="montant" class="form-label">Montant <span class="text-danger">*</span></label>
-             <input type="number" id="montant" class="form-control" formControlName="montant">
-             <div *ngIf="employePaieConfigForm.get('montant')?.invalid && employePaieConfigForm.get('montant')?.touched"
-                class="text-danger mt-1">
-                Le montant est requis et doit être positif.
-             </div>
-           </div>
-             <!-- Taux pour POURCENTAGE_BASE -->
-            <div *ngIf="selectedFormula === 'POURCENTAGE_BASE'">
-              <label for="taux" class="form-label">Taux <span class="text-danger">*</span></label>
-              <input type="number" id="taux" class="form-control" formControlName="taux">
-              <div *ngIf="employePaieConfigForm.get('taux')?.invalid && employePaieConfigForm.get('taux')?.touched"
-                 class="text-danger mt-1">
-                Le taux est requis et doit être positif.
+
+             <div *ngIf="selectedFormula === 'MONTANT_FIXE'">
+                <label for="montant" class="form-label">Montant <span class="text-danger">*</span></label>
+                <input type="number" id="montant" class="form-control" formControlName="montant">
               </div>
-           </div>
-           <!-- Pour les autres formules, rien ou un texte d’info -->
-           <div *ngIf="selectedFormula !== 'MONTANT_FIXE' && selectedFormula !== 'POURCENTAGE_BASE'">
-               <small class="text-muted">Pas de valeur à saisir pour cet élément.</small>
-           </div>
+
+              <!-- Pour POURCENTAGE_BASE -->
+              <div *ngIf="selectedFormula === 'POURCENTAGE_BASE'">
+                 <label for="taux" class="form-label">Taux <span class="text-danger">*</span></label>
+                 <input type="number" id="taux" class="form-control" formControlName="taux">
+             </div>
+
+             <!-- Pour TAUX_DEFAUT_X_MONTANT_DEFAUT -->
+              <div *ngIf="selectedFormula === 'TAUX_DEFAUT_X_MONTANT_DEFAUT'">
+                <label for="taux" class="form-label">Taux <span class="text-danger">*</span></label>
+                <input type="number" id="taux" class="form-control" formControlName="taux">
+                <label for="montant" class="form-label mt-2">Montant <span class="text-danger">*</span></label>
+                <input type="number" id="montant" class="form-control" formControlName="montant">
+              </div>
+
+              <!-- Pour NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT -->
+              <div *ngIf="selectedFormula === 'NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT'">
+                 <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                  <input type="number" id="nombre" class="form-control" formControlName="nombre">
+                  <label for="taux" class="form-label mt-2">Taux <span class="text-danger">*</span></label>
+                  <input type="number" id="taux" class="form-control" formControlName="taux">
+                 <label for="montant" class="form-label mt-2">Montant <span class="text-danger">*</span></label>
+                 <input type="number" id="montant" class="form-control" formControlName="montant">
+              </div>
+
           </div>
 
           <div class="col-md-4">

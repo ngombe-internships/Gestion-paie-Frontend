@@ -17,6 +17,10 @@ import { EmployeurListComponent } from './components/employeur-list/employeur-li
 import { EntrepriseDetailsComponent } from './components/entreprise-details/entreprise-details.component';
 import { DasboardOveriewComponent } from './components/dasboard-overiew/dasboard-overiew.component';
 import { EmployeurDasboardComponent } from './components/employeur-dasboard/employeur-dasboard.component';
+import { BulletinTemplateComponent } from './components/bulletin-template/bulletin-template.component';
+import { ElementPaieListComponent } from './components/element-paie-list/element-paie-list.component';
+import { EmployeConfigListComponent } from './components/employe-config-list/employe-config-list.component';
+import { EmployeConfigComponent } from './components/employe-config/employe-config.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -47,7 +51,16 @@ export const routes: Routes = [
      {path:  'employeBulletin', component: EmployeeBulletinListComponent , canActivate: [authGuard]},
      {path: 'employeur', component:EmployeurListComponent, canActivate: [authGuard]},
      {path: 'entrepriseDetail/:id', component: EntrepriseDetailsComponent , canActivate:[authGuard]},
-     {path: 'dashEmployeur', component:EmployeurDasboardComponent, canActivate:[authGuard]}
+     {path: 'dashEmployeur', component:EmployeurDasboardComponent, canActivate:[authGuard]},
+
+
+     {path: 'element',component:ElementPaieListComponent , canActivate:[authGuard] },
+     {path:'template', component: BulletinTemplateComponent, canActivate:[authGuard]},
+
+     { path: 'employe-paie-config', component: EmployeConfigListComponent, canActivate: [authGuard] },
+      { path: 'employe-paie-config/new', component: EmployeConfigComponent, canActivate: [authGuard] },
+      { path: 'employe-paie-config/edit/:id', component: EmployeConfigComponent, canActivate: [authGuard] },
+
     ]
    },
 

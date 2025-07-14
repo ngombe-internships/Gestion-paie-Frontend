@@ -1,0 +1,152 @@
+<div class="bulletin-template-admin">
+  <h2>Templates de Bulletin</h2>
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="loading">Chargement...</div>
+
+ <ul class="template-list">
+  <li *ngFor="let tpl of templates" [class.selected]="tpl === selectedTemplate"
+      (click)="selectTemplate(tpl)">
+    <span>{{ tpl.nom }}</span>
+    <span *ngIf="tpl.isDefault" class="default">(Par défaut)</span>
+    <button (click)="setAsDefault(tpl); $event.stopPropagation()"
+            *ngIf="!tpl.isDefault">Définir par défaut</button>
+    <button (click)="deleteTemplate(tpl); $event.stopPropagation()">Supprimer</button>
+  </li>
+</ul>
+
+  <form [formGroup]="form" (ngSubmit)="createTemplate()" class="new-template-form">
+    <input placeholder="Nom du template" formControlName="nom">
+    <label><input type="checkbox" formControlName="isDefault"> Par défaut</label>
+    <button type="submit" [disabled]="form.invalid">Créer</button>
+  </form>
+
+  <div *ngIf="selectedTemplate" class="main-content">
+    <div class="preview-panel">
+      <h3>Prévisualisation du bulletin</h3>
+      <app-bulletin-preview
+        [bulletinData]="selectedTemplate ? fakeBulletinFromTemplate(selectedTemplate) : null"
+        [employeData]="fakeEmploye">
+      </app-bulletin-preview>
+    </div>
+
+    <div class="config-panel">
+      <!-- Configuration des heures -->
+      <!-- <div class="heures-config-section">
+        <h3>Configuration des Heures</h3>
+        <div class="heures-config">
+          <label>
+            <input type="checkbox"
+                   [(ngModel)]="selectedTemplate.heuresConfig.heuresNormalesActive"
+                   (change)="saveHeuresConfig()">
+            Heures normales actives
+          </label>
+          <label>
+            <input type="checkbox"
+                   [(ngModel)]="selectedTemplate.heuresConfig.heuresSup1Active"
+                   (change)="saveHeuresConfig()">
+            Heures supplémentaires actives
+          </label>
+          <div *ngIf="selectedTemplate.heuresConfig.heuresSup1Active">
+            <label>
+              Taux heures sup. 1:
+              <input type="number"
+                     step="0.01"
+                     [(ngModel)]="selectedTemplate.heuresConfig.tauxSup1"
+                     (change)="saveHeuresConfig()"
+                     placeholder="1.20">
+            </label>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- Configuration des éléments -->
+      <div class="elements-panel">
+        <h3>Éléments du Template</h3>
+
+        <!-- Liste des éléments configurés -->
+        <div class="elements-config-list">
+          <div *ngFor="let cfg of selectedTemplate.elementsConfig; trackBy: trackByElementId"
+               class="element-config-item">
+            <div class="element-header">
+              <input type="checkbox"
+                     [(ngModel)]="cfg.active"
+                     (change)="updateElementConfig(cfg)"
+                     id="active-{{cfg.elementPaieId}}">
+              <label for="active-{{cfg.elementPaieId}}" class="element-name">
+                {{ cfg.elementPaie?.designation || 'Élément inconnu' }}
+              </label>
+              <button (click)="removeElementFromTemplate(cfg)" class="remove-btn">❌</button>
+            </div>
+
+            <div *ngIf="cfg.active" class="element-details">
+            <div class="config-row">
+               <!-- Pour Montant fixe -->
+              <div *ngIf="cfg.formuleCalculOverride === 'MONTANT_FIXE'">
+               <label>
+                   Montant par défaut :
+                 <input type="number"
+                 step="0.01"
+                 [(ngModel)]="cfg.montantDefaut"
+                 (change)="updateElementConfig(cfg)"
+                 placeholder="Montant (ex: 10000)">
+               </label>
+              </div>
+
+                <!-- Pour Pourcentage base -->
+               <div *ngIf="cfg.formuleCalculOverride === 'POURCENTAGE_BASE'">
+               <label>
+                 Taux par défaut :
+                 <input type="number"
+                 step="0.0001"
+                 [(ngModel)]="cfg.tauxDefaut"
+                 (change)="updateElementConfig(cfg)"
+                 placeholder="Taux (ex: 0.03 pour 3%)">
+               </label>
+            </div>
+
+            <!-- Pour les autres formules, rien ou un texte d'info -->
+            <div *ngIf="cfg.formuleCalculOverride !== 'MONTANT_FIXE' && cfg.formuleCalculOverride !== 'POURCENTAGE_BASE'">
+               <small class="text-muted">Pas de valeur à définir</small>
+            </div>
+        </div>
+
+              <div class="config-row">
+                <label>
+                  Formule de calcul:
+                  <select [(ngModel)]="cfg.formuleCalculOverride"
+                          (change)="updateElementConfig(cfg)">
+                    <option value="NOMBRE_BASE_TAUX">Nombre × Base × Taux</option>
+                    <option value="MONTANT_FIXE">Montant fixe</option>
+                    <option value="BAREME">Barème</option>
+                    <option value="POURCENTAGE_BASE">Pourcentage de la base</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="config-row">
+                <label>
+                  Ordre d'affichage:
+                  <input type="number"
+                         [(ngModel)]="cfg.affichageOrdre"
+                         (change)="updateElementConfig(cfg)"
+                         placeholder="100">
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ajouter un nouvel élément -->
+        <div class="add-element-section">
+          <label>Ajouter un élément :</label>
+          <select #el (change)="addElementToTemplate(elements[el.selectedIndex - 1]); el.selectedIndex = 0">
+            <option value="">-- Sélectionner un élément --</option>
+            <option *ngFor="let element of elements" [disabled]="isElementInTemplate(element.id)">
+              {{ element.designation }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

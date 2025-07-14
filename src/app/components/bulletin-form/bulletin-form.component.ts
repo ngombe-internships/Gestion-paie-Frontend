@@ -68,21 +68,10 @@ export class BulletinFormComponent implements OnInit {
   private initForm(): void {
     this.formGroup = this.fb.group({
 
-      tauxHoraire: [173.3333, [Validators.required, Validators.min(0.01)]],
-      heuresNormal: [0, [Validators.required, Validators.min(0)]],
-      heuresSup1: [0, [Validators.min(0)]],
-      heuresSup2: [0, [Validators.min(0)]],
+      heuresSup: [0, [Validators.min(0)]],
       heuresFerie: [0, [Validators.min(0)]],
       heuresNuit: [0, [Validators.min(0)]],
-      jourConge: [0, [Validators.min(0)]],
-      primeTransport: [0, [Validators.min(0)]],
-      primePonctualite: [0, [Validators.min(0)]],
-      primeTechnicite: [0, [Validators.min(0)]],
-      primeAnciennete: [0, [Validators.min(0)]],
-      primeRendement: [0, [Validators.min(0)]],
-      autrePrimes: [0, [Validators.min(0)]],
-      avantageNature: [0, [Validators.min(0)]],
-      avancesSurSalaires:[0,[Validators.min(0)]],
+
       datePaiement: [null, Validators.required], // Rendre obligatoire la date de paiement
       methodePaiement: [this.methodePaiementOptions[0], Validators.required] // Rendre obligatoire la méthode de paiement
 
@@ -119,21 +108,9 @@ export class BulletinFormComponent implements OnInit {
       const bulletinData: BulletinPaie = {
         employe: this.selectedEmploye ? {id: this.selectedEmploye.id} as Employe: undefined,
         entreprise:{id: this.currentEntrepriseId} as any,
-        tauxHoraire: this.formGroup.get('tauxHoraire')?.value || 0,
-        heuresNormal: this.formGroup.get('heuresNormal')?.value || 0,
-        heuresSup1: this.formGroup.get('heuresSup1')?.value || 0,
-        heuresSup2: this.formGroup.get('heuresSup2')?.value || 0,
+        heuresSup: this.formGroup.get('heuresSup')?.value || 0,
         heuresFerie: this.formGroup.get('heuresFerie')?.value || 0,
         heuresNuit: this.formGroup.get('heuresNuit')?.value || 0,
-        jourConge: this.formGroup.get('jourConge')?.value || 0,
-        primeTransport: this.formGroup.get('primeTransport')?.value || 0,
-        primePonctualite: this.formGroup.get('primePonctualite')?.value || 0,
-        primeTechnicite: this.formGroup.get('primeTechnicite')?.value || 0,
-        //primeAnciennete: this.formGroup.get('primeAnciennete')?.value || 0,
-        primeRendement: this.formGroup.get('primeRendement')?.value || 0,
-        autrePrimes: this.formGroup.get('autrePrimes')?.value || 0,
-        avantageNature: this.formGroup.get('avantageNature')?.value || 0,
-        avancesSurSalaires:this.formGroup.get('avancesSurSalaires')?.value || 0,
         datePaiement: this.formGroup.get('datePaiement')?.value,
         methodePaiement: this.formGroup.get('methodePaiement')?.value
 
@@ -211,21 +188,13 @@ export class BulletinFormComponent implements OnInit {
     // this.selectedEmploye = null;
     // Réinitialiser avec des valeurs par défaut
     this.formGroup.patchValue({
-      tauxHoraire: 173.3333,
-      heuresNormal: 0,
-      heuresSup1: 0,
-      heuresSup2: 0,
+
+      heuresSup: 0,
       heuresFerie: 0,
       heuresNuit: 0,
-      primeTransport: 0,
-      primePonctualite: 0,
-      primeTechnicite: 0,
-      //primeAnciennete: 0,
-      primeRendement: 0,
-      autrePrimes: 0,
-      avantageNature: 0,
+
       avancesSurSalaires: 0,
-      methodePaiement:undefined,
+      methodePaiement: this.methodePaiementOptions[0],
       datePaiement:undefined,
     });
   }

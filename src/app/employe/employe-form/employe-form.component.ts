@@ -5,6 +5,7 @@ import { EmployeCreate } from '../../model/employeCreate';
 import { EmployeService } from '../../services/employe.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Employe } from '../../model/employe';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-employe-form',
@@ -18,6 +19,8 @@ export class EmployeFormComponent implements OnInit {
   employeId : number | null = null
   errorMessage: string | null = null;
   sucessMessage: string | null = null;
+  currentStep: number = 1;
+  totalSteps: number = 3;
 
 
   //Enums pour les listes deroulantes
@@ -45,29 +48,84 @@ export class EmployeFormComponent implements OnInit {
       })
   }
 
-  private initForm(): void {
+  private initForm(employe?: Employe): void {
     this.employeForm = this.fb.group({
 
+    informationsPersonnelles: this.fb.group({
+        matricule: [employe?.matricule || '', [Validators.required]],
+        nom: [employe?.nom || '', [Validators.required]],
+        prenom: [employe?.prenom || '', [Validators.required]],
+        numeroCnps: [employe?.numeroCnps || '', [Validators.required]],
+        niu: [employe?.niu || '', [Validators.required]],
+        email: [employe?.email || '', [Validators.email, Validators.required]],
+        adresse: [employe?.adresse || '', [Validators.required]],
+        telephone: [employe?.telephone || ''],
+        dateNaissance: [employe?.dateNaissance || '', [Validators.required]],
+        sexe: [employe?.sexe || '', [Validators.required]]
+      }),
+      informationsProfessionnelles: this.fb.group({
+        dateEmbauche: [employe?.dateEmbauche || '', [Validators.required]],
+        poste: [employe?.poste || '', [Validators.required]],
+        service: [employe?.service || '', [Validators.required]],
+        classificationProfessionnelle: [employe?.classificationProfessionnelle || '', [Validators.required]],
+        categorie: [employe?.categorie || '', [Validators.required]],
+        echelon: [employe?.echelon || '', [Validators.required]],
+        typeContratEnum: [employe?.typeContratEnum || '', [Validators.required]]
+      }),
+     detailsContractuels: this.fb.group({
 
-      matricule : ['', [Validators.required]],
-      nom :['', [Validators.required]],
-      prenom :['', [Validators.required]],
-      numeroCnps:['', [Validators.required]],
-      niu :['', [Validators.required]],
-      email :['', [Validators.email]],
-      adresse :['', [Validators.required]],
-      telephone :['', [Validators.required]],
-      dateEmbauche :['', [Validators.required]],
-      poste :['', [Validators.required]],
-      service :['', [Validators.required]],
-      classificationProfessionnelle :['', [Validators.required]],
-      categorie :['', [Validators.required]],
-      echelon :['', [Validators.required]],
-      typeContratEnum :['', [Validators.required]],
-      dateNaissance :['', [Validators.required]],
-      sexe :['', [Validators.required]]
+      heuresContractuellesHebdomadaires: [employe?.heuresContractuellesHebdomadaires ?? null, [Validators.required, Validators.min(1)]],
+        joursOuvrablesContractuelsHebdomadaires: [employe?.joursOuvrablesContractuelsHebdomadaires ?? null, [Validators.required, Validators.min(1),Validators.max(7)]],
+        salaireBase: [employe?.salaireBase ?? null, [Validators.required, Validators.min(0)]]
+     })
+
+
     })
   }
+
+  //currentstep =  etape actuel
+  getCurrentStepFormGroup(): FormGroup | null {
+  switch (this.currentStep){
+    case 1 :return this.employeForm.get('informationsPersonnelles') as FormGroup;
+    case 2 : return this.employeForm.get('informationsProfessionnelles') as FormGroup;
+    case 3 : return this.employeForm.get('detailsContractuels') as FormGroup;
+    default: return null;
+  }
+ }
+
+ validateCurrentStep() : boolean {
+  const currentFormGroup = this.getCurrentStepFormGroup();
+  if(currentFormGroup) {
+    this.markAllAsTouched(currentFormGroup);
+    return currentFormGroup.valid;
+  }
+  return false;
+ }
+
+ nextStep():void {
+  if(this.currentStep < this.totalSteps){
+    if(this.validateCurrentStep()){
+     this.currentStep++;
+     this.errorMessage = null;
+     this.sucessMessage = null;
+    } else {
+     this.errorMessage = 'Veuillez corriger les erreur avant de passer á l\'etape suivante.';
+   }
+  } else {
+    this.onSubmit();
+  }
+
+ }
+
+ previousStep(): void {
+  if(this.currentStep >1){
+    this.currentStep--;
+    this.errorMessage = null;
+    this.sucessMessage = null;
+  }
+ }
+
+
 
   private loadEmployeData(id: number): void {
     this.employeService.getEmployeById(id).subscribe({
@@ -76,7 +134,7 @@ export class EmployeFormComponent implements OnInit {
         const formattedDateEmbauche = employe.dateEmbauche ? new Date (employe.dateEmbauche).toISOString().split('T')[0] : '';
         const formatteDateNaissance = employe.dateNaissance ? new Date (employe.dateNaissance).toISOString().split('T')[0] : '';
 
-        this.employeForm.patchValue({
+        this.employeForm.get('informationsPersonnelles')?.patchValue({
           matricule: employe.matricule,
           nom: employe.nom,
           prenom: employe.prenom,
@@ -85,6 +143,10 @@ export class EmployeFormComponent implements OnInit {
           telephone: employe.telephone,
           email: employe.email,
           adresse: employe.adresse,
+          dateNaissance : formatteDateNaissance,
+          sexe: employe.sexe,
+        });
+        this.employeForm.get('informationsProfessionnelles')?.patchValue({
           dateEmbauche: formattedDateEmbauche,
           poste: employe.poste,
           service: employe.service,
@@ -92,9 +154,13 @@ export class EmployeFormComponent implements OnInit {
           categorie: employe.categorie,
           echelon: employe.echelon,
           typeContratEnum: employe.typeContratEnum,
-          dateNaissance : employe.dateNaissance,
-          sexe: employe.sexe
-      });
+
+        });
+        this.employeForm.get('detailsContractuels')?.patchValue({
+          heuresContractuellesHebdomadaires:employe.heuresContractuellesHebdomadaires,
+          joursOuvrablesContractuelsHebdomadaires: employe.joursOuvrablesContractuelsHebdomadaires,
+          salaireBase: employe.salaireBase
+        })
     },
     error: (err) => {
       this.errorMessage = 'Erreur lors du charement des donnes de l\'employe';
@@ -104,35 +170,98 @@ export class EmployeFormComponent implements OnInit {
  }
 
 
+
   onSubmit(): void {
-    this.errorMessage = null;
-    this.sucessMessage = null;
+
+
+  if(!this.validateCurrentStep()) {
+    this.errorMessage = 'Veuillez corriger les erreurs avant de soummetre le formulaire.'
+    return;
+  }
 
     if (this.employeForm.valid) {
-      const employeData: EmployeCreate = this.employeForm.value;
+      const formValue = this.employeForm.value;
+      const employeData: EmployeCreate = {
+        ...formValue.informationsPersonnelles,
+        ...formValue.informationsProfessionnelles,
+        ...formValue.detailsContractuels,
+      }
+
+      if(new Date(employeData.dateEmbauche) > new Date()){
+        this.errorMessage = 'La date d\'embauche ne peut pas etre dans le futur. '
+        return;
+      }
+       if(new Date(employeData.dateNaissance) > new Date()){
+        this.errorMessage = 'La date de naissance ne peut pas etre dans le futur. '
+        return;
+      }
+
+
 
       if(this.isEditMode && this.employeId) {
         this.employeService.uptadeEmploye(this.employeId, employeData).subscribe ({
           next: () => {
             this.sucessMessage = 'Employe mis a jour avec succes!';
-            this.router.navigate([`/dashboard/employes`]);
+            this.errorMessage = null;
+            setTimeout(() => {
+              this.router.navigate([`/dashboard/employes`]);
+            }, 2000)
+
           },
-          error: (err) => {
-            this.errorMessage = 'Erreur lors de la mise a jour de l\'employe.';
-            console.error('Update error:', err);
-          }
+         error: (err: HttpErrorResponse) => {
+          console.error('Create error:', err);
+          if(err.error && typeof err.error === 'object' && err.error.message) {
+
+            this.errorMessage = `Erreur lors de la mise a jour de l\'employé: ${err.error.message}`;
+            } else if (err.status === 409){
+
+              this.errorMessage = 'Erreur: Un employe avec ce matricule ou NIU existe deja.';
+           } else if (err.status === 400 && err.error && typeof err.error === 'object'){
+            let detaileError = 'Erreur de validation : ';
+            for (const key in err.error) {
+             if (err.error.hasOwnProperty(key)) {
+                detaileError += `${key}: ${err.error[key]};`;
+             }
+           }
+            this.errorMessage = detaileError.trim(); // Supprime les espaces inutiles en fin de chaîne
+        } else {
+        // Condition par défaut: Pour toutes les autres erreurs non gérées spécifiquement
+        this.errorMessage = 'Erreur lors de la création de l\'employé. Veuillez réessayer.';
+      }
+}
         });
       } else {
         this.employeService.createEmploye(employeData).subscribe({
           next: () => {
             this.sucessMessage = 'Employé créé avec succès!';
+            this.errorMessage = null;
             this.employeForm.reset();
+            this.currentStep =1 ;
+            setTimeout(() => {
             this.router.navigate(['/dashboard/employes']);
+            }, 2000);
           },
-          error: (err) => {
-            this.errorMessage = 'Erreur lors de la création de l\'employé.';
-            console.error('Create error:', err);
-          }
+       error: (err: HttpErrorResponse) => {
+    console.error('Create error:', err);
+    if(err.error && typeof err.error === 'object' && err.error.message) {
+        this.errorMessage = `Erreur lors de la création de l\'employé: ${err.error.message}`;
+    } else if (err.status === 409){
+
+      this.errorMessage = 'Erreur: Un employe avec ce matricule ou NIU existe deja.';
+    } else if (err.status === 400 && err.error && typeof err.error === 'object'){
+
+      let detaileError = 'Erreur de validation : ';
+        for (const key in err.error) {
+            if (err.error.hasOwnProperty(key)) {
+                detaileError += `${key}: ${err.error[key]};`;
+            }
+        }
+        this.errorMessage = detaileError.trim(); // Supprime les espaces inutiles en fin de chaîne
+    } else {
+        this.errorMessage = 'Erreur lors de la création de l\'employé. Veuillez réessayer.';
+    }
+  }
+
         });
       }
     } else {
@@ -150,25 +279,43 @@ export class EmployeFormComponent implements OnInit {
    });
   }
 
-  isFieldInvalid (field: string): boolean {
-    const control = this.employeForm.get(field);
-    return !!(control && control.invalid && (control.touched || control.dirty));
+  isFieldInvalid (controlName: string): boolean {
+    const currentFormGroup = this.getCurrentStepFormGroup();
+    if (currentFormGroup){
+      const control = currentFormGroup.get(controlName);
+      return !!(control && control.invalid && (control.touched || control.dirty ));
+    }
+    return false;
   }
 
-  getErrorMessage(field: string): string {
-    const control = this.employeForm.get(field);
+  getErrorMessage(controlName: string): string {
+    const currentFormGroup = this.getCurrentStepFormGroup();
+    if(currentFormGroup){
+    const control = currentFormGroup.get(controlName);
     if(!control || !control.errors) {
       return '';
     }
-    if (control.hasError ('required')) {
-      return 'Ce champs est oblogatoire.';
+      if (control.hasError('required')) {
+        return 'Ce champ est obligatoire.';
+      }
+      if (control.hasError('email')) {
+        return 'Format d\'email invalide.';
+      }
+      if (control.hasError('min')) {
+        return `La valeur minimale est ${control.errors['min'].min}.`;
+      }
+      if (control.hasError('max')) {
+        return `La valeur maximale est ${control.errors['max'].max}.`;
+      }
+      if (control.hasError('minlength')) {
+        return `Minimum ${control.errors['minlength'].requiredLength} caractères.`;
+      }
+      if (control.hasError('maxlength')) {
+        return `Maximum ${control.errors['maxlength'].requiredLength} caractères.`;
+      }
     }
-    if (control.hasError('email')) {
-      return 'Format d\'email invalid';
-    }
-    return 'Champ invalide';
-  }
-
+  return'';
+}
   onCancel(): void {
     this.router.navigate(['/dashboard/employes']);
   }

@@ -34,7 +34,7 @@
               <td>{{ bulletin.id }}</td>
               <td>{{ bulletin.periodePaie }}</td>
               <td>{{ bulletin.datePaiement }}</td>
-              <td>{{ bulletin.salaireNet | number:'1.2-2' }} FCFA</td>
+              <td>{{ bulletin.salaireNetAPayer| number:'1.2-2' }} FCFA</td>
               <td>
                 <span class="badge" [ngClass]="{
                   'bg-success': bulletin.statusBulletin=== 'ENVOYÉ',

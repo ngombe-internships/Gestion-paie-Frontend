@@ -1,10 +1,11 @@
-import { HttpClient, HttpStatusCode } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { BulletinPaie } from '../model/bulletin';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environment';
 import { Employe } from '../model/employe';
-import { DashboardMetric } from './dashboard.service';
+import { FormuleCalculType } from '../model/enum/enum';
+
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +17,17 @@ export class BulletinService {
   constructor() { }
 
   // Méthode pour calculer le bulletin
-  calculerBulletin(fiche: BulletinPaie): Observable<ApiResponse<BulletinPaieResponseDto>> {
-    return this.http.post<ApiResponse<BulletinPaieResponseDto>>(`${this.baseUrl}/calculate1`, fiche);
-  }
+ calculerBulletin(fiche: BulletinPaie): Observable<ApiResponse<BulletinPaieResponseDto>> {
+    const headers = new HttpHeaders()
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json');
+
+    return this.http.post<ApiResponse<BulletinPaieResponseDto>>(
+        `${this.baseUrl}/calculate1`,
+        fiche,
+        { headers }
+    );
+}
 
   // Méthode pour créer un bulletin
   creerBulletin(fiche: BulletinPaie): Observable<ApiResponse<BulletinPaieResponseDto>> {
@@ -86,9 +95,7 @@ export class BulletinService {
   }
 
   // Méthode pour télécharger le PDF
-  downloadBulletinPdf(id: number): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/pdf/${id}`, { responseType: 'blob' });
-  }
+
 
   getBulletinPreviewHtml(id: number): Observable<string> {
     return this.http.get(`${this.baseUrl}/${id}/previews`, {responseType: 'text'});
@@ -98,7 +105,60 @@ export class BulletinService {
       return this.http.get<ApiResponse<number>>(`${this.baseUrl}/count`)
     }
 
+   downloadBulletinPdf(id: number): Observable<Blob> {
+    const headers = new HttpHeaders({
+        'Accept': 'application/pdf'
+    });
+
+    return this.http.get(`${this.baseUrl}/pdf/${id}`, {
+        headers: headers,
+        responseType: 'blob',
+        observe: 'response'
+    }).pipe(
+        map(response => {
+            if (response.status === 200 && response.body instanceof Blob) {
+                // Vérifier que c'est bien un PDF
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/pdf')) {
+                    return response.body;
+                }
+                throw new Error('Le fichier reçu n\'est pas un PDF');
+            }
+            throw new Error('Réponse invalide du serveur');
+        }),
+        catchError((error: HttpErrorResponse) => {
+            let errorMessage = 'Erreur lors de la génération du PDF';
+
+            if (error.status === 404) {
+                errorMessage = 'Bulletin non trouvé';
+            } else if (error.status === 403) {
+                errorMessage = 'Accès non autorisé';
+            } else if (error.error instanceof Blob) {
+                // Lire le message d'erreur du blob
+                return new Observable<never>((observer) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        try {
+                            const errorResponse = JSON.parse(reader.result as string);
+                            observer.error(new Error(errorResponse.message || errorMessage));
+                        } catch {
+                            observer.error(new Error(errorMessage));
+                        }
+                    };
+                    reader.onerror = () => observer.error(new Error('Erreur lors de la lecture de la réponse'));
+                    reader.readAsText(error.error);
+                });
+            }
+
+            return throwError(() => new Error(errorMessage));
+        })
+    );
 }
+
+}
+
+
+
 
 
 interface ApiResponse<T> {
@@ -107,56 +167,29 @@ interface ApiResponse<T> {
   statut: HttpStatusCode;
 }
 
+interface ErrorResponse {
+    message: string;
+    status: string;
+    data: any;
+}
+
 // Interface pour la réponse du bulletin calculé
 export interface BulletinPaieResponseDto {
   id?: number;
   employe?: Employe;
-  salaireBase?: number;
-  heuresNormal?: number;
-  tauxHoraire?:number;
-  heuresSup1?: number;
-  heuresSup2?: number;
+  heuresSup?: number;
   heuresNuit?: number;
   heuresFerie?: number;
-  primeTransport? : number,
-  primePonctualite? : number,
-  primeTechnicite ?: number,
-  primeAnciennete ?: number,
-  primeRendement ?: number,
-  totalPrimes?: number;
-  salaireBrut?: number;
+  lignesPaie?: LignePaieDto[];
   salaireImposable?: number;
+ salaireBrut?: number;
   baseCnps?: number;
-  baseCnps1?: number; //pour les calcul lier
-  // Impôts et taxes
-  irpp?: number;
-  cac?: number;
-  taxeCommunale?: number;
-  redevanceAudioVisuelle?: number;
-
-  // Cotisations salariales
-  cnpsVieillesseSalarie?: number;
-  creditFoncierSalarie?: number;
-  fneSalarie?: number;
-  totalRetenues?: number;
-
-  // Charges patronales
-  cnpsVieillesseEmployeur?: number;
-  cnpsAllocationsFamiliales?: number;
-  cnpsAccidentsTravail?: number;
-  creditFoncierPatronal?: number;
-  fnePatronal?: number;
+  totalRetenuesSalariales?: number;
   totalChargesPatronales?: number;
-
-  // Résultats finaux
-  salaireNet?: number;
   coutTotalEmployeur?: number;
-  cotisationCnps?: number;
+  salaireNetAPayer?: number;
+totalGains?: number;
 
-  //conge
-  allocationConge?: number;
-  jourConge?:number;
-  //nouveau statut
 
   statusBulletin?: 'GÉNÉRÉ' | 'VALIDÉ' | 'ENVOYÉ' | 'ARCHIVÉ' | 'ANNULÉ';
   periodePaie?: string;
@@ -170,51 +203,22 @@ export interface BulletinPaieResponseDto {
 export interface BulletinPaieEmployeurDto   {
   employe?: EmployeResponseDto;
   id?: number;
-  salaireBase?: number;
-  heuresNormal?: number;
-  tauxHoraire?:number;
-  heuresSup1?: number;
-  heuresSup2?: number;
+
+  heuresSup?: number;
   heuresNuit?: number;
   heuresFerie?: number;
-  primeTransport? : number,
-  primePonctualite? : number,
-  primeTechnicite ?: number,
-  primeAnciennete ?: number,
-  primeRendement ?: number,
-  totalPrimes?: number;
+  lignesPaie?: LignePaieDto[];
+
+  totalGains?: number;
   salaireBrut?: number;
-  salaireImposable?: number;
   baseCnps?: number;
-  baseCnps1?: number; //pour les calcul lier
-  // Impôts et taxes
-  irpp?: number;
-  cac?: number;
-  taxeCommunale?: number;
-  redevanceAudioVisuelle?: number;
+  salaireImposable?: number;
 
-  // Cotisations salariales
-  cnpsVieillesseSalarie?: number;
-  creditFoncierSalarie?: number;
-  fneSalarie?: number;
-  totalRetenues?: number;
-
-  // Charges patronales
-  cnpsVieillesseEmployeur?: number;
-  cnpsAllocationsFamiliales?: number;
-  cnpsAccidentsTravail?: number;
-  creditFoncierPatronal?: number;
-  fnePatronal?: number;
+  totalImpots?: number;
+  totalRetenuesSalariales?: number;
   totalChargesPatronales?: number;
-
-  // Résultats finaux
-  salaireNet?: number;
-  coutTotalEmployeur?: number;
+  salaireNetAPayer?: number;
   cotisationCnps?: number;
-
-  //conge
-  allocationConge?: number;
-  jourConge?:number;
 
   //nouveau
   statusBulletin?: 'GÉNÉRÉ' | 'VALIDÉ' | 'ENVOYÉ' | 'ARCHIVÉ' | 'ANNULÉ';
@@ -223,6 +227,22 @@ export interface BulletinPaieEmployeurDto   {
   datePaiement?: string;
   methodePaiement?: string;
   avancesSurSalaires?:number;
+
+}
+export interface LignePaieDto {
+  designation?: string;
+  nombre?: number;
+  baseCalcul?: number;
+  tauxApplique?: number;
+  montantFinal?: number;
+  type?: 'GAIN' | 'RETENUE' | 'CHARGE_PATRONALE';
+  baseApplique?:number;
+  formuleCalcul?: 'BAREME';
+  tauxPatronal?:number;      // Patronale
+ montantPatronal?: number;
+ isMerged?:boolean;
+ tauxPatronalAffiche?: string;
+  tauxAffiche?:string;
 
 }
 
@@ -247,6 +267,9 @@ export interface EmployeResponseDto {
   sexe?: string;
   nationalite?: string;
   ville?: string;
+  heuresContractuellesHebdomadaires: number;
+  joursOuvrablesContractuelsHebdomadaires: number;
+  SalaireBase: number;
 }
 
 export interface EntrepriseResponseDto {

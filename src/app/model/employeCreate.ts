@@ -19,4 +19,8 @@ export interface EmployeCreate {
   typeContratEnum : TypeContratEnum;
   dateNaissance : string;
   sexe : SexeEnum;
+  heuresContractuellesHebdomadaires: number;
+  joursOuvrablesContractuelsHebdomadaires: number;
+  salaireBase: number;
+  avantagesNature?: string[];
 }

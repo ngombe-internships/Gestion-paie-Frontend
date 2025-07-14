@@ -11,191 +11,258 @@
       <div class="alert alert-success">{{ sucessMessage }}</div>
     }
 
+   <div class="progress mb-4">
+  <div class="progress-bar bg-success"  role="progressbar"
+       [style.width]="(currentStep / totalSteps * 100) + '%'"
+       [attr.aria-valuenow]="currentStep"
+       [attr.aria-valuemin]="1"
+       [attr.aria-valuemax]="totalSteps">
+    Étape {{ currentStep }} sur {{ totalSteps }}
+  </div>
+</div>
     <form [formGroup]="employeForm" (ngSubmit)="onSubmit()">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label for="matricule" class="form-label">Matricule <span class="text-danger">*</span></label>
-            <input type="text" id="matricule" formControlName="matricule" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('matricule')">
-            @if (isFieldInvalid('matricule')) {
-              <div class="invalid-feedback">{{ getErrorMessage('matricule') }}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
-            <input type="text" id="nom" formControlName="nom" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('nom')">
-            @if (isFieldInvalid('nom')) {
-              <div class="invalid-feedback">{{ getErrorMessage('nom') }}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="prenom" class="form-label">Prénom <span class="text-danger">*</span></label>
-            <input type="text" id="prenom" formControlName="prenom" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('prenom')">
-            @if (isFieldInvalid('prenom')) {
-              <div class="invalid-feedback">{{ getErrorMessage('prenom') }}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="numeroCnps" class="form-label">Numéro CNPS <span class="text-danger">*</span></label>
-            <input type="text" id="numeroCnps" formControlName="numeroCnps" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('numeroCnps')">
-            @if (isFieldInvalid('numeroCnps')) {
-              <div class="invalid-feedback">{{ getErrorMessage('numeroCnps') }}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="niu" class="form-label">NIU <span class="text-danger">*</span></label>
-            <input type="text" id="niu" formControlName="niu" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('niu')">
-            @if (isFieldInvalid('niu')) {
-              <div class="invalid-feedback">{{ getErrorMessage('niu') }}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="telephone" class="form-label">Téléphone</label>
-            <input type="text" id="telephone" formControlName="telephone" class="form-control">
-          </div>
-
-            <div class="mb-3">
-            <label for="sexe" class="form-label">Sexe <span class="text-danger">*</span></label>
-            <select id="sexe" formControlName="sexe" class="form-select"
-                    [class.is-invalid]="isFieldInvalid('sexe')">
-              <option value="">Sélectionner Votre Sexe</option>
-              @for (sexe of SexeEnum; track sexe) {
-                <option [value]="sexe">{{ sexe }}</option>
+     @if (currentStep === 1) {
+        <div formGroupName="informationsPersonnelles">
+          <h3>Informations personnelles</h3>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="matricule" class="form-label">Matricule <span class="text-danger">*</span></label>
+              <input type="text" id="matricule" formControlName="matricule" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('matricule')">
+              @if (isFieldInvalid('matricule')) {
+                <div class="invalid-feedback">{{ getErrorMessage('matricule') }}</div>
               }
-            </select>
-            @if (isFieldInvalid('classificationProfessionnelle')) {
-              <div class="invalid-feedback">{{ getErrorMessage('classificationProfessionnelle') }}</div>
-            }
-          </div>
+            </div>
 
-          <div class="mb-3">
-            <label for="dateNaissance" class="form-label">Date Naissance <span class="text-danger">*</span></label>
-            <input type="date" id="dateNaissance" formControlName="dateNaissance" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('dateNaissance')">
-            @if (isFieldInvalid('dateNaissance')) {
-              <div class="invalid-feedback">{{ getErrorMessage('dateNaissance') }}</div>
-            }
-          </div>
-
-        </div>
-
-
-
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-            <input type="email" id="email" formControlName="email" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('email')">
-            @if (isFieldInvalid('email')) {
-              <div class="invalid-feedback">{{ getErrorMessage('email') }}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="adresse" class="form-label">Adresse</label>
-            <input type="text" id="adresse" formControlName="adresse" class="form-control">
-          </div>
-
-          <div class="mb-3">
-            <label for="dateEmbauche" class="form-label">Date d'embauche <span class="text-danger">*</span></label>
-            <input type="date" id="dateEmbauche" formControlName="dateEmbauche" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('dateEmbauche')">
-            @if (isFieldInvalid('dateEmbauche')) {
-              <div class="invalid-feedback">{{ getErrorMessage('dateEmbauche') }}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="poste" class="form-label">Poste <span class="text-danger">*</span></label>
-            <input type="text" id="poste" formControlName="poste" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('poste')">
-            @if (isFieldInvalid('poste')) {
-              <div class="invalid-feedback">{{ getErrorMessage('poste') }}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="service" class="form-label">Service <span class="text-danger">*</span></label>
-            <input type="text" id="service" formControlName="service" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('service')">
-            @if (isFieldInvalid('service')) {
-              <div class="invalid-feedback">{{ getErrorMessage('service') }}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="classificationProfessionnelle" class="form-label">Statut <span class="text-danger">*</span></label>
-            <select id="classificationProfessionnelle" formControlName="classificationProfessionnelle" class="form-select"
-                    [class.is-invalid]="isFieldInvalid('classificationProfessionnelle')">
-              <option value="">Sélectionner un statut</option>
-              @for (statut of statutEmployeEnum; track statut) {
-                <option [value]="statut">{{ statut }}</option>
+            <div class="col-md-6 mb-3">
+              <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+              <input type="text" id="nom" formControlName="nom" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('nom')">
+              @if (isFieldInvalid('nom')) {
+                <div class="invalid-feedback">{{ getErrorMessage('nom') }}</div>
               }
-            </select>
-            @if (isFieldInvalid('classificationProfessionnelle')) {
-              <div class="invalid-feedback">{{ getErrorMessage('classificationProfessionnelle') }}</div>
-            }
-          </div>
+            </div>
 
-          <div class="mb-3">
-            <label for="categorie" class="form-label">Catégorie <span class="text-danger">*</span></label>
-            <select id="categorie" formControlName="categorie" class="form-select"
-                    [class.is-invalid]="isFieldInvalid('categorie')">
-              <option value="">Sélectionner une catégorie</option>
-              @for (cat of categorieEnum; track cat) {
-                <option [value]="cat">{{ cat }}</option>
+            <div class="col-md-6 mb-3">
+              <label for="prenom" class="form-label">Prénom <span class="text-danger">*</span></label>
+              <input type="text" id="prenom" formControlName="prenom" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('prenom')">
+              @if (isFieldInvalid('prenom')) {
+                <div class="invalid-feedback">{{ getErrorMessage('prenom') }}</div>
               }
-            </select>
-            @if (isFieldInvalid('categorie')) {
-              <div class="invalid-feedback">{{ getErrorMessage('categorie') }}</div>
-            }
-          </div>
+            </div>
 
-          <div class="mb-3">
-            <label for="echelon" class="form-label">Échelon <span class="text-danger">*</span></label>
-            <select id="echelon" formControlName="echelon" class="form-select"
-                    [class.is-invalid]="isFieldInvalid('echelon')">
-              <option value="">Sélectionner un échelon</option>
-              @for (echelon of echelonEnum; track echelon) {
-                <option [value]="echelon">{{ echelon }}</option>
+            <div class="col-md-6 mb-3">
+              <label for="numeroCnps" class="form-label">Numéro CNPS <span class="text-danger">*</span></label>
+              <input type="text" id="numeroCnps" formControlName="numeroCnps" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('numeroCnps')">
+              @if (isFieldInvalid('numeroCnps')) {
+                <div class="invalid-feedback">{{ getErrorMessage('numeroCnps') }}</div>
               }
-            </select>
-            @if (isFieldInvalid('echelon')) {
-              <div class="invalid-feedback">{{ getErrorMessage('echelon') }}</div>
-            }
-          </div>
+            </div>
 
-          <div class="mb-3">
-            <label for="typeContratEnum" class="form-label">Type de Contrat <span class="text-danger">*</span></label>
-            <select id="typeContratEnum" formControlName="typeContratEnum" class="form-select"
-                    [class.is-invalid]="isFieldInvalid('typeContratEnum')">
-              <option value="">Sélectionner un type de contrat</option>
-              @for (type of typeContratEnum; track type) {
-                <option [value]="type">{{ type }}</option>
+            <div class="col-md-6 mb-3">
+              <label for="niu" class="form-label">NIU <span class="text-danger">*</span></label>
+              <input type="text" id="niu" formControlName="niu" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('niu')">
+              @if (isFieldInvalid('niu')) {
+                <div class="invalid-feedback">{{ getErrorMessage('niu') }}</div>
               }
-            </select>
-            @if (isFieldInvalid('typeContratEnum')) {
-              <div class="invalid-feedback">{{ getErrorMessage('typeContratEnum') }}</div>
-            }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+              <input type="email" id="email" formControlName="email" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('email')">
+              @if (isFieldInvalid('email')) {
+                <div class="invalid-feedback">{{ getErrorMessage('email') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="adresse" class="form-label">Adresse <span class="text-danger">*</span></label>
+              <input type="text" id="adresse" formControlName="adresse" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('adresse')">
+              @if (isFieldInvalid('adresse')) {
+                <div class="invalid-feedback">{{ getErrorMessage('adresse') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="telephone" class="form-label">Téléphone</label>
+              <input type="text" id="telephone" formControlName="telephone" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('telephone')">
+              @if (isFieldInvalid('telephone')) {
+                <div class="invalid-feedback">{{ getErrorMessage('telephone') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="dateNaissance" class="form-label">Date de Naissance <span class="text-danger">*</span></label>
+              <input type="date" id="dateNaissance" formControlName="dateNaissance" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('dateNaissance')">
+              @if (isFieldInvalid('dateNaissance')) {
+                <div class="invalid-feedback">{{ getErrorMessage('dateNaissance') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="sexe" class="form-label">Sexe <span class="text-danger">*</span></label>
+              <select id="sexe" formControlName="sexe" class="form-select"
+                      [class.is-invalid]="isFieldInvalid('sexe')">
+                <option value="">Sélectionner le sexe</option>
+                @for (sexe of SexeEnum; track sexe) {
+                  <option [value]="sexe">{{ sexe }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('sexe')) {
+                <div class="invalid-feedback">{{ getErrorMessage('sexe') }}</div>
+              }
+            </div>
           </div>
         </div>
-      </div>
+      }
 
-      <div class="d-flex justify-content-end mt-4">
-        <button type="button" class="btn btn-secondary me-2" (click)="onCancel()">Annuler</button>
-        <button type="submit" class="btn btn-primary" [disabled]="employeForm.invalid">
-          {{ isEditMode ? 'Mettre à jour l\'employé' : 'Enregistrer l\'employé' }}
-        </button>
+      @if (currentStep === 2) {
+        <div formGroupName="informationsProfessionnelles">
+          <h3>Informations professionnelles</h3>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="dateEmbauche" class="form-label">Date d'embauche <span class="text-danger">*</span></label>
+              <input type="date" id="dateEmbauche" formControlName="dateEmbauche" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('dateEmbauche')">
+              @if (isFieldInvalid('dateEmbauche')) {
+                <div class="invalid-feedback">{{ getErrorMessage('dateEmbauche') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="poste" class="form-label">Poste <span class="text-danger">*</span></label>
+              <input type="text" id="poste" formControlName="poste" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('poste')">
+              @if (isFieldInvalid('poste')) {
+                <div class="invalid-feedback">{{ getErrorMessage('poste') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="service" class="form-label">Service <span class="text-danger">*</span></label>
+              <input type="text" id="service" formControlName="service" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('service')">
+              @if (isFieldInvalid('service')) {
+                <div class="invalid-feedback">{{ getErrorMessage('service') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="classificationProfessionnelle" class="form-label">Classification professionnelle <span class="text-danger">*</span></label>
+              <select id="classificationProfessionnelle" formControlName="classificationProfessionnelle" class="form-select"
+                      [class.is-invalid]="isFieldInvalid('classificationProfessionnelle')">
+                <option value="">Sélectionner une classification</option>
+                @for (statut of statutEmployeEnum; track statut) {
+                  <option [value]="statut">{{ statut }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('classificationProfessionnelle')) {
+                <div class="invalid-feedback">{{ getErrorMessage('classificationProfessionnelle') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="categorie" class="form-label">Catégorie <span class="text-danger">*</span></label>
+              <select id="categorie" formControlName="categorie" class="form-select"
+                      [class.is-invalid]="isFieldInvalid('categorie')">
+                <option value="">Sélectionner une catégorie</option>
+                @for (categorie of categorieEnum; track categorie) {
+                  <option [value]="categorie">{{ categorie }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('categorie')) {
+                <div class="invalid-feedback">{{ getErrorMessage('categorie') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="echelon" class="form-label">Échelon <span class="text-danger">*</span></label>
+              <select id="echelon" formControlName="echelon" class="form-select"
+                      [class.is-invalid]="isFieldInvalid('echelon')">
+                <option value="">Sélectionner un échelon</option>
+                @for (echelon of echelonEnum; track echelon) {
+                  <option [value]="echelon">{{ echelon }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('echelon')) {
+                <div class="invalid-feedback">{{ getErrorMessage('echelon') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="typeContratEnum" class="form-label">Type de Contrat <span class="text-danger">*</span></label>
+              <select id="typeContratEnum" formControlName="typeContratEnum" class="form-select"
+                      [class.is-invalid]="isFieldInvalid('typeContratEnum')">
+                <option value="">Sélectionner un type de contrat</option>
+                @for (type of typeContratEnum; track type) {
+                  <option [value]="type">{{ type }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('typeContratEnum')) {
+                <div class="invalid-feedback">{{ getErrorMessage('typeContratEnum') }}</div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (currentStep === 3) {
+        <div formGroupName="detailsContractuels">
+          <h3>Détails contractuels et salariaux</h3>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="heuresContractuellesHebdomadaires" class="form-label">Heures  hebdomadaires <span class="text-danger">*</span></label>
+              <input type="number" id="heuresContractuellesHebdomadaires" formControlName="heuresContractuellesHebdomadaires" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('heuresContractuellesHebdomadaires')">
+              @if (isFieldInvalid('heuresContractuellesHebdomadaires')) {
+                <div class="invalid-feedback">{{ getErrorMessage('heuresContractuellesHebdomadaires') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="joursOuvrablesContractuelsHebdomadaires" class="form-label">Jours ouvrables hebdomadaires <span class="text-danger">*</span></label>
+              <input type="number" id="joursOuvrablesContractuelsHebdomadaires" formControlName="joursOuvrablesContractuelsHebdomadaires" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('joursOuvrablesContractuelsHebdomadaires')">
+              @if (isFieldInvalid('joursOuvrablesContractuelsHebdomadaires')) {
+                <div class="invalid-feedback">{{ getErrorMessage('joursOuvrablesContractuelsHebdomadaires') }}</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="salaireBase" class="form-label">Salaire de base <span class="text-danger">*</span></label>
+              <input type="number" id="salaireBase" formControlName="salaireBase" class="form-control"
+                     [class.is-invalid]="isFieldInvalid('salaireBase')">
+              @if (isFieldInvalid('salaireBase')) {
+                <div class="invalid-feedback">{{ getErrorMessage('salaireBase') }}</div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="d-flex justify-content-between mt-4">
+        @if (currentStep > 1) {
+          <button type="button" class="btn btn-secondary" (click)="previousStep()">Précédent</button>
+        } @else {
+          <div></div>
+        }
+
+        <button type="button" class="btn btn-danger" (click)="onCancel()">Annuler</button>
+
+        @if (currentStep < totalSteps) {
+          <button type="button" class="btn btn-primary" (click)="nextStep()">Suivant</button>
+        } @else {
+          <button type="submit" class="btn btn-success">
+            {{ isEditMode ? 'Mettre à jour l\'employé' : 'Enregistrer l\'employé' }}
+          </button>
+        }
       </div>
     </form>
   </div>

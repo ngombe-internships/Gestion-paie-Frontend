@@ -48,45 +48,46 @@ export class BulletinPreviewComponent implements OnChanges {
   // }
 
   generatePdf(): void {
-    if (!this.bulletinData || this.bulletinData.id === undefined || this.bulletinData.id === null) {
-      console.error("Impossible de télécharger le PDF : l'ID du bulletin est manquant.");
-      this.toastrService.warning("Impossible de télécharger le PDF : le bulletin doit d'abord être calculé et avoir un ID.");
-      this.errorMessage = "Impossible de télécharger le PDF : l'ID du bulletin est manquant.";
-      return;
+    if (!this.bulletinData || !this.bulletinData.id) {
+        this.toastrService.error("Le bulletin doit d'abord être calculé et sauvegardé");
+        return;
     }
 
-    const bulletinId = this.bulletinData.id;
-    this.errorMessage = null;
+    this.toastrService.info('Génération du PDF en cours...', 'Patientez');
 
-    this.bulletinService.downloadBulletinPdf(bulletinId).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `bulletin_paie_${bulletinId}.pdf`;
+    this.bulletinService.downloadBulletinPdf(this.bulletinData.id).subscribe({
+        next: (blob: Blob) => {
+            try {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bulletin_paie_${this.bulletinData?.employe?.nom || ''}_${this.bulletinData?.employe?.prenom || ''}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                this.toastrService.success('PDF généré avec succès');
+            } catch (e) {
+                console.error('Erreur lors du traitement du PDF:', e);
+                this.toastrService.error('Erreur lors du traitement du PDF');
+            }
+        },
+        error: (error) => {
+            console.error('Erreur lors de la génération du PDF:', error);
+            let errorMessage = 'Erreur lors de la génération du PDF';
 
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        a.remove();
+            if (error.message) {
+                errorMessage = error.message;
+            } else if (error.status === 404) {
+                errorMessage = 'Bulletin non trouvé';
+            } else if (error.status === 403) {
+                errorMessage = 'Accès non autorisé';
+            } else if (error.status === 500) {
+                errorMessage = 'Erreur serveur lors de la génération du PDF';
+            }
 
-        console.log('PDF téléchargé avec succès.');
-        this.toastrService.success('Le bulletin de paie a été téléchargé avec succès.', 'Téléchargement réussi');
-      },
-      error: (err) => {
-        console.error("Erreur lors du téléchargement du PDF: ", err);
-        const status = err.status || 'unknown';
-        const message = err.message || 'Le fichier PDF n\'a pas pu être généré ou trouvé.';
-        this.errorMessage = `Erreur lors du téléchargement du PDF: ${status} - ${message}`;
-
-        if (err.status === 403) {
-          this.toastrService.error('Accès non autorisé au PDF. Vérifiez vos permissions.', 'Accès refusé');
-        } else if (err.status === 404) {
-          this.toastrService.error('Le PDF demandé n\'a pas été trouvé.', 'Fichier non trouvé');
-        } else {
-          this.toastrService.error('Une erreur est survenue lors du téléchargement du PDF.', 'Erreur PDF');
+            this.toastrService.error(errorMessage, 'Erreur');
         }
-      }
     });
   }
 }

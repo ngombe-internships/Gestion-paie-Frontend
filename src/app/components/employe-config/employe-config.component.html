@@ -1,0 +1,97 @@
+<div class="employe-config-form">
+  <h2 class="display-4 fw-bold text-primary mb-0">
+    <i class="bi bi-gear-fill me-3"></i>
+    {{ configId ? 'Modifier' : 'Nouvelle' }} Configuration de Paie
+  </h2>
+  <div class="mt-2">
+    <span class="badge bg-light text-dark fs-6">Gérer les éléments de paie par employé</span>
+  </div>
+
+  <div class="card mt-4 shadow-sm">
+    <div class="card-header bg-white">
+      <h4 class="mb-0" style="color: #0d6efd;"><i class="bi bi-person-fill me-2"></i>Détails de la Configuration</h4>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="employePaieConfigForm" (ngSubmit)="onSubmit()">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="employe" class="form-label">Employé <span class="text-danger">*</span></label>
+            <select id="employe" class="form-select" formControlName="employe">
+              <option [ngValue]="null" disabled>Sélectionner un employé</option>
+              <option *ngFor="let employe of employes" [ngValue]="employe.id">
+                {{ employe.nom }} {{ employe.prenom }} ({{ employe.matricule }})
+              </option>
+            </select>
+            <div *ngIf="employePaieConfigForm.get('employe')?.invalid && employePaieConfigForm.get('employe')?.touched"
+                 class="text-danger mt-1">
+              L'employé est requis.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="elementPaie" class="form-label">Élément de Paie <span class="text-danger">*</span></label>
+            <select id="elementPaie" class="form-select" formControlName="elementPaie">
+              <option [ngValue]="null" disabled>Sélectionner un élément de paie</option>
+              <option *ngFor="let element of elementPaies" [ngValue]="element.id">
+                {{ element.designation }} ({{ element.code }})
+              </option>
+            </select>
+            <div *ngIf="employePaieConfigForm.get('elementPaie')?.invalid && employePaieConfigForm.get('elementPaie')?.touched"
+                 class="text-danger mt-1">
+              L'élément de paie est requis.
+            </div>
+          </div>
+
+
+         <div class="col-md-4">
+             <!-- Montant pour MONTANT_FIXE -->
+           <div *ngIf="selectedFormula === 'MONTANT_FIXE'">
+             <label for="montant" class="form-label">Montant <span class="text-danger">*</span></label>
+             <input type="number" id="montant" class="form-control" formControlName="montant">
+             <div *ngIf="employePaieConfigForm.get('montant')?.invalid && employePaieConfigForm.get('montant')?.touched"
+                class="text-danger mt-1">
+                Le montant est requis et doit être positif.
+             </div>
+           </div>
+             <!-- Taux pour POURCENTAGE_BASE -->
+            <div *ngIf="selectedFormula === 'POURCENTAGE_BASE'">
+              <label for="taux" class="form-label">Taux <span class="text-danger">*</span></label>
+              <input type="number" id="taux" class="form-control" formControlName="taux">
+              <div *ngIf="employePaieConfigForm.get('taux')?.invalid && employePaieConfigForm.get('taux')?.touched"
+                 class="text-danger mt-1">
+                Le taux est requis et doit être positif.
+              </div>
+           </div>
+           <!-- Pour les autres formules, rien ou un texte d’info -->
+           <div *ngIf="selectedFormula !== 'MONTANT_FIXE' && selectedFormula !== 'POURCENTAGE_BASE'">
+               <small class="text-muted">Pas de valeur à saisir pour cet élément.</small>
+           </div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="dateDebut" class="form-label">Date Début <span class="text-danger">*</span></label>
+            <input type="date" id="dateDebut" class="form-control" formControlName="dateDebut">
+            <div *ngIf="employePaieConfigForm.get('dateDebut')?.invalid && employePaieConfigForm.get('dateDebut')?.touched"
+                 class="text-danger mt-1">
+              La date de début est requise.
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="dateFin" class="form-label">Date Fin</label>
+            <input type="date" id="dateFin" class="form-control" formControlName="dateFin">
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-4">
+          <button type="button" class="btn btn-outline-secondary me-2" (click)="onCancel()">
+            <i class="bi bi-x-circle me-1"></i> Annuler
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="employePaieConfigForm.invalid">
+            <i class="bi bi-save me-1"></i> {{ configId ? 'Mettre à jour' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

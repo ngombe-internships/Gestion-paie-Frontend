@@ -18,5 +18,8 @@ export interface Employe {
   echelon : EchelonEnum;
   typeContratEnum : TypeContratEnum;
   dateNaissance : string;
-  sexe : SexeEnum
+  sexe : SexeEnum;
+  heuresContractuellesHebdomadaires: number;
+  joursOuvrablesContractuelsHebdomadaires: number;
+  salaireBase: number;
 }

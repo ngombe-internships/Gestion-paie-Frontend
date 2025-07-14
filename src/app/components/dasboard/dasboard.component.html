@@ -1,58 +1,90 @@
 <div class="dashboard-container">
-  <aside class="sidebar">
-  <div class="sidebar-header">
-    <h3>Tableau de Bord</h3>
-    <p class="welcome-message">Bienvenue, <span class="display-name">{{displayName}}</span> !</p>
+  <!-- Bouton hamburger -->
+  <button class="hamburger-btn"
+          [class.active]="isSidebarOpen"
+          (click)="toggleSidebar()"
+          aria-label="Menu de navigation">
+    <div class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </button>
 
-  </div>
-  <nav class="sidebar-nav">
-    <ul>
-      @if(userRole === 'ADMIN'){
-         <li><a routerLink="/dashboard/overview" class="nav-link"><i class="bi bi-bar-chart-fill me-2"></i>Aperçu Global</a></li>
-        <li><a routerLink ="/dashboard/register/employer-company" class="nav-link">Enregistrer un Employeur</a></li>
-        <li><a routerLink ="/dashboard/employeur" class="nav-link">Liste des employeur</a></li>
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.active]="isSidebarOpen">
+    <div class="sidebar-header">
+      <h3>Tableau de Bord</h3>
+      <p class="welcome-message">Bienvenue, <span class="display-name">{{displayName}}</span> !</p>
+    </div>
 
+    <nav class="sidebar-nav">
+      <ul>
+        @if(userRole === 'ADMIN'){
+          <li><a routerLink="/dashboard/overview"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">
+                 <i class="bi bi-bar-chart-fill me-2"></i>Aperçu Global</a></li>
+          <li><a routerLink="/dashboard/register/employer-company"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Enregistrer un Employeur</a></li>
+          <li><a routerLink="/dashboard/employeur"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Liste des employeur</a></li>
+        }
 
-        <!-- <li><a routerLink ="/dashboard/employe" class="nav-link">Previsualiser un bulletins</a></li> -->
-        <!-- <li><a routerLink ="/employe" class="nav-link">Liste des employes</a></li> -->
-
-      }
-
-    @if (userRole === 'EMPLOYEUR') {
-         <li><a routerLink="/dashboard/dashEmployeur" class="nav-link"><i class="bi bi-bar-chart-fill me-2"></i>Aperçu Global</a></li>
-          <li><a routerLink="/dashboard/employes/create" class="nav-link">Ajout d'un Employe</a></li>
-          <li><a routerLink="/dashboard/register/employer" class="nav-link">Créer le compte d'un Employe</a></li>
-          <li><a routerLink="/dashboard/employes" class="nav-link">Mes Employés</a></li>
-          <li><a routerLink="/dashboard/element" class="nav-link">Créer les Element de paie</a></li>
-          <li><a routerLink="/dashboard/template" class="nav-link">Cree Template du Bulletin </a></li>
-          <li><a routerLink="/dashboard/bulletins/employeur" class="nav-link">Les Bulletins Emis</a></li>
-          <li><a routerLink="/dashboard/employe-paie-config" class="nav-link">Config Emloye</a></li>
-
-          <!-- <li><a routerLink="/dashboard/entreprise-profile" class="nav-link">Profil Entreprise</a></li> -->
-          <!-- <li><a routerLink="/dashboard/bulletins" class="nav-link">Previsualiser un bulletins</a></li> -->
-
+        @if (userRole === 'EMPLOYEUR') {
+          <li><a routerLink="/dashboard/dashEmployeur"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">
+                 <i class="bi bi-bar-chart-fill me-2"></i>Aperçu Global</a></li>
+          <li><a routerLink="/dashboard/employes/create"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Ajout d'un Employe</a></li>
+          <li><a routerLink="/dashboard/register/employer"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Créer le compte d'un Employe</a></li>
+          <li><a routerLink="/dashboard/employes"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Mes Employés</a></li>
+          <li><a routerLink="/dashboard/element"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Créer les Element de paie</a></li>
+          <li><a routerLink="/dashboard/template"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Cree Template du Bulletin</a></li>
+          <li><a routerLink="/dashboard/bulletins/employeur"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Les Bulletins Emis</a></li>
+          <li><a routerLink="/dashboard/employe-paie-config"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Config Emloye</a></li>
         }
 
         @if (userRole === 'EMPLOYE') {
-        <li><a routerLink="/dashboard/mon-profil" class="nav-link">Mon Profil</a></li>
-          <li><a routerLink="/dashboard/employeBulletin" class="nav-link">Mes Bulletins de Paie</a></li>
+          <li><a routerLink="/dashboard/mon-profil"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Mon Profil</a></li>
+          <li><a routerLink="/dashboard/employeBulletin"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Mes Bulletins de Paie</a></li>
         }
 
-       <li ><a (click)="logout()" class="nav-link logout-link">Déconnexion</a></li>
-
-  </ul>
-  </nav>
+        <li><a (click)="logout()"
+               class="nav-link logout-link">Déconnexion</a></li>
+      </ul>
+    </nav>
   </aside>
 
-   <main class="content">
-    <div class="content-header">
+  <!-- Overlay pour fermer le menu -->
+  <div class="sidebar-overlay"
+       [class.active]="isSidebarOpen"
+       (click)="closeSidebar()"></div>
 
+  <!-- Contenu principal -->
+  <main class="content">
+    <div class="content-header">
       <router-outlet></router-outlet>
-      <!-- <h1>Résumé de l'Activité</h1>
-      </div>
-    <div class="content-body">
-      <p>Ceci est le contenu principal de votre tableau de bord. La navigation à gauche est adaptée à votre rôle.</p> -->
-      </div>
+    </div>
   </main>
 </div>
-

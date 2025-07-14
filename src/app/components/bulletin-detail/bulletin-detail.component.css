@@ -1,3 +1,119 @@
 .test {
   margin-left: -20px;
 }
+
+/* CSS Responsive pour petits appareils uniquement */
+
+/* Smartphones (portrait et paysage) */
+@media only screen and (max-width: 768px) {
+
+  /* Bouton retour */
+  .btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    width: auto;
+    margin-bottom: 1rem;
+  }
+
+  /* Container principal */
+  .container {
+    padding: 0.75rem !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Titre principal */
+  .text-2xl {
+    font-size: 1.25rem !important;
+    line-height: 1.75rem !important;
+    margin-bottom: 1rem !important;
+    padding: 0 0.5rem;
+  }
+
+  /* Bouton télécharger PDF */
+  .btn-success {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Zone de contenu du bulletin */
+  .bg-white {
+    padding: 1rem !important;
+    margin: 0 !important;
+    border-radius: 0.375rem !important;
+  }
+
+  /* Messages d'état */
+  .text-center {
+    padding: 0 0.5rem;
+  }
+
+  .text-lg {
+    font-size: 1rem !important;
+  }
+
+  /* Ajustements pour le contenu du bulletin */
+  .bg-white div[innerHTML] {
+    overflow-x: auto;
+    font-size: 0.875rem;
+  }
+
+  /* Tables dans le bulletin si présentes */
+  .bg-white table {
+    width: 100%;
+    font-size: 0.75rem;
+    border-collapse: collapse;
+  }
+
+  .bg-white th,
+  .bg-white td {
+    padding: 0.25rem 0.5rem;
+    text-align: left;
+    border: 1px solid #e5e7eb;
+  }
+}
+
+/* Très petits écrans (smartphones en portrait) */
+@media only screen and (max-width: 480px) {
+
+  .container {
+    padding: 0.5rem !important;
+  }
+
+  .text-2xl {
+    font-size: 1.125rem !important;
+    line-height: 1.5rem !important;
+  }
+
+  .bg-white {
+    padding: 0.75rem !important;
+    border-radius: 0.25rem !important;
+  }
+
+  .bg-white div[innerHTML] {
+    font-size: 0.75rem;
+  }
+
+  /* Boutons plus compacts */
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-success {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  /* Tables encore plus compactes */
+  .bg-white table {
+    font-size: 0.625rem;
+  }
+
+  .bg-white th,
+  .bg-white td {
+    padding: 0.125rem 0.25rem;
+  }
+}

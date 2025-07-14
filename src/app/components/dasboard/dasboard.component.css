@@ -114,3 +114,287 @@
 .status-annulé {
     background-color: #dc3545; /* Rouge */
 }
+
+
+/* Responsive pour dashboard.component.css */
+
+/* Bouton hamburger - visible seulement sur mobile */
+.hamburger-btn {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1001;
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.hamburger-btn:hover {
+  background: #5856eb;
+}
+
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  width: 20px;
+  height: 15px;
+  justify-content: space-between;
+}
+
+.hamburger-icon span {
+  display: block;
+  height: 2px;
+  background: white;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+/* Animation du hamburger quand le menu est ouvert */
+.hamburger-btn.active .hamburger-icon span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-btn.active .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.active .hamburger-icon span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Overlay pour fermer le menu en cliquant à côté */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    position: relative;
+  }
+
+  /* Afficher le bouton hamburger sur mobile */
+  .hamburger-btn {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Masqué par défaut */
+    width: 280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  }
+
+  /* Sidebar visible quand active */
+  .sidebar.active {
+    left: 0;
+  }
+
+  /* Overlay visible quand sidebar active */
+  .sidebar.active ~ .sidebar-overlay {
+    display: block;
+  }
+
+  .sidebar-header {
+    padding: 1rem;
+    padding-top: 4rem; /* Espace pour le bouton hamburger */
+  }
+
+  .sidebar-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .welcome-message {
+    font-size: 0.9rem;
+  }
+
+  .sidebar-nav ul {
+    padding: 0 1rem;
+  }
+
+  .sidebar-nav li {
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-link {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 6px;
+  }
+
+  .nav-link i {
+    font-size: 1rem;
+  }
+
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem;
+    padding-top: 4rem; /* Espace pour le bouton hamburger */
+  }
+
+  .content-header {
+    padding: 0;
+  }
+
+  .content-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .content-body {
+    padding: 1rem 0;
+  }
+
+  /* Ajuster les éléments dans le contenu */
+  .content-body p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 576px) {
+  .hamburger-btn {
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.4rem;
+  }
+
+  .sidebar {
+    width: 100%;
+    left: -100%;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .sidebar-header {
+    padding: 1rem 0.5rem;
+    padding-top: 3.5rem;
+  }
+
+  .sidebar-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .welcome-message {
+    font-size: 0.8rem;
+  }
+
+  .sidebar-nav ul {
+    padding: 0 0.5rem;
+  }
+
+  .nav-link {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .nav-link i {
+    font-size: 0.9rem;
+  }
+
+  .content {
+    padding: 0.5rem;
+    padding-top: 3.5rem;
+  }
+
+  .content-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .content-body {
+    padding: 0.5rem 0;
+  }
+
+  .content-body p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Styles pour les écrans plus larges (desktop) */
+@media (min-width: 769px) {
+  .hamburger-btn {
+    display: none;
+  }
+
+  .sidebar-overlay {
+    display: none !important;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    transition: none;
+  }
+
+  .content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+  }
+}
+
+/* Animation pour une meilleure expérience utilisateur */
+.sidebar {
+  transition: left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.sidebar-overlay {
+  transition: opacity 0.3s ease;
+}
+
+/* Améliorer l'accessibilité */
+.hamburger-btn:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.nav-link:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* Responsive pour les cartes et éléments dans le contenu */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .table-responsive {
+    font-size: 0.8rem;
+  }
+
+  .form-control {
+    font-size: 0.9rem;
+  }
+
+  .alert {
+    font-size: 0.9rem;
+  }
+}

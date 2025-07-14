@@ -256,3 +256,194 @@ button:hover:not(:disabled) {
             }
         }
 
+/* Responsive pour bulletin-preview.component.css */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+    margin: 0;
+    width: 100%;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .header .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .info-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .info-box {
+    margin-bottom: 1rem;
+  }
+
+  .info-box h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-label {
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+  }
+
+  .info-value {
+    padding-left: 0;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Table responsive */
+  .payroll-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-size: 0.7rem;
+  }
+
+  .payroll-table th,
+  .payroll-table td {
+    padding: 0.3rem;
+    min-width: 60px;
+  }
+
+  .payroll-table th {
+    font-size: 0.6rem;
+  }
+
+  /* Masquer certaines colonnes sur mobile */
+  .payroll-table th:nth-child(2),
+  .payroll-table td:nth-child(2) {
+    display: none;
+  }
+
+  .payroll-table th:nth-child(7),
+  .payroll-table td:nth-child(7) {
+    display: none;
+  }
+
+  .summary-section {
+    overflow-x: auto;
+  }
+
+  .summary-table {
+    min-width: 600px;
+    font-size: 0.7rem;
+  }
+
+  .summary-table th,
+  .summary-table td {
+    padding: 0.4rem;
+    white-space: nowrap;
+  }
+
+  .pdf-actions {
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  .btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .footer {
+    font-size: 0.7rem;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding: 0.3rem;
+  }
+
+  .header h1 {
+    font-size: 1.2rem;
+  }
+
+  .info-section {
+    gap: 0.5rem;
+  }
+
+  .info-box {
+    padding: 0.75rem;
+  }
+
+  .info-box h2 {
+    font-size: 1rem;
+  }
+
+  .payroll-table {
+    font-size: 0.6rem;
+  }
+
+  .payroll-table th,
+  .payroll-table td {
+    padding: 0.2rem;
+    min-width: 50px;
+  }
+
+  /* Sur très petits écrans, afficher en format liste */
+  .mobile-format .payroll-table {
+    display: none;
+  }
+
+  .mobile-format .payroll-mobile {
+    display: block;
+  }
+
+  .payroll-mobile-item {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+  }
+
+  .payroll-mobile-item h4 {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  .payroll-mobile-item .detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  .summary-table {
+    min-width: 500px;
+    font-size: 0.6rem;
+  }
+
+  .summary-table th,
+  .summary-table td {
+    padding: 0.3rem;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .footer {
+    font-size: 0.6rem;
+  }
+}

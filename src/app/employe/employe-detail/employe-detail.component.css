@@ -287,3 +287,230 @@
             }
         }
 
+
+
+        /* CSS pour les petits écrans - Détails employé */
+
+/* Styles généraux pour mobile */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 10px;
+    margin-top: 15px;
+  }
+
+  /* Header de la carte */
+  .card-header {
+    padding: 15px;
+    border-radius: 10px 10px 0 0 !important;
+  }
+
+  .card-header h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .card-header .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .card-header .btn {
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Corps de la carte */
+  .card-body {
+    padding: 20px 15px;
+  }
+
+  /* Sections d'informations */
+  .mb-4 h4 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+
+  .mb-4 h4 i {
+    font-size: 1rem;
+  }
+
+  /* Colonnes responsive */
+  .row.g-3 {
+    margin: 0 -5px;
+  }
+
+  .row.g-3 [class*="col-"] {
+    padding: 0 5px;
+    margin-bottom: 10px;
+  }
+
+  /* Items d'information */
+  .info-item {
+    padding: 12px 10px !important;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: #f8f9fa !important;
+    border: 1px solid #e9ecef;
+  }
+
+  .info-item label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin-bottom: 5px;
+  }
+
+  .info-item div {
+    font-size: 0.9rem;
+    word-wrap: break-word;
+  }
+
+  /* Liens dans les info-items */
+  .info-item a {
+    color: #0d6efd;
+    font-size: 0.85rem;
+  }
+
+  .info-item a i {
+    font-size: 0.8rem;
+  }
+
+  /* États de chargement */
+  .spinner-border {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .text-center.py-5 {
+    padding: 30px 0 !important;
+  }
+
+  .text-center.py-5 p {
+    font-size: 1rem;
+  }
+
+  /* Messages d'erreur */
+  .alert {
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+
+  .alert i {
+    font-size: 1.1rem;
+  }
+
+  /* Section actions */
+  .border-top {
+    margin-top: 25px;
+    padding-top: 20px;
+  }
+
+  .border-top .d-flex {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .border-top .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+
+  /* Icônes */
+  .bi {
+    margin-right: 5px;
+  }
+
+  /* État vide */
+  .text-center.py-5 i {
+    font-size: 3rem !important;
+  }
+
+  .text-center.py-5 h5 {
+    font-size: 1.1rem;
+    margin-top: 15px;
+  }
+
+  .text-center.py-5 p {
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+}
+
+/* Styles pour très petits écrans (moins de 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 8px;
+  }
+
+  .card {
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .card-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .card-body {
+    padding: 15px 10px;
+  }
+
+  .info-item {
+    padding: 10px 8px !important;
+  }
+
+  .info-item label {
+    font-size: 0.7rem;
+  }
+
+  .info-item div {
+    font-size: 0.85rem;
+  }
+
+  .mb-4 h4 {
+    font-size: 1rem;
+  }
+
+  .border-top .btn {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Amélioration de la lisibilité */
+@media (max-width: 768px) {
+  /* Espacement vertical entre les sections */
+  .mb-4:not(:last-child) {
+    margin-bottom: 25px !important;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  /* Amélioration du contraste */
+  .text-muted {
+    color: #495057 !important;
+  }
+
+  /* Boutons plus accessibles */
+  .btn {
+    min-height: 44px;
+    font-weight: 500;
+  }
+
+  /* Amélioration de la navigation */
+  .card-header .btn-outline-light {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.3);
+  }
+
+  .card-header .btn-outline-light:hover {
+    background: rgba(255,255,255,0.2);
+  }
+}

@@ -1,0 +1,187 @@
+/* CSS Responsive pour employeru-dashboard.component.css */
+
+/* Petits écrans (smartphones) */
+@media (max-width: 576px) {
+  .container-fluid {
+    padding: 0.5rem;
+  }
+
+  .py-4 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .display-4 {
+    font-size: 1.5rem !important;
+  }
+
+  .mb-5 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .badge.fs-6 {
+    font-size: 0.75rem !important;
+  }
+
+  /* Alert responsive */
+  .alert {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Cards layout pour mobile */
+  .row.g-4 {
+    gap: 1rem !important;
+  }
+
+  .col-md-6,
+  .col-lg-4 {
+    width: 100% !important;
+    margin-bottom: 1rem;
+  }
+
+  /* Dashboard cards */
+  .dashboard-card {
+    border-radius: 0.75rem;
+    transition: transform 0.2s;
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .card-body {
+    padding: 1.5rem !important;
+  }
+
+  .card-body i {
+    font-size: 2rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .card-title {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .card-text.display-4 {
+    font-size: 2rem !important;
+  }
+
+  /* Spinner responsive */
+  .spinner-border {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+  }
+
+  /* Couleurs spécifiques aux cartes */
+  .employees-card .card-body i {
+    color: #007bff !important;
+  }
+
+  .bulletins-card .card-body i {
+    color: #28a745 !important;
+  }
+
+  /* Améliorer l'espacement */
+  .text-center.mb-5 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .text-center.mb-5 .display-4 {
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+/* Très petits écrans (moins de 400px) */
+@media (max-width: 400px) {
+  .container-fluid {
+    padding: 0.25rem;
+  }
+
+  .display-4 {
+    font-size: 1.25rem !important;
+  }
+
+  .card-body {
+    padding: 1rem !important;
+  }
+
+  .card-body i {
+    font-size: 1.5rem !important;
+  }
+
+  .card-title {
+    font-size: 0.8rem !important;
+  }
+
+  .card-text.display-4 {
+    font-size: 1.5rem !important;
+  }
+
+  .badge.fs-6 {
+    font-size: 0.7rem !important;
+  }
+
+  /* Réduire l'espacement */
+  .mb-5 {
+    margin-bottom: 1rem !important;
+  }
+
+  .row.g-4 {
+    gap: 0.5rem !important;
+  }
+
+  .col-md-6,
+  .col-lg-4 {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Écrans moyens (tablettes) */
+@media (min-width: 577px) and (max-width: 768px) {
+  .col-md-6 {
+    width: 50% !important;
+  }
+
+  .col-lg-4 {
+    width: 50% !important;
+  }
+
+  .card-body {
+    padding: 2rem !important;
+  }
+
+  .card-body i {
+    font-size: 2.5rem !important;
+  }
+
+  .card-text.display-4 {
+    font-size: 2.5rem !important;
+  }
+
+  .display-4 {
+    font-size: 1.75rem !important;
+  }
+
+  /* Centrer les cartes si impair */
+  .row.g-4.justify-content-center {
+    justify-content: center !important;
+  }
+}
+
+/* Écrans larges (desktops) */
+@media (min-width: 769px) and (max-width: 992px) {
+  .col-lg-4 {
+    width: 33.333333% !important;
+  }
+
+  .card-body {
+    padding: 2.5rem !important;
+  }
+
+  .display-4 {
+    font-size: 2rem !important;
+  }
+}

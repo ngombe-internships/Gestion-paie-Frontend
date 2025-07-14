@@ -277,3 +277,223 @@
             }
         }
 
+
+        @media (max-width: 768px) {
+            .login-container {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem;
+            }
+
+            .login-card {
+                width: 100%;
+                max-width: 400px;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                overflow: hidden;
+            }
+
+            .left-panel {
+                background: linear-gradient(135deg, #6610f2, #007bff);
+                color: white;
+                text-align: center;
+                padding: 2rem 1rem;
+                min-height: 200px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .logo-container {
+                margin-bottom: 1rem;
+            }
+
+            .logo-placeholder img {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-bottom: 1rem;
+            }
+
+            .brand-title {
+                font-size: 1.8rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+            }
+
+            .brand-subtitle {
+                font-size: 0.9rem;
+                opacity: 0.8;
+                margin-bottom: 0;
+            }
+
+            .right-panel {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                text-align: center;
+                margin-bottom: 0.5rem;
+                color: #333;
+            }
+
+            .form-subtitle {
+                text-align: center;
+                color: #666;
+                font-size: 0.9rem;
+                margin-bottom: 2rem;
+            }
+
+            .form-floating {
+                margin-bottom: 1.5rem;
+            }
+
+            .form-floating input {
+                border: 2px solid #e9ecef;
+                border-radius: 10px;
+                padding: 1rem 0.75rem;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+            }
+
+            .form-floating input:focus {
+                border-color: #6610f2;
+                box-shadow: 0 0 0 0.2rem rgba(102, 16, 242, 0.15);
+            }
+
+            .form-floating label {
+                font-size: 0.85rem;
+                color: #666;
+                padding-left: 0.75rem;
+            }
+
+            .btn-login {
+                background: linear-gradient(135deg, #6610f2, #007bff);
+                border: none;
+                border-radius: 10px;
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 16, 242, 0.3);
+            }
+
+            .btn-login:disabled {
+                opacity: 0.6;
+                transform: none;
+            }
+
+            .alert {
+                border-radius: 10px;
+                border: none;
+                font-size: 0.9rem;
+            }
+
+            .alert-danger {
+                background: #fff5f5;
+                color: #c53030;
+                border-left: 4px solid #e53e3e;
+            }
+
+            .invalid-feedback {
+                font-size: 0.8rem;
+                margin-top: 0.25rem;
+            }
+
+            .form-control.is-invalid {
+                border-color: #dc3545;
+            }
+
+            .spinner-border-sm {
+                width: 1rem;
+                height: 1rem;
+            }
+
+            /* Animation d'entrée */
+            .login-card {
+                animation: slideInUp 0.6s ease-out;
+            }
+
+            @keyframes slideInUp {
+                from {
+                    transform: translateY(50px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            /* Masquer les sections pour mobile */
+            .row {
+                margin: 0;
+            }
+
+            .col-lg-5, .col-md-6 {
+                padding: 0;
+            }
+
+            .col-lg-7 {
+                padding: 0;
+            }
+
+            .w {
+                width: 100%;
+            }
+        }
+
+        /* Styles pour desktop (garder les styles existants) */
+        @media (min-width: 769px) {
+            .login-container {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+            }
+
+            .login-card {
+                width: 100%;
+                max-width: 1000px;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                overflow: hidden;
+                height: 600px;
+            }
+
+            .left-panel {
+                background: linear-gradient(135deg, #6610f2, #007bff);
+                color: white;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 3rem 2rem;
+            }
+
+            .right-panel {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 3rem 2rem;
+            }
+
+            .w {
+                width: 100%;
+                max-width: 400px;
+            }
+        }

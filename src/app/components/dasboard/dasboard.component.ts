@@ -1,7 +1,7 @@
 import { Router, RouterModule } from '@angular/router';
 import { routes } from './../../app.routes';
 import { AuthService } from './../../services/auth.service';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 
@@ -15,6 +15,7 @@ export class DasboardComponent implements OnInit {
 
   displayName: string | null = null;
   userRole: string | null = null;
+    isSidebarOpen = false;
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -73,5 +74,31 @@ export class DasboardComponent implements OnInit {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+   toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  //fermer le sidebar lors du clic sur un lien de navigation
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
+
+
+   onNavLinkClick() {
+    if (window.innerWidth <= 768) {
+      this.closeSidebar();
+    }
+  }
+
+  // gérer le redimensionnement de la fenêtre
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    if (event.target.innerWidth > 768) {
+      this.isSidebarOpen = false;
+    }
+  }
+
+
 
 }

@@ -1,0 +1,378 @@
+/* CSS pour les petits écrans - Liste des employés */
+
+/* Styles généraux pour mobile */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 10px 8px;
+  }
+
+  /* Titre principal */
+  .text-center.mb-5 {
+    margin-bottom: 25px !important;
+  }
+
+  .display-4 {
+    font-size: 1.5rem !important;
+    margin-bottom: 10px !important;
+  }
+
+  .display-4 i {
+    font-size: 1.3rem;
+    margin-right: 8px !important;
+  }
+
+  .badge.bg-light {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+
+  /* Carte de recherche */
+  .card.shadow-lg {
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+  }
+
+  .card-header {
+    padding: 15px;
+    border-radius: 10px 10px 0 0 !important;
+  }
+
+  .card-header h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+  }
+
+  .card-header i {
+    font-size: 1rem;
+  }
+
+  .card-body {
+    padding: 20px 15px;
+  }
+
+  /* Champ de recherche */
+  .form-label {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+
+  .input-group-lg .form-control {
+    padding: 12px;
+    font-size: 0.9rem;
+    border-radius: 8px 8px 8px 0 !important;
+  }
+
+  .input-group-lg .input-group-text {
+    padding: 12px;
+    border-radius: 8px 0 0 8px !important;
+  }
+
+  /* Boutons de recherche */
+  .btn-lg {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    margin: 5px 0;
+  }
+
+  .text-center .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .text-center .btn:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Header d'actions */
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .d-flex.justify-content-between h5 {
+    text-align: center;
+    margin-bottom: 0;
+    font-size: 1rem;
+  }
+
+  .d-flex.justify-content-between .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  /* Messages d'état */
+  .alert {
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .alert i {
+    font-size: 1.1rem;
+    margin-right: 8px;
+  }
+
+  .spinner-border-sm {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+
+  /* Tableau responsive */
+  .table-responsive {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table {
+    margin-bottom: 0;
+  }
+
+  .table thead {
+    background: linear-gradient(135deg, #1f2937, #374151) !important;
+  }
+
+  .table thead th {
+    padding: 15px 8px;
+    font-size: 0.8rem;
+    border: none;
+    white-space: nowrap;
+  }
+
+  .table thead th i {
+    font-size: 0.7rem;
+    margin-right: 4px;
+  }
+
+  .table tbody td {
+    padding: 12px 8px;
+    font-size: 0.8rem;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+  }
+
+  /* Badges dans le tableau */
+  .badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  /* Groupe de boutons d'actions */
+  .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-group .btn {
+    margin: 2px 0;
+    padding: 6px 8px;
+    font-size: 0.7rem;
+    border-radius: 4px !important;
+    width: 100%;
+  }
+
+  .btn-group .btn i {
+    font-size: 0.7rem;
+    margin-right: 4px;
+  }
+
+  /* Colonnes spécifiques */
+  .table td:nth-child(1) { /* Matricule */
+    font-weight: 600;
+    color: #0d6efd;
+  }
+
+  .table td:nth-child(7) { /* Actions */
+    width: 120px;
+    min-width: 120px;
+  }
+
+  /* Masquer certaines colonnes sur très petits écrans */
+  .table td:nth-child(5), /* Service */
+  .table th:nth-child(5) {
+    display: none;
+  }
+
+  .table td:nth-child(6), /* Date embauche */
+  .table th:nth-child(6) {
+    display: none;
+  }
+}
+
+/* Styles pour très petits écrans (moins de 480px) */
+@media (max-width: 480px) {
+  .container-fluid {
+    padding: 8px 5px;
+  }
+
+  .display-4 {
+    font-size: 1.3rem !important;
+  }
+
+  .card-body {
+    padding: 15px 10px;
+  }
+
+  .btn-lg {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+  }
+
+  .d-flex.justify-content-between {
+    padding: 10px;
+  }
+
+  .table thead th {
+    padding: 10px 4px;
+    font-size: 0.7rem;
+  }
+
+  .table tbody td {
+    padding: 8px 4px;
+    font-size: 0.75rem;
+  }
+
+  .btn-group .btn {
+    padding: 4px 6px;
+    font-size: 0.65rem;
+  }
+
+  /* Masquer aussi le poste sur très petits écrans */
+  .table td:nth-child(4), /* Poste */
+  .table th:nth-child(4) {
+    display: none;
+  }
+
+  /* Réduire la largeur des actions */
+  .table td:nth-child(7) {
+    width: 80px;
+    min-width: 80px;
+  }
+}
+
+/* Amélioration de l'expérience utilisateur */
+@media (max-width: 768px) {
+  /* Effet hover amélioré */
+  .table-hover tbody tr:hover {
+    background-color: rgba(99, 102, 241, 0.08) !important;
+    transform: none; /* Désactiver la transformation sur mobile */
+  }
+
+  /* Amélioration des cartes */
+  .card:hover {
+    transform: none; /* Désactiver la transformation sur mobile */
+  }
+
+  /* Boutons plus accessibles */
+  .btn {
+    min-height: 44px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Amélioration du contraste */
+  .text-muted {
+    color: #495057 !important;
+  }
+
+  /* Scroll horizontal smooth */
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Amélioration de la barre de progression */
+  .progress {
+    height: 6px;
+    border-radius: 3px;
+  }
+
+  /* Amélioration des états vides */
+  .alert {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* Amélioration du header gradient */
+  .bg-gradient {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  }
+
+  /* Amélioration des badges */
+  .badge.bg-primary {
+    background-color: #0d6efd !important;
+  }
+
+  .badge.bg-secondary {
+    background-color: #6c757d !important;
+  }
+
+  .badge.bg-light {
+    background-color: #f8f9fa !important;
+    color: #495057 !important;
+    border: 1px solid #dee2e6;
+  }
+}
+
+/* Animation pour le chargement */
+@media (max-width: 768px) {
+  .spinner-border {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Animation pour l'apparition des lignes */
+  .table tbody tr {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Masquer complètement certains éléments sur mobile */
+@media (max-width: 576px) {
+  /* Masquer les icônes dans les en-têtes de colonnes */
+  .table thead th i {
+    display: none;
+  }
+
+  /* Simplifier les boutons d'actions */
+  .btn-group .btn {
+    padding: 4px;
+    font-size: 0.6rem;
+  }
+
+  .btn-group .btn i {
+    display: none;
+  }
+
+  /* Réduire encore plus les espaces */
+  .table thead th,
+  .table tbody td {
+    padding: 6px 2px;
+  }
+}

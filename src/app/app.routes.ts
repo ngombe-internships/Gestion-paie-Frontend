@@ -21,13 +21,13 @@ import { BulletinTemplateComponent } from './components/bulletin-template/bullet
 import { ElementPaieListComponent } from './components/element-paie-list/element-paie-list.component';
 import { EmployeConfigListComponent } from './components/employe-config-list/employe-config-list.component';
 import { EmployeConfigComponent } from './components/employe-config/employe-config.component';
+import { noAuthGuard } from './guard/noAuth.guard';
 
 export const routes: Routes = [
-  {path: 'login', component: LoginComponent},
+  {path: 'login', component: LoginComponent, canActivate:[noAuthGuard]},
 
    {
     path: 'dashboard',
-    loadChildren: () => import('./components/dasboard/dasboard.module').then(m => m.DasboardModule),
     component: DasboardComponent,
     canActivate: [authGuard],
     children:[

@@ -40,6 +40,10 @@
           },
           "configurations": {
             "production": {
+              "optimization": {
+                "scripts": true,
+                 "styles": true // <-- C'est ça qui active la minification et la purge basique
+                },
               "budgets": [
                 {
                   "type": "initial",

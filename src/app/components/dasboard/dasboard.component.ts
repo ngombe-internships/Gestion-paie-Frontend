@@ -4,10 +4,11 @@ import { AuthService } from './../../services/auth.service';
 import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { HeaderComponent } from "../header/header.component";
 
 @Component({
   selector: 'app-dasboard',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, HeaderComponent],
   templateUrl: './dasboard.component.html',
   styleUrl: './dasboard.component.css'
 })

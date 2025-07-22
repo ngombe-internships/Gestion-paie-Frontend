@@ -10,6 +10,8 @@ import { forkJoin } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-employe-config-list',
@@ -41,7 +43,7 @@ export class EmployeConfigListComponent  implements OnInit{
     private readonly elementpaieService = inject(ElementpaieService);
      private readonly router = inject(Router);
     private readonly toastrService = inject(ToastrService);
-
+   private readonly dialog = inject ( MatDialog);
 
     trackByConfigId(index: number, config: EmployePaieConfig): number | undefined {
     return config.id;
@@ -151,7 +153,20 @@ export class EmployeConfigListComponent  implements OnInit{
   }
 
   onDeleteConfig(id: number | undefined): void {
-    if (id && confirm('Êtes-vous sûr de vouloir supprimer cette configuration ?')) {
+  if (!id) return;
+
+  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    width: '400px',
+    data: {
+      title: 'Confirmation de suppression',
+      message: 'Êtes-vous sûr de vouloir supprimer cette configuration ?',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler'
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(confirmed => {
+    if (confirmed) {
       this.employePaieConfigService.deleteEmployePaieConfig(id).subscribe({
         next: () => {
           this.toastrService.success('Configuration supprimée avec succès !');
@@ -159,11 +174,19 @@ export class EmployeConfigListComponent  implements OnInit{
         },
         error: (err) => {
           this.error = 'Erreur lors de la suppression de la configuration.';
-          console.error('Error deleting config:', err);
+          this.toastrService.error(
+            'Une erreur est survenue lors de la suppression',
+            'Erreur',
+            { timeOut: 5000 }
+          );
+
+          // Optionnel : logger l'erreur dans un service de logging
+          // this.errorLoggingService.logError('DeleteConfigError', err);
         }
       });
     }
-  }
+  });
+}
 
   getElementPaieFormula(elementPaieId: number): string {
   const element = this.allElementPaies.find(el => el.id === elementPaieId);

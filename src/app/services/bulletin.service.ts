@@ -182,13 +182,14 @@ export interface BulletinPaieResponseDto {
   heuresFerie?: number;
   lignesPaie?: LignePaieDto[];
   salaireImposable?: number;
- salaireBrut?: number;
+  salaireBrut?: number;
   baseCnps?: number;
   totalRetenuesSalariales?: number;
   totalChargesPatronales?: number;
   coutTotalEmployeur?: number;
   salaireNetAPayer?: number;
-totalGains?: number;
+  totalGains?: number;
+  cotisationCnps?: number;
 
 
   statusBulletin?: 'GÉNÉRÉ' | 'VALIDÉ' | 'ENVOYÉ' | 'ARCHIVÉ' | 'ANNULÉ';
@@ -240,7 +241,7 @@ export interface LignePaieDto {
   formuleCalcul?: 'BAREME';
   tauxPatronal?:number;      // Patronale
  montantPatronal?: number;
- isMerged?:boolean;
+ merged?:boolean;
  tauxPatronalAffiche?: string;
   tauxAffiche?:string;
 

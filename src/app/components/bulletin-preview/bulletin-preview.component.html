@@ -115,7 +115,7 @@
        <!-- Affichage des retenues/impôts -->
   @for (ligne of bulletinData?.lignesPaie; track ligne.designation) {
     @if (ligne.type === 'RETENUE') {
-      <tr [class.merged-row]="ligne.isMerged">
+      <tr [class.merged-row]="ligne.merged">
         <td>{{ ligne.designation }}</td>
         <td>{{ ligne.nombre ? (ligne.nombre | number:'1.2-2') : '' }}</td>
         <td>{{ ligne.baseApplique ? (ligne.baseApplique | number:'1.2-2') : '' }}</td>
@@ -130,17 +130,17 @@
         <td>{{ ligne.montantFinal | number:'1.2-2' }}</td>
 
         <!-- Taux patronal (pour les lignes fusionnées) -->
-        <td>{{ ligne.isMerged && ligne.tauxPatronalAffiche ? ligne.tauxPatronalAffiche : '' }}</td>
+        <td>{{ ligne.merged && ligne.tauxPatronalAffiche ? ligne.tauxPatronalAffiche : '' }}</td>
 
         <!-- Montant patronal (pour les lignes fusionnées) -->
-        <td>{{ ligne.isMerged && ligne.montantPatronal ? (ligne.montantPatronal | number:'1.2-2') : '' }}</td>
+        <td>{{ ligne.merged && ligne.montantPatronal ? (ligne.montantPatronal | number:'1.2-2') : '' }}</td>
       </tr>
     }
   }
 
   <!-- Affichage des charges patronales (seulement celles qui ne sont pas fusionnées) -->
   @for (ligne of bulletinData?.lignesPaie; track ligne.designation) {
-    @if (ligne.type === 'CHARGE_PATRONALE' && !ligne.isMerged) {
+    @if (ligne.type === 'CHARGE_PATRONALE' && !ligne.merged) {
       <tr>
         <td>{{ ligne.designation }}</td>
         <td>{{ ligne.nombre ? (ligne.nombre | number:'1.2-2') : '' }}</td>
@@ -182,7 +182,7 @@
         <tr>
           <td>{{ bulletinData?.salaireImposable | number:'1.2-2' }}</td>
           <td>{{ bulletinData?.totalRetenuesSalariales | number:'1.2-2' }}</td>
-          <td>{{ bulletinData?.baseCnps | number:'1.2-2' }}</td>
+          <td>{{ bulletinData?.cotisationCnps | number:'1.2-2' }}</td>
           <td>{{ bulletinData?.totalChargesPatronales | number:'1.2-2' }}</td>
           <td>{{ bulletinData?.salaireBrut | number:'1.2-2' }}</td>
           <td>{{ bulletinData?.coutTotalEmployeur | number:'1.2-2' }}</td>

@@ -86,6 +86,8 @@
     color: #333;
 }
 
+
+
 /* Styles pour les badges de statut dans les tableaux Bootstrap */
 .status-badge {
     padding: 0.4em 0.8em;
@@ -398,3 +400,24 @@
     font-size: 0.9rem;
   }
 }
+
+
+.app-header {
+  display: flex; /* Active Flexbox */
+  justify-content: space-between; /* Pousse le premier élément à gauche, le dernier à droite */
+  align-items: center; /* Centre les éléments verticalement */
+
+  /* Styles de positionnement et visuels pour le header lui-même */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 15px 30px;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+

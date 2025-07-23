@@ -19,25 +19,64 @@ export class RegisterEmployerComponent implements OnInit {
   successMessage: string | null = null;
   isLoading: boolean = false;
   selectedFile: File | null = null;
+
   @ViewChild('fileInput') fileInput!: ElementRef;
+   @ViewChild('topElement') topElement!: ElementRef;
 
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject (Router);
 
-  ngOnInit (): void {
-    this.registerEmployerForm = this.fb.group ({
-      username: ['',[Validators.required, Validators.minLength(3)]],
-      password: ['',[Validators.required, Validators.minLength(6)]],
+  ngOnInit(): void {
+    this.initializeForm();
+  }
+
+  // Méthode pour initialiser le formulaire
+  private initializeForm(): void {
+    this.registerEmployerForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
       nomEntreprise: ['', Validators.required],
-      adresseEntreprise:['',Validators.required],
-      emailEntreprise:['',[Validators.required, Validators.email]],
-      telephoneEntreprise: ['',[Validators.required, Validators.pattern('^[0-9]{8,15}$')]],
-      numeroSiret:['',[Validators.required]],
-      dateCreation:['',[Validators.required]]
-    }, {validators: this.passwordMatchValidator});
+      adresseEntreprise: ['', Validators.required],
+      emailEntreprise: ['', [Validators.required, Validators.email]],
+      telephoneEntreprise: ['', [Validators.required, Validators.pattern('^[0-9]{8,15}$')]],
+      numeroSiret: ['', [Validators.required]],
+      dateCreation: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
   }
+
+   private resetForm(): void {
+    this.registerEmployerForm.reset();
+    this.selectedFile = null;
+
+
+    // Réinitialiser l'input file
+    if (this.fileInput?.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
+
+    // Marquer tous les champs comme non touchés
+    this.registerEmployerForm.markAsUntouched();
+    Object.keys(this.registerEmployerForm.controls).forEach(key => {
+      this.registerEmployerForm.get(key)?.markAsUntouched();
+      this.registerEmployerForm.get(key)?.markAsPristine();
+    });
+  }
+
+  // Méthode pour scroller vers le haut
+  private scrollToTop(): void {
+    if (this.topElement?.nativeElement) {
+      this.topElement.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      // Fallback si l'élément n'existe pas
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement; // Caster l'élément cible en HTMLInputElement
@@ -47,6 +86,8 @@ export class RegisterEmployerComponent implements OnInit {
       if (!this.isValidImage(file)) {
         this.errorMessage = 'Veuillez sélectionner un fichier image valide (JPEG, PNG, GIF).';
         this.selectedFile = null; // Réinitialiser pour éviter d'envoyer un fichier invalide
+        this.scrollToTop();
+        this.clearMessagesAfterDelay();
       } else {
         this.errorMessage = null; // Effacer le message d'erreur si le fichier est valide
       }
@@ -83,6 +124,8 @@ export class RegisterEmployerComponent implements OnInit {
      if (this.selectedFile && !this.isValidImage(this.selectedFile)) {
       this.errorMessage = 'Le fichier sélectionné n\'est pas une image valide.';
       this.isLoading = false;
+      this.scrollToTop();
+      this.clearMessagesAfterDelay();
       return;
      }
 
@@ -97,7 +140,7 @@ export class RegisterEmployerComponent implements OnInit {
       emailEntreprise: formValue.emailEntreprise,
       telephoneEntreprise: formValue.telephoneEntreprise,
       numeroSiret: formValue.numeroSiret,
-      dateCreation: formValue.dateCreation // Assurez-vous que le format de date est compatible avec le backend
+      dateCreation: formValue.dateCreation
     };
 
 
@@ -116,21 +159,35 @@ export class RegisterEmployerComponent implements OnInit {
           this.isLoading = false;
           if (response.data) {
             this.successMessage = response.message;
-            this.router.navigate(['/login']);
+            this.scrollToTop();
+            this.clearMessagesAfterDelay();
+
+            setTimeout(() => {
+              this.router.navigate(['/login']);
+            }, 2000);
           } else {
             this.errorMessage = response.message || 'Échec de l\'enregistrement de l\'employeur.';
+            this.scrollToTop();
+            this.clearMessagesAfterDelay();
+            this.resetForm();
+            this.isLoading = false;
           }
         },
         error: (err) => {
           this.isLoading = false;
           console.error('Erreur d\'enregistrement employeur:', err);
           this.errorMessage = err.error?.message || err.message || 'Échec de l\'enregistrement de l\'employeur. Veuillez réessayer.';
+
+          this.scrollToTop();
+          this.clearMessagesAfterDelay();
+         // this.resetForm();
         }
       });
     } else {
       this.errorMessage = 'Veuillez corriger les erreurs dans le formulaire.';
       this.markAllAsTouched(this.registerEmployerForm);
       this.isLoading = false;
+      this.scrollToTop();
     }
   }
 
@@ -169,6 +226,12 @@ export class RegisterEmployerComponent implements OnInit {
     });
   }
 
+  private clearMessagesAfterDelay(): void {
+    setTimeout(() => {
+      this.successMessage= null;
+      this.errorMessage = null;
+    }, 4000);
+  }
 
 
 }

@@ -1,123 +1,168 @@
+<div #topElement class="scroll-target" style="height: 1px;"></div>
 <div class="container mt-5">
   <div class="row justify-content-center">
-    <div class="col-md-7 col-lg-5">
+    <div class="col-md-8 col-lg-6">
       <div class="card shadow-sm p-4">
         <h2 class="card-title text-center mb-4">Créer un compte Employeur</h2>
 
         @if(errorMessage){
           <div class="alert alert-danger mb-3" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
             {{errorMessage}}
           </div>
         }
         @if(successMessage){
-          <div class="alert alert-success mb-3" role="alert">{{successMessage}}</div>
+          <div class="alert alert-success mb-3" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{successMessage}}
+          </div>
         }
 
         <form [formGroup]="registerEmployerForm" (ngSubmit)="onSubmit()">
-          <div class="mb-3">
-            <label for="username" class="form-label">Nom d'utilisateur</label>
-            <input type="text" id="username" formControlName="username" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('username')">
-            @if(isFieldInvalid('username')){
-              <div class="invalid-feedback">{{getErrorMessage('username')}}</div>
-            }
-          </div>
 
-          <div class="mb-3">
-            <label for="password" class="form-label">Mot de passe</label>
-            <input type="password" id="password" formControlName="password" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('password')">
-            @if(isFieldInvalid('password')){
-              <div class="invalid-feedback">{{getErrorMessage('password')}}</div>
-            }
-          </div>
+          <!-- SECTION 1: Informations du compte -->
+          <div class="account-section mb-5">
+            <div class="section-header mb-4">
+              <h5 class="text-primary fw-bold mb-2">
+                <i class="fas fa-user me-2"></i>Informations du compte
+              </h5>
+              <hr class="text-primary">
+            </div>
 
-          <div class="mb-4">
-            <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
-            <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control"
-                   [class.is-invalid]="isFieldInvalid('confirmPassword') || registerEmployerForm.hasError('mismatch')">
-            @if(isFieldInvalid('confirmPassword') || registerEmployerForm.hasError('mismatch')) {
-              <div class="invalid-feedback">
-                {{getErrorMessage('confirmPassword')}}
+            <div class="row">
+              <div class="col-12 mb-3">
+                <label for="username" class="form-label fw-semibold">Nom d'utilisateur</label>
+                <input type="text" id="username" formControlName="username" class="form-control"
+                       placeholder="Votre nom d'utilisateur"
+                       [class.is-invalid]="isFieldInvalid('username')">
+                @if(isFieldInvalid('username')){
+                  <div class="invalid-feedback">{{getErrorMessage('username')}}</div>
+                }
               </div>
-            }
+
+              <div class="col-md-6 mb-3">
+                <label for="password" class="form-label fw-semibold">Mot de passe</label>
+                <input type="password" id="password" formControlName="password" class="form-control"
+                       placeholder="Votre mot de passe"
+                       [class.is-invalid]="isFieldInvalid('password')">
+                @if(isFieldInvalid('password')){
+                  <div class="invalid-feedback">{{getErrorMessage('password')}}</div>
+                }
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="confirmPassword" class="form-label fw-semibold">Confirmer le mot de passe</label>
+                <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control"
+                       placeholder="Confirmer votre mot de passe"
+                       [class.is-invalid]="isFieldInvalid('confirmPassword') || registerEmployerForm.hasError('mismatch')">
+                @if(isFieldInvalid('confirmPassword') || registerEmployerForm.hasError('mismatch')) {
+                  <div class="invalid-feedback">
+                    {{getErrorMessage('confirmPassword')}}
+                  </div>
+                }
+              </div>
+            </div>
           </div>
 
-          <hr class="my-4">
-          <h5 class="mb-3">Informations sur l'entrprise</h5>
+          <!-- SECTION 2: Informations de l'entreprise -->
+          <div class="company-section mb-4">
+            <div class="section-header mb-4">
+              <h5 class="text-success fw-bold mb-2">
+                <i class="fas fa-building me-2"></i>Informations de l'entreprise
+              </h5>
+              <hr class="text-success">
+            </div>
 
-          <div class="mb-3">
-            <label for="nomEntreprise" class="form-label">Nom de l'entreprise</label>
-            <input type="text" id="nomEntreprise" formControlName="nomEntreprise" class="form-control"
-            [class.is-invalid]="isFieldInvalid('nomEntreprise')">
-            @if(isFieldInvalid('nomEntreprise')){
-              <div class="invalid-feedback">{{getErrorMessage('nomEntreprise')}}</div>
-            }
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="nomEntreprise" class="form-label fw-semibold">Nom de l'entreprise</label>
+                <input type="text" id="nomEntreprise" formControlName="nomEntreprise" class="form-control"
+                       placeholder="Nom de votre entreprise"
+                       [class.is-invalid]="isFieldInvalid('nomEntreprise')">
+                @if(isFieldInvalid('nomEntreprise')){
+                  <div class="invalid-feedback">{{getErrorMessage('nomEntreprise')}}</div>
+                }
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="numeroSiret" class="form-label fw-semibold">Numéro Siret</label>
+                <input type="text" id="numeroSiret" formControlName="numeroSiret" class="form-control"
+                       placeholder="14 chiffres"
+                       [class.is-invalid]="isFieldInvalid('numeroSiret')">
+                @if(isFieldInvalid('numeroSiret')){
+                  <div class="invalid-feedback">{{getErrorMessage('numeroSiret')}}</div>
+                }
+              </div>
+
+              <div class="col-12 mb-3">
+                <label for="adresseEntreprise" class="form-label fw-semibold">Adresse de l'entreprise</label>
+                <input type="text" id="adresseEntreprise" formControlName="adresseEntreprise" class="form-control"
+                       placeholder="Adresse complète de votre entreprise"
+                       [class.is-invalid]="isFieldInvalid('adresseEntreprise')">
+                @if(isFieldInvalid('adresseEntreprise')){
+                  <div class="invalid-feedback">{{getErrorMessage('adresseEntreprise')}}</div>
+                }
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="emailEntreprise" class="form-label fw-semibold">Email de l'entreprise</label>
+                <input type="email" id="emailEntreprise" formControlName="emailEntreprise" class="form-control"
+                       placeholder="contact@entreprise.com"
+                       [class.is-invalid]="isFieldInvalid('emailEntreprise')">
+                @if(isFieldInvalid('emailEntreprise')){
+                  <div class="invalid-feedback">{{getErrorMessage('emailEntreprise')}}</div>
+                }
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="telephoneEntreprise" class="form-label fw-semibold">Téléphone</label>
+                <input type="text" id="telephoneEntreprise" formControlName="telephoneEntreprise" class="form-control"
+                       placeholder="0123456789"
+                       [class.is-invalid]="isFieldInvalid('telephoneEntreprise')">
+                @if(isFieldInvalid('telephoneEntreprise')){
+                  <div class="invalid-feedback">{{getErrorMessage('telephoneEntreprise')}}</div>
+                }
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="dateCreation" class="form-label fw-semibold">Date de création</label>
+                <input type="date" id="dateCreation" formControlName="dateCreation" class="form-control"
+                       [class.is-invalid]="isFieldInvalid('dateCreation')">
+                @if(isFieldInvalid('dateCreation')){
+                  <div class="invalid-feedback">{{getErrorMessage('dateCreation')}}</div>
+                }
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Logo (Optionnel)</label>
+                <input type="file" #fileInput id="logo" class="form-control" style="display: none;" (change)="onFileSelected($event)">
+                <div class="d-grid">
+                  <button type="button" class="btn btn-outline-secondary" (click)="triggerFileInputClick()">
+                    <i class="fas fa-upload me-2"></i>
+                    {{ selectedFile ? selectedFile.name : 'Choisir un logo' }}
+                  </button>
+                </div>
+                @if(selectedFile && !isValidImage(selectedFile)) {
+                  <div class="invalid-feedback d-block">Le fichier doit être une image (JPEG, PNG, GIF).</div>
+                }
+              </div>
+            </div>
           </div>
 
-          <div class="mb-3">
-            <label for="numeroSiret" class="form-label">NumeroSiret l'entreprise</label>
-            <input type="text" id="numeroSirete" formControlName="numeroSiret" class="form-control"
-            [class.is-invalid]="isFieldInvalid('numeroSiret')">
-            @if(isFieldInvalid('numeroSiret')){
-              <div class="invalid-feedback">{{getErrorMessage('numeroSiret')}}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="adresseEntreprise" class="form-label">Adressede l'entreprise</label>
-            <input type="text" id="adresseEntreprise" formControlName="adresseEntreprise" class="form-control"
-            [class.is-invalid]="isFieldInvalid('adresseEntreprise')">
-            @if(isFieldInvalid('adresseEntreprise')){
-              <div class="invalid-feedback">{{getErrorMessage('adresseEntreprise')}}</div>
-            }
-          </div>
-
-           <div class="mb-3">
-            <label for="emailEntreprise" class="form-label">Email de l'entreprise</label>
-            <input type="text" id="emailEntreprise" formControlName="emailEntreprise" class="form-control"
-            [class.is-invalid]="isFieldInvalid('emailEntreprise')">
-            @if(isFieldInvalid('emailEntreprise')){
-              <div class="invalid-feedback">{{getErrorMessage('emailEntreprise')}}</div>
-            }
-          </div>
-
-           <div class="mb-3">
-            <label for="telephoneEntreprise" class="form-label">Numero telephone l'entreprise</label>
-            <input type="text" id="telephoneEntreprise" formControlName="telephoneEntreprise" class="form-control"
-            [class.is-invalid]="isFieldInvalid('telephoneEntreprise')">
-            @if(isFieldInvalid('telephoneEntreprise')){
-              <div class="invalid-feedback">{{getErrorMessage('telephoneEntreprise')}}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label for="dateCreation" class="form-label">Date de creation l'entreprise</label>
-            <input type="date" id="dateCreation" formControlName="dateCreation" class="form-control"
-            [class.is-invalid]="isFieldInvalid('dateCreation')">
-            @if(isFieldInvalid('dateCreation')){
-              <div class="invalid-feedback">{{getErrorMessage('dateCreation')}}</div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Logo de l'entreprise (Optionnel)</label>
-            <input type="file" #fileInput id="logo" class="form-control" style="display: none;" (change)="onFileSelected($event)">
-            <button type="button" class="btn btn-outline-secondary w-100" (click)="triggerFileInputClick()">
-              {{ selectedFile ? selectedFile.name : 'Choisir un logo' }}
+          <!-- Bouton de soumission -->
+          <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-success btn-lg fw-bold" [disabled]="registerEmployerForm.invalid || isLoading">
+              @if(isLoading){
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Enregistrement en cours...
+              } @else {
+                <i class="fas fa-check-circle me-2"></i>
+                Créer le compte employeur
+              }
             </button>
-            @if(selectedFile && !isValidImage(selectedFile)) {
-              <div class="invalid-feedback d-block">Le fichier doit être une image (JPEG, PNG, GIF).</div>
-            }
           </div>
 
 
-          <button type="submit" class="btn btn-primary w-100" [disabled]="registerEmployerForm.invalid || isLoading">
-            @if(isLoading){
-              <span class="spinner-border spinner-border-sm " role="status" aria-hidden="true"></span>
-            }
-            {{isLoading ? 'Enregistrement en cours...' : 'Enregistrer Employeur'}}
-          </button>
         </form>
       </div>
     </div>

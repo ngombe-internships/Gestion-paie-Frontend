@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { BulletinPaieResponseDto, BulletinService } from '../../services/bulletin.service';
-import { BulletinPaie } from '../../model/bulletin';
+import { BulletinPaie, BulletinPaieCreateDto } from '../../model/bulletin';
 import { BulletinPreviewComponent } from '../bulletin-preview/bulletin-preview.component';
 import { EmployeService } from '../../services/employe.service';
 import { ActivatedRoute } from '@angular/router';
@@ -105,9 +105,9 @@ export class BulletinFormComponent implements OnInit {
       this.isCalculating = true;
 
 
-      const bulletinData: BulletinPaie = {
-        employe: this.selectedEmploye ? {id: this.selectedEmploye.id} as Employe: undefined,
-        entreprise:{id: this.currentEntrepriseId} as any,
+      const bulletinData: BulletinPaieCreateDto = {
+        employeId:  this.selectedEmploye.id! ,
+        entrepriseId:this.currentEntrepriseId! ,
         heuresSup: this.formGroup.get('heuresSup')?.value || 0,
         heuresFerie: this.formGroup.get('heuresFerie')?.value || 0,
         heuresNuit: this.formGroup.get('heuresNuit')?.value || 0,
@@ -115,7 +115,7 @@ export class BulletinFormComponent implements OnInit {
         methodePaiement: this.formGroup.get('methodePaiement')?.value
 
       };
-         delete (bulletinData as any).id;
+        
 
      // Vérifier le payload
      console.log('Payload envoyé au backend:', bulletinData);

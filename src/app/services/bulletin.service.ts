@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { BulletinPaie } from '../model/bulletin';
+import { BulletinPaie, BulletinPaieCreateDto } from '../model/bulletin';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environment';
 import { Employe } from '../model/employe';
@@ -17,27 +17,21 @@ export class BulletinService {
   constructor() { }
 
   // Méthode pour calculer le bulletin
- calculerBulletin(fiche: BulletinPaie): Observable<ApiResponse<BulletinPaieResponseDto>> {
-  const ficheSansId = {...fiche};
-  delete ficheSansId.id;
-  console.log('Payload envoyé au backend:', ficheSansId);
+ calculerBulletin(fiche: BulletinPaieCreateDto): Observable<ApiResponse<BulletinPaieResponseDto>> {
   const headers = new HttpHeaders()
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json');
 
     return this.http.post<ApiResponse<BulletinPaieResponseDto>>(
         `${this.baseUrl}/calculate1`,
-        ficheSansId,
+        fiche,
         { headers }
     );
 }
 
   // Méthode pour créer un bulletin
   creerBulletin(fiche: BulletinPaie): Observable<ApiResponse<BulletinPaieResponseDto>> {
-    const ficheSansId = {...fiche};
-    delete ficheSansId.id;
-    console.log('Payload envoyé au backend:', ficheSansId);
-    return this.http.post<ApiResponse<BulletinPaieResponseDto>>(`${this.baseUrl}/create`, ficheSansId);
+       return this.http.post<ApiResponse<BulletinPaieResponseDto>>(`${this.baseUrl}/create`, fiche);
   }
 
   // Méthode pour récupérer tous les bulletins

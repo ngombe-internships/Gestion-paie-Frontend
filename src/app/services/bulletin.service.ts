@@ -18,20 +18,24 @@ export class BulletinService {
 
   // Méthode pour calculer le bulletin
  calculerBulletin(fiche: BulletinPaie): Observable<ApiResponse<BulletinPaieResponseDto>> {
-    const headers = new HttpHeaders()
+  const ficheSansId = {...fiche};
+  delete ficheSansId.id;
+  const headers = new HttpHeaders()
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json');
 
     return this.http.post<ApiResponse<BulletinPaieResponseDto>>(
         `${this.baseUrl}/calculate1`,
-        fiche,
+        ficheSansId,
         { headers }
     );
 }
 
   // Méthode pour créer un bulletin
   creerBulletin(fiche: BulletinPaie): Observable<ApiResponse<BulletinPaieResponseDto>> {
-    return this.http.post<ApiResponse<BulletinPaieResponseDto>>(`${this.baseUrl}/create`, fiche);
+    const ficheSansId = {...fiche};
+    delete ficheSansId.id;
+    return this.http.post<ApiResponse<BulletinPaieResponseDto>>(`${this.baseUrl}/create`, ficheSansId);
   }
 
   // Méthode pour récupérer tous les bulletins

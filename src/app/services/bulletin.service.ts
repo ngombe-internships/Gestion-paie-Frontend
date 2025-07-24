@@ -20,6 +20,7 @@ export class BulletinService {
  calculerBulletin(fiche: BulletinPaie): Observable<ApiResponse<BulletinPaieResponseDto>> {
   const ficheSansId = {...fiche};
   delete ficheSansId.id;
+  console.log('Payload envoyé au backend:', ficheSansId);
   const headers = new HttpHeaders()
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json');
@@ -35,6 +36,7 @@ export class BulletinService {
   creerBulletin(fiche: BulletinPaie): Observable<ApiResponse<BulletinPaieResponseDto>> {
     const ficheSansId = {...fiche};
     delete ficheSansId.id;
+    console.log('Payload envoyé au backend:', ficheSansId);
     return this.http.post<ApiResponse<BulletinPaieResponseDto>>(`${this.baseUrl}/create`, ficheSansId);
   }
 

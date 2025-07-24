@@ -115,6 +115,10 @@ export class BulletinFormComponent implements OnInit {
         methodePaiement: this.formGroup.get('methodePaiement')?.value
 
       };
+         delete (bulletinData as any).id;
+
+     // Vérifier le payload
+     console.log('Payload envoyé au backend:', bulletinData);
 
       if(!this.isBulletinCalculated){
         console.log('Données envoyées au service pour calcul :', bulletinData);
@@ -137,6 +141,9 @@ export class BulletinFormComponent implements OnInit {
         // etape 2 sauvergarde le bulletin
         if(this.calculatedBulletinData) {
           console.log('Sauvegarde du bulletin calcule:', this.calculatedBulletinData);
+
+           const toSave = { ...this.calculatedBulletinData };
+           delete (toSave as any).id;
           this.bulletinService.creerBulletin(this.calculatedBulletinData).subscribe({
             next:(response) => {
 

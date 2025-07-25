@@ -1,177 +1,220 @@
 @media (max-width: 768px) {
-            .container {
-                padding: 1rem !important;
-                margin-top: 2rem !important;
-            }
+    .container {
+        padding: 1rem !important;
+        margin-top: 2rem !important;
+        max-width: 100% !important;
+    }
 
-            .row {
-                margin: 0 !important;
-            }
+    .row {
+        margin: 0 !important;
+    }
 
-            .col-md-7, .col-lg-5 {
-                padding: 0 !important;
-            }
+    .col-md-8, .col-lg-6 {
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        padding: 0 !important;
+    }
 
-            .card {
-                border-radius: 15px !important;
-                border: none !important;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
-                margin-bottom: 2rem;
-            }
+    .card {
+        border-radius: 15px !important;
+        border: none !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+        margin-bottom: 2rem;
+        padding: 1.5rem !important;
+        width: 100% !important;
+    }
 
-            .card-title {
-                font-size: 1.3rem !important;
-                font-weight: 600 !important;
-                color: #333 !important;
-                margin-bottom: 1.5rem !important;
-            }
+    .card-title {
+        font-size: 1.3rem !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+        margin-bottom: 1.5rem !important;
+    }
 
-            .form-label {
-                font-size: 0.9rem !important;
-                font-weight: 500 !important;
-                color: #555 !important;
-                margin-bottom: 0.5rem !important;
-            }
+    .form-label {
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+        color: #555 !important;
+        margin-bottom: 0.5rem !important;
+    }
 
-            .form-select, .form-control {
-                border-radius: 10px !important;
-                border: 2px solid #e9ecef !important;
-                padding: 0.75rem 1rem !important;
-                font-size: 0.95rem !important;
-                transition: all 0.3s ease !important;
-            }
+    .form-control {
+        border-radius: 10px !important;
+        border: 2px solid #e9ecef !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.95rem !important;
+        transition: all 0.3s ease !important;
+    }
 
-            .form-select:focus, .form-control:focus {
-                border-color: #6610f2 !important;
-                box-shadow: 0 0 0 0.2rem rgba(102, 16, 242, 0.15) !important;
-            }
+    .form-control:focus {
+        border-color: #6610f2 !important;
+        box-shadow: 0 0 0 0.2rem rgba(102, 16, 242, 0.15) !important;
+    }
 
-            .form-select.is-invalid, .form-control.is-invalid {
-                border-color: #dc3545 !important;
-            }
+    .form-control.is-invalid {
+        border-color: #dc3545 !important;
+    }
 
-            .invalid-feedback {
-                font-size: 0.8rem !important;
-                margin-top: 0.25rem !important;
-            }
+    .invalid-feedback {
+        font-size: 0.8rem !important;
+        margin-top: 0.25rem !important;
+    }
 
-            .btn-primary {
-                background: linear-gradient(135deg, #6610f2, #007bff) !important;
-                border: none !important;
-                border-radius: 10px !important;
-                padding: 0.75rem 1.5rem !important;
-                font-size: 1rem !important;
-                font-weight: 600 !important;
-                transition: all 0.3s ease !important;
-                text-transform: uppercase !important;
-                letter-spacing: 0.5px !important;
-            }
+    .btn-primary {
+        background: linear-gradient(135deg, #6610f2, #007bff) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
 
-            .btn-primary:hover {
-                transform: translateY(-2px) !important;
-                box-shadow: 0 5px 15px rgba(102, 16, 242, 0.3) !important;
-            }
+    .btn-primary:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(102, 16, 242, 0.3) !important;
+    }
 
-            .btn-primary:disabled {
-                opacity: 0.6 !important;
-                transform: none !important;
-            }
+    .btn-primary:disabled {
+        opacity: 0.6 !important;
+        transform: none !important;
+    }
 
-            .alert {
-                border-radius: 10px !important;
-                border: none !important;
-                font-size: 0.9rem !important;
-                margin-bottom: 1rem !important;
-            }
+    .btn-outline-secondary {
+        border-radius: 10px !important;
+        border: 2px solid #6c757d !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.9rem !important;
+        transition: all 0.3s ease !important;
+    }
 
-            .alert-danger {
-                background: #fff5f5 !important;
-                color: #c53030 !important;
-                border-left: 4px solid #e53e3e !important;
-            }
+    .btn-outline-secondary:hover {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+    }
 
-            .alert-success {
-                background: #f0fff4 !important;
-                color: #38a169 !important;
-                border-left: 4px solid #48bb78 !important;
-            }
+    .alert {
+        border-radius: 10px !important;
+        border: none !important;
+        font-size: 0.9rem !important;
+        margin-bottom: 1rem !important;
+    }
 
-            .spinner-border-sm {
-                width: 1rem !important;
-                height: 1rem !important;
-            }
+    .alert-danger {
+        background: #fff5f5 !important;
+        color: #c53030 !important;
+        border-left: 4px solid #e53e3e !important;
+    }
 
-            .mb-3 {
-                margin-bottom: 1.5rem !important;
-            }
+    .alert-success {
+        background: #f0fff4 !important;
+        color: #38a169 !important;
+        border-left: 4px solid #48bb78 !important;
+    }
 
-            .mb-4 {
-                margin-bottom: 2rem !important;
-            }
+    .spinner-border-sm {
+        width: 1rem !important;
+        height: 1rem !important;
+    }
 
-            /* Amélioration du select */
-            .form-select option {
-                padding: 0.5rem !important;
-            }
+    .mb-3 {
+        margin-bottom: 1.5rem !important;
+    }
 
-            /* Animation d'entrée */
-            .card {
-                animation: slideInUp 0.6s ease-out;
-            }
+    .mb-4 {
+        margin-bottom: 2rem !important;
+    }
 
-            @keyframes slideInUp {
-                from {
-                    transform: translateY(30px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateY(0);
-                    opacity: 1;
-                }
-            }
+    .my-4 {
+        margin: 2rem 0 !important;
+    }
 
-            /* Responsive pour très petits écrans */
-            @media (max-width: 480px) {
-                .container {
-                    padding: 0.5rem !important;
-                }
+    /* Section séparateur */
+    hr {
+        border-color: #e9ecef !important;
+        margin: 2rem 0 !important;
+    }
 
-                .card {
-                    margin: 0.5rem !important;
-                }
+    h5 {
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+        margin-bottom: 1.5rem !important;
+    }
 
-                .card-title {
-                    font-size: 1.1rem !important;
-                }
+    /* Animation d'entrée */
+    .card {
+        animation: slideInUp 0.6s ease-out;
+    }
 
-                .form-label {
-                    font-size: 0.85rem !important;
-                }
+    @keyframes slideInUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
 
-                .form-select, .form-control {
-                    font-size: 0.9rem !important;
-                    padding: 0.6rem 0.8rem !important;
-                }
-
-                .btn-primary {
-                    font-size: 0.9rem !important;
-                    padding: 0.6rem 1rem !important;
-                }
-            }
+    /* Responsive pour très petits écrans */
+    @media (max-width: 480px) {
+        .container {
+            padding: 0.5rem !important;
         }
 
-        /* Styles pour desktop (garder les styles existants) */
-        @media (min-width: 769px) {
-            .container {
-                margin-top: 3rem;
-            }
-
-            .card {
-                padding: 2rem;
-            }
-
-            .card-title {
-                font-size: 1.5rem;
-                font-weight: 600;
-            }
+        .card {
+            margin: 0.5rem !important;
+            padding: 1rem !important;
         }
+
+        .card-title {
+            font-size: 1.1rem !important;
+        }
+
+        .form-label {
+            font-size: 0.85rem !important;
+        }
+
+        .form-control {
+            font-size: 0.9rem !important;
+            padding: 0.6rem 0.8rem !important;
+        }
+
+        .btn-primary {
+            font-size: 0.9rem !important;
+            padding: 0.6rem 1rem !important;
+        }
+
+        h5 {
+            font-size: 1rem !important;
+        }
+    }
+}
+
+/* Styles pour desktop (modifiés pour pleine largeur) */
+@media (min-width: 769px) {
+    .container {
+        margin-top: 3rem;
+        max-width: 100% !important;
+        padding: 0 2rem !important;
+    }
+
+    .col-md-8, .col-lg-6 {
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    .card {
+        padding: 2rem;
+        width: 100% !important;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+}

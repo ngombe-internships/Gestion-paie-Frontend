@@ -1,24 +1,60 @@
 <div class="bulletin-template-admin">
-  <h2>Templates de Bulletin</h2>
+  <h2 class="text-center">Templates de Bulletin</h2>
   <div *ngIf="error" class="error">{{ error }}</div>
   <div *ngIf="loading">Chargement...</div>
 
- <ul class="template-list">
-  <li *ngFor="let tpl of templates" [class.selected]="tpl === selectedTemplate"
-      (click)="selectTemplate(tpl)">
-    <span>{{ tpl.nom }}</span>
-    <span *ngIf="tpl.isDefault" class="default">(Par défaut)</span>
-    <button (click)="setAsDefault(tpl); $event.stopPropagation()"
-            *ngIf="!tpl.isDefault">Définir par défaut</button>
-    <button (click)="deleteTemplate(tpl); $event.stopPropagation()">Supprimer</button>
-  </li>
-</ul>
+<div class="top-section">
+  <div class="left-column">
+    <!--Bouton pour dupliquer-->
+    <button type="button" (click)="duplicateDefaultTemplate()" [disabled]="loading">
+      Dupliquer le template par défaut
+    </button>
 
+    <ul class="template-list">
+      <li *ngFor="let tpl of templates" [class.selected]="tpl === selectedTemplate"
+          (click)="selectTemplate(tpl)">
+        <span>{{ tpl.nom }}</span>
+        <span *ngIf="tpl.isDefault" class="default">Par défaut</span>
+
+        <div class="template-actions">
+          <button (click)="setAsDefault(tpl); $event.stopPropagation()" *ngIf="!tpl.isDefault">
+            Définir par défaut
+          </button>
+          <button (click)="unsetAsDefault(tpl); $event.stopPropagation()" *ngIf="tpl.isDefault && canUnsetDefault()">
+            Quitter le mode par défaut
+          </button>
+          <button class="delete-btn" (click)="deleteTemplate(tpl); $event.stopPropagation()">
+            Supprimer
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="right-column">
+  <!-- Bloc d’édition du template sélectionné -->
+  <div *ngIf="selectedTemplate" class="template-edit">
+    <input [(ngModel)]="selectedTemplate.nom" placeholder="Nom du template" />
+    <label>
+     <input type="checkbox" [(ngModel)]="selectedTemplate.isDefault" />
+        Par défaut
+    </label>
+   <button (click)="updateTemplate()" [disabled]="loading" class="btn-save">Enregistrer</button>
+  </div>
   <form [formGroup]="form" (ngSubmit)="createTemplate()" class="new-template-form">
     <input placeholder="Nom du template" formControlName="nom">
     <label><input type="checkbox" formControlName="isDefault"> Par défaut</label>
     <button type="submit" [disabled]="form.invalid">Créer</button>
   </form>
+
+ </div>
+
+
+</div>
+
+
+
+
 
   <div *ngIf="selectedTemplate" class="main-content">
     <div class="preview-panel">

@@ -1,111 +1,192 @@
-<div class="container-flex">
-  <!-- Prévisualisation à gauche -->
-  <div class="preview-container">
-    <app-bulletin-preview [bulletinData]="bulletinCalcule" [employeData]="selectedEmploye"></app-bulletin-preview>
+<div class="max-w-6xl mx-auto p-6 bg-white" #topElement>
+  <h1 class="text-2xl font-bold text-center mb-8">Générateur de Bulletin de Paie</h1>
 
-  </div>
+  <!-- Boutons de navigation -->
+<div class="nav-header-buttons">
+      <button
+      type="button"
+    class="nav-header-button nav-header-button--back"
+      (click)="goToEmployes()"
+    >
+      Retour aux Employés
+    </button>
 
-  <!-- Formulaire à droite -->
-  <div class="form-container">
-    <form [formGroup]="formGroup" (submit)="submit($event)">
-
-
-
-
-      <div class="form-field">
-        <label for="heuresSup">Heures Sup</label>
-        <input id="heuresSup" name="heuresSup" type="number" formControlName="heuresSup">
-        @if (isFieldValid('heuresSup')) {
-          @if (formGroup.get('heuresSup')?.hasError('required')) {
-            <div class="error">Ce champ est requis</div>
-          }
-          @if(formGroup.get('heuresSup')?.hasError('min')) {
-            <div class="error">Ce champ doit être supérieur à 0</div>
-          }
-        }
-      </div>
-
-
-
-      <div class="form-field">
-        <label for="heuresFerie">Heures Férié</label>
-        <input id="heuresFerie" name="heuresFerie" type="number" formControlName="heuresFerie">
-        @if (isFieldValid('heuresFerie')) {
-          @if (formGroup.get('heuresFerie')?.hasError('required')) {
-            <div class="error">Ce champ est requis</div>
-          }
-          @if(formGroup.get('heuresFerie')?.hasError('min')) {
-            <div class="error">Ce champ doit être supérieur à 0</div>
-          }
-        }
-      </div>
-
-      <div class="form-field">
-        <label for="heuresNuit">Heures Nuit</label>
-        <input id="heuresNuit" name="heuresNuit" type="number" formControlName="heuresNuit">
-        @if (isFieldValid('heuresNuit')) {
-          @if (formGroup.get('heuresNuit')?.hasError('required')) {
-            <div class="error">Ce champ est requis</div>
-          }
-          @if(formGroup.get('heuresNuit')?.hasError('min')) {
-            <div class="error">Ce champ doit être supérieur à 0</div>
-          }
-        }
-      </div>
-
-
-       <!-- <div class="form-field">
-        <label for="avancesSurSalaires">Avances Sur Salaires</label>
-        <input id="avancesSurSalaires" name="avancesSurSalaires" type="number" formControlName="avancesSurSalaires">
-        @if (isFieldValid('avancesSurSalaires')) {
-          @if (formGroup.get('avancesSurSalaires')?.hasError('required')) {
-            <div class="error">Ce champ est requis</div>
-          }
-          @if(formGroup.get('avancesSurSalaires')?.hasError('min')) {
-            <div class="error">Ce champ doit être supérieur à 0</div>
-          }
-        }
-      </div> -->
-
-       <div class="form-field">
-        <label for="datePaiement">Date de Paiement</label>
-        <input id="datePaiement" name="datePaiement" type="date" formControlName="datePaiement">
-        @if (isFieldValid('datePaiement')) {
-          @if (formGroup.get('datePaiement')?.hasError('required')) {
-            <div class="error">Ce champ est requis</div>
-          }
-          @if(formGroup.get('datePaiement')?.hasError('futureDate')) {
-            <div class="error">Ce champ doit ne doit pas etre dans le futur</div>
-          }
-        }
-      </div>
-
-      <div class="mb-3">
-            <label for="methodePaiement" class="form-label"> Methode de Paiement <span class="text-danger">*</span></label>
-            <select id="methodePaiement" formControlName="methodePaiement" class="form-select"
-                    [class.is-invalid]="isFieldValid('methodePaiement')">
-              <option value="">Sélectionner un statut</option>
-              @for (methodePaiement of methodePaiementOptions; track methodePaiement) {
-                <option [value]="methodePaiement">{{ methodePaiement }}</option>
-              }
-            </select>
-            @if (isFieldValid(' methodePaiement')) {
-              <div class="error">Ce champ est requis </div>
-            }
+    <!-- Message d'erreur centré -->
+    <div *ngIf="backendErrorMessage" class="nav-error-message">
+      {{ backendErrorMessage }}
     </div>
 
+    <button
+      type="button"
+    class="nav-header-button nav-header-button--template"
+      (click)="goToBulletinTemplate()"
+    >
+      Template Bulletin
+    </button>
+  </div>
 
+  <!-- Container principal avec flex layout -->
+  <div class="container-flex flex gap-6">
 
-      <div class="form-actions">
+    <!-- Prévisualisation à gauche -->
+    <div class="preview-container flex-1">
+      <app-bulletin-preview
+        [bulletinData]="bulletinCalcule"
+        [employeData]="selectedEmploye">
+      </app-bulletin-preview>
+    </div>
 
-          <button type="submit" class="btn-calculate" [disabled]="formGroup.invalid">
-          {{ isBulletinCalculated ? 'Sauvegarder le Bulletin' : 'Calculer le Bulletin' }}
-        </button>
-        <button type="button" class="btn-reset" (click)="resetForm()">
-          Réinitialiser
-        </button>
-      </div>
-    </form>
+    <!-- Formulaire à droite -->
+    <div class="form-container flex-1">
+      <form [formGroup]="formGroup" (ngSubmit)="submit($event)" class="space-y-4">
+
+        <!-- Heures Supplémentaires -->
+        <div class="form-field">
+          <label for="heuresSup" class="block text-sm font-medium text-gray-700 mb-1">
+            Heures Supplémentaires
+          </label>
+          <input
+            id="heuresSup"
+            name="heuresSup"
+            type="number"
+            formControlName="heuresSup"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldValid('heuresSup')"
+            min="0"
+            step="0.5"
+          >
+          <div *ngIf="isFieldValid('heuresSup')" class="mt-1">
+            <div *ngIf="formGroup.get('heuresSup')?.hasError('required')" class="error text-red-600 text-sm">
+              Ce champ est requis
+            </div>
+            <div *ngIf="formGroup.get('heuresSup')?.hasError('min')" class="error text-red-600 text-sm">
+              Ce champ doit être supérieur ou égal à 0
+            </div>
+          </div>
+        </div>
+
+        <!-- Heures Fériées -->
+        <div class="form-field">
+          <label for="heuresFerie" class="block text-sm font-medium text-gray-700 mb-1">
+            Heures Fériées
+          </label>
+          <input
+            id="heuresFerie"
+            name="heuresFerie"
+            type="number"
+            formControlName="heuresFerie"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldValid('heuresFerie')"
+            min="0"
+            step="0.5"
+          >
+          <div *ngIf="isFieldValid('heuresFerie')" class="mt-1">
+            <div *ngIf="formGroup.get('heuresFerie')?.hasError('required')" class="error text-red-600 text-sm">
+              Ce champ est requis
+            </div>
+            <div *ngIf="formGroup.get('heuresFerie')?.hasError('min')" class="error text-red-600 text-sm">
+              Ce champ doit être supérieur ou égal à 0
+            </div>
+          </div>
+        </div>
+
+        <!-- Heures de Nuit -->
+        <div class="form-field">
+          <label for="heuresNuit" class="block text-sm font-medium text-gray-700 mb-1">
+            Heures de Nuit
+          </label>
+          <input
+            id="heuresNuit"
+            name="heuresNuit"
+            type="number"
+            formControlName="heuresNuit"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldValid('heuresNuit')"
+            min="0"
+            step="0.5"
+          >
+          <div *ngIf="isFieldValid('heuresNuit')" class="mt-1">
+            <div *ngIf="formGroup.get('heuresNuit')?.hasError('required')" class="error text-red-600 text-sm">
+              Ce champ est requis
+            </div>
+            <div *ngIf="formGroup.get('heuresNuit')?.hasError('min')" class="error text-red-600 text-sm">
+              Ce champ doit être supérieur ou égal à 0
+            </div>
+          </div>
+        </div>
+
+        <!-- Date de Paiement -->
+        <div class="form-field">
+          <label for="datePaiement" class="block text-sm font-medium text-gray-700 mb-1">
+            Date de Paiement <span class="text-red-600">*</span>
+          </label>
+          <input
+            id="datePaiement"
+            name="datePaiement"
+            type="date"
+            formControlName="datePaiement"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldValid('datePaiement')"
+          >
+          <div *ngIf="isFieldValid('datePaiement')" class="mt-1">
+            <div *ngIf="formGroup.get('datePaiement')?.hasError('required')" class="error text-red-600 text-sm">
+              Ce champ est requis
+            </div>
+            <div *ngIf="formGroup.get('datePaiement')?.hasError('futureDate')" class="error text-red-600 text-sm">
+              Ce champ ne doit pas être dans le futur
+            </div>
+          </div>
+        </div>
+
+        <!-- Méthode de Paiement -->
+        <div class="form-field">
+          <label for="methodePaiement" class="block text-sm font-medium text-gray-700 mb-1">
+            Méthode de Paiement <span class="text-red-600">*</span>
+          </label>
+          <select
+            id="methodePaiement"
+            formControlName="methodePaiement"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldValid('methodePaiement')"
+          >
+            <option value="">Sélectionner une méthode</option>
+            <option *ngFor="let methodePaiement of methodePaiementOptions" [value]="methodePaiement">
+              {{ methodePaiement }}
+            </option>
+          </select>
+          <div *ngIf="isFieldValid('methodePaiement')" class="mt-1">
+            <div class="error text-red-600 text-sm">Ce champ est requis</div>
+          </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="form-actions flex gap-4 pt-6">
+          <button
+            type="submit"
+            class="btn-calculate flex-1 bg-blue-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            [disabled]="formGroup.invalid || isCalculating"
+          >
+            <span *ngIf="isCalculating" class="inline-flex items-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Traitement...
+            </span>
+            <span *ngIf="!isCalculating">
+              {{ isBulletinCalculated ? 'Sauvegarder le Bulletin' : 'Calculer le Bulletin' }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="btn-reset flex-1 bg-gray-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200"
+            (click)="resetForm()"
+          >
+            Réinitialiser
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
-

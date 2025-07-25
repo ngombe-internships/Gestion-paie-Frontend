@@ -58,4 +58,14 @@ export class BulletinTemplateService {
 getAllByEntreprise(entrepriseId: number) {
   return this.http.get<BulletinTemplate[]>(`${this.baseUrl}/entreprise/${entrepriseId}`);
 }
+
+duplicateDefaultTemplateToEntreprise(entrepriseId: number) {
+  return this.http.post<BulletinTemplate>(
+    `${this.baseUrl}/duplicate-default/${entrepriseId}`,
+    {} 
+  );
+}
+
+
+
 }

@@ -176,7 +176,7 @@ loadTemplates() {
       },
       error: () => this.error = "Erreur lors de l'ajout de l'élément"
     });
-   
+
   }
 
   removeElementFromTemplate(config: TemplateElementPaieConfig) {
@@ -242,12 +242,81 @@ loadTemplates() {
   }
 
   setAsDefault(tpl: BulletinTemplate) {
-  if (!tpl.id) return;
-  this.templateService.setDefault(tpl.id).subscribe({
+  // Côté client : désactive les autres
+  this.templates.forEach(t => {
+    if (t !== tpl) t.isDefault = false;
+  });
+  tpl.isDefault = true;
+  this.templateService.setDefault(tpl.id!).subscribe({
     next: () => this.loadTemplates(),
-    error: () => this.error = 'Erreur lors du changement de template par défaut'
+    error: () => this.error = 'Erreur lors du changement'
   });
 }
+
+duplicateDefaultTemplate() {
+  const entrepriseId = this.authService.getEntrepriseId();
+  if (!entrepriseId) {
+    this.error = "Impossible de récupérer l'entreprise courante.";
+    return;
+  }
+  this.loading = true;
+  this.templateService.duplicateDefaultTemplateToEntreprise(entrepriseId).subscribe({
+    next: tpl => {
+      this.loadTemplates();
+      this.loading = false;
+      // Optionnel: sélectionner le nouveau template dupliqué
+      this.selectedTemplate = tpl;
+    },
+    error: () => {
+      this.error = "Erreur lors de la duplication du template par défaut";
+      this.loading = false;
+    }
+  });
+}
+
+updateTemplate() {
+  if (!this.selectedTemplate || !this.selectedTemplate.id) return;
+  this.loading = true;
+  this.templateService.update(this.selectedTemplate.id, this.selectedTemplate).subscribe({
+    next: () => {
+      this.loadTemplates();
+      this.loading = false;
+    },
+    error: () => {
+      this.error = "Erreur lors de la mise à jour du template";
+      this.loading = false;
+    }
+  });
+}
+
+unsetAsDefault(tpl: BulletinTemplate) {
+  // Vérifie qu'il y a au moins un autre template par défaut
+  const defaults = this.templates.filter(t => t.isDefault);
+  if (defaults.length <= 1) {
+    this.error = "Il doit toujours rester au moins un template par défaut.";
+    return;
+  }
+  tpl.isDefault = false;
+  this.templateService.update(tpl.id!, tpl).subscribe({
+    next: () => this.loadTemplates(),
+    error: () => this.error = 'Erreur lors de la modification'
+  });
+}
+
+// Pour empêcher de tout retirer
+canUnsetDefault(): boolean {
+  // Il faut toujours au moins 1 template par défaut !
+  return this.templates.filter(t => t.isDefault).length > 1;
+}
+
+
+
+
+
+
+
+
+
 
   // Employé factice pour la preview
   fakeEmploye: Employe = {
@@ -347,4 +416,9 @@ fakeBulletinFromTemplate(template: BulletinTemplate): BulletinPaieResponseDto {
     avancesSurSalaires: 100,
   };
 }
+
+get showEmptyState(): boolean {
+  return !this.selectedTemplate;
+}
+
 }

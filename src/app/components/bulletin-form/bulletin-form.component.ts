@@ -1,18 +1,19 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { BulletinPaieResponseDto, BulletinService } from '../../services/bulletin.service';
 import { BulletinPaie, BulletinPaieCreateDto } from '../../model/bulletin';
 import { BulletinPreviewComponent } from '../bulletin-preview/bulletin-preview.component';
 import { EmployeService } from '../../services/employe.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Employe } from '../../model/employe';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-bulletin-form',
   standalone: true,
-  imports: [ReactiveFormsModule, BulletinPreviewComponent],
+  imports: [ReactiveFormsModule, BulletinPreviewComponent,CommonModule],
   templateUrl: './bulletin-form.component.html',
   styleUrls: ['./bulletin-form.component.css']
 })
@@ -23,6 +24,7 @@ export class BulletinFormComponent implements OnInit {
   isBulletinCalculated: boolean = false;
   calculatedBulletinData: BulletinPaie | null =null;
   currentEntrepriseId: number | null = null;
+   backendErrorMessage: string | null = null;
    methodePaiementOptions: string[] = [
     'VIREMENT',
     'CHEQUE',
@@ -32,12 +34,14 @@ export class BulletinFormComponent implements OnInit {
     'AUTRE'
   ];
 
+  @ViewChild('topElement') topElement!: ElementRef;
   private readonly fb = inject (FormBuilder) ;
   private readonly bulletinService = inject(BulletinService) ;
   private readonly route = inject(ActivatedRoute);
   private readonly employeService = inject(EmployeService);
   private readonly toastrService = inject(ToastrService);
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   isCalculating: any;
 
   constructor() {}
@@ -55,14 +59,21 @@ export class BulletinFormComponent implements OnInit {
           },
           error: (error) => {
             console.error('Erreur lors du chargement de l\'employe:', error);
-            this.toastrService.error('Impossible de charger les donnes de l\'employe')
+            const errorMsg = this.extractErrorMessage(error);
+            this.toastrService.error(errorMsg);
+            this.backendErrorMessage = errorMsg;
+            this.scrollToTop();
           }
         });
       }
     });
     this.currentEntrepriseId = this.authService.getEntrepriseId();
     if(!this.currentEntrepriseId) {
-      this.toastrService.error('ID d\'entreprise non trouve. Veuillez vous reconnecter.')
+      const errorMsg = 'ID d\'entreprise non trouvé. Veuillez vous reconnecter.';
+      this.toastrService.error(errorMsg);
+      this.backendErrorMessage = errorMsg;
+      this.scrollToTop();
+
     }
   }
   private initForm(): void {
@@ -78,6 +89,38 @@ export class BulletinFormComponent implements OnInit {
     });
   }
 
+   // Méthode pour extraire le message d'erreur du backend
+  private extractErrorMessage(error: any): string {
+    // Si c'est une HttpErrorResponse avec error.error contenant le message
+    if (error?.error?.message) {
+      return error.error.message;
+    }
+    // Si c'est directement dans error.message
+    if (error?.message && !error.message.includes('Http failure response')) {
+      return error.message;
+    }
+    // Message par défaut si on ne trouve pas de message spécifique
+    return 'Une erreur est survenue. Veuillez réessayer.';
+  }
+
+  // Méthode pour scroller vers le haut
+  private scrollToTop(): void {
+    if (this.topElement?.nativeElement) {
+      this.topElement.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      // Fallback si l'élément n'existe pas
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+  private clearMessagesAfterDelay(): void {
+    setTimeout(() => {
+      this.backendErrorMessage = null;
+    }, 5000);
+  }
+
   private loadEmployeDetails(id: number): void {
     this.employeService.getEmployeById(id).subscribe({
       next: (employe: Employe) => {
@@ -87,8 +130,10 @@ export class BulletinFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading employee details:', error);
-        //alert('Erreur lors du chargement des détails de l\'employé.');
-      }
+        const errorMsg = this.extractErrorMessage(error);
+        this.backendErrorMessage = errorMsg;
+        this.scrollToTop();
+        this.clearMessagesAfterDelay();      }
     });
   }
 
@@ -100,6 +145,7 @@ export class BulletinFormComponent implements OnInit {
 
   submit(event: Event): void {
     event.preventDefault();
+    this.backendErrorMessage = null;
 
     if (this.formGroup.valid && this.selectedEmploye && this.currentEntrepriseId) {
       this.isCalculating = true;
@@ -115,7 +161,7 @@ export class BulletinFormComponent implements OnInit {
         methodePaiement: this.formGroup.get('methodePaiement')?.value
 
       };
-        
+
 
      // Vérifier le payload
      console.log('Payload envoyé au backend:', bulletinData);
@@ -134,8 +180,13 @@ export class BulletinFormComponent implements OnInit {
         },
         error: (error) => {
           console.error('Erreur lors du calcul du bulletin:', error);
-          this.toastrService.error('Veuillez corriger les erreurs dans le formulaire.');
-         },
+           this.isCalculating = false;
+            const errorMsg = this.extractErrorMessage(error);
+            this.toastrService.error(errorMsg);
+            this.backendErrorMessage = errorMsg;
+            this.scrollToTop();
+            this.clearMessagesAfterDelay();
+        },
         });
       } else {
         // etape 2 sauvergarde le bulletin
@@ -151,17 +202,28 @@ export class BulletinFormComponent implements OnInit {
               this.bulletinCalcule = response.data; // Le DTO ici AURA l'ID
               this.isBulletinCalculated = false; // Réinitialiser pour un nouveau calcul
               this.calculatedBulletinData = null; // Vider les données intermédiaires
+              this.isCalculating = false;
               console.log('Bulletin sauvegardé avec ID:', this.bulletinCalcule.id);
               this.toastrService.success('Bulletin de paie sauvegardé avec succès! Le PDF est maintenant disponible.');
             },
             error: (error) => {
               console.error('Erreur lors de la sauvegarde du bulletin:', error);
-              this.toastrService.error('Erreur lors de la sauvegarde. Vérifiez la console pour plus de détails.');
+              this.isCalculating = false;
+              const errorMsg = this.extractErrorMessage(error);
+              this.toastrService.error(errorMsg);
+              this.backendErrorMessage = errorMsg;
+              this.scrollToTop();
+              this.clearMessagesAfterDelay();
             }
           });
         } else {
-          console.error("Aucune donnée de bulletin à sauvegarder.");
-          this.toastrService.error("Veuillez d'abord calculer le bulletin.");
+               console.error("Aucune donnée de bulletin à sauvegarder.");
+               const errorMsg = "Veuillez d'abord calculer le bulletin.";
+               this.toastrService.error(errorMsg);
+               this.backendErrorMessage = errorMsg;
+               this.isCalculating = false;
+               this.scrollToTop();
+               this.clearMessagesAfterDelay();
         }
       }
     }  else {
@@ -184,6 +246,7 @@ export class BulletinFormComponent implements OnInit {
           formErrors: this.formGroup.errors // Ceci sera souvent null si les erreurs sont sur les contrôles individuels
       });
       this.toastrService.error(errorMessage);
+      this.backendErrorMessage = errorMessage;
     }
   }
 
@@ -192,6 +255,7 @@ export class BulletinFormComponent implements OnInit {
     this.bulletinCalcule = null;
     this.isBulletinCalculated= false;
     this.calculatedBulletinData = null;
+    this.backendErrorMessage = null;
     // this.selectedEmploye = null;
     // Réinitialiser avec des valeurs par défaut
     this.formGroup.patchValue({
@@ -205,4 +269,14 @@ export class BulletinFormComponent implements OnInit {
       datePaiement:undefined,
     });
   }
+
+   goToEmployes(): void {
+    this.router.navigate(['/dashboard/employes']);
+  }
+
+   goToBulletinTemplate(): void {
+    this.router.navigate(['/dashboard/template']);
+  }
+
+
 }

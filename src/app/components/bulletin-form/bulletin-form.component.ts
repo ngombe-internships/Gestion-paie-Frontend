@@ -175,6 +175,7 @@ export class BulletinFormComponent implements OnInit {
            this.bulletinCalcule = response.data;
            this.calculatedBulletinData = bulletinData;
            this.isBulletinCalculated = true;
+           this.isCalculating = false;
            console.log('Bulletin calculé reçu (sans ID):', this.bulletinCalcule);
            this.toastrService.success('Bulletin de paie calcule. Cliquez dur "Sauvegarder le Bulletin pour  "')
         },

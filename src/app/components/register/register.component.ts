@@ -64,13 +64,11 @@ export class RegisterComponent implements OnInit {
 
       this.authService.register({ username, password, employeId: Number(employeId)}).subscribe({
         next:(response) => {
-          this.successMessage = response.message || 'inscription reussie! Vous pouvez maintenant vous connecter.';
+          this.successMessage = response.message || 'inscription reussie! Employe peut maintenant ce connecter.';
           this.isLoading = false;
           this.registerForm.reset();
 
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000);
+
         },
         error: (err) => {
           console.error('Erreur d\'inscription:', err);

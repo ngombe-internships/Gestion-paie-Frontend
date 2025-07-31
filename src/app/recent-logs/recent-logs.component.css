@@ -1,0 +1,448 @@
+/* Styles généraux pour recent-logs.component */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.15) !important;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #1f2937, #374151);
+  color: white;
+  padding: 1.5rem;
+  border: none;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.card-title i {
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.card-body {
+  padding: 0;
+  background: white;
+}
+
+/* Styles pour les logs récents */
+.list-group {
+  border: none;
+}
+
+.list-group-item {
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1.25rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+.list-group-item:hover {
+  background-color: rgba(99, 102, 241, 0.08);
+  transform: translateX(5px);
+}
+
+/* Styles pour les éléments de log */
+.log-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.log-user {
+  font-weight: 600;
+  color: #198754;
+  font-size: 0.95rem;
+}
+
+.log-date {
+  font-size: 0.8rem;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.log-action {
+  font-weight: 500;
+  color: #0d6efd;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.log-details {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Badge pour le statut */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Styles pour l'état de chargement */
+.alert {
+  border: none;
+  border-radius: 12px;
+  padding: 1.5rem;
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+}
+
+.alert-info {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #0277bd;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+/* Lien "Voir tout" */
+.card-footer {
+  background: #f8f9fa;
+  border: none;
+  padding: 1rem 1.5rem;
+  text-align: center;
+}
+
+.card-footer a {
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-footer a:hover {
+  color: #0b5ed7;
+  transform: translateY(-1px);
+}
+
+.card-footer a i {
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.card-footer a:hover i {
+  transform: translateX(3px);
+}
+
+/* État vide */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #6c757d;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+/* CSS Responsive pour recent-logs */
+
+/* Tablettes et écrans moyens (max-width: 768px) */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+  }
+
+  .card-header {
+    padding: 1.25rem 1rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .card-title i {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+  }
+
+  .list-group-item {
+    padding: 1rem;
+  }
+
+  .log-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .log-user {
+    font-size: 0.9rem;
+  }
+
+  .log-date {
+    font-size: 0.75rem;
+  }
+
+  .log-action {
+    font-size: 0.85rem;
+  }
+
+  .log-details {
+    font-size: 0.8rem;
+  }
+
+  .card-footer {
+    padding: 0.75rem 1rem;
+  }
+
+  .alert {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Petits écrans - Mobile (max-width: 576px) */
+@media (max-width: 576px) {
+  .card {
+    margin-bottom: 1rem;
+    border-radius: 8px;
+  }
+
+  .card:hover {
+    transform: none; /* Désactiver la transformation sur mobile */
+  }
+
+  .card-header {
+    padding: 1rem 0.75rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-title i {
+    font-size: 0.9rem;
+    margin-right: 0.4rem;
+  }
+
+  .list-group-item {
+    padding: 0.75rem;
+  }
+
+  .list-group-item:hover {
+    transform: none; /* Désactiver la transformation sur mobile */
+  }
+
+  .log-header {
+    margin-bottom: 0.5rem;
+  }
+
+  .log-user {
+    font-size: 0.85rem;
+  }
+
+  .log-date {
+    font-size: 0.7rem;
+  }
+
+  .log-action {
+    font-size: 0.8rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .log-details {
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .card-footer {
+    padding: 0.6rem;
+  }
+
+  .card-footer a {
+    font-size: 0.85rem;
+  }
+
+  .alert {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  /* Tronquer les détails longs sur mobile */
+  .log-details {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Très petits écrans (max-width: 480px) */
+@media (max-width: 480px) {
+  .card-header {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+  }
+
+  .list-group-item {
+    padding: 0.6rem 0.5rem;
+  }
+
+  .log-user {
+    font-size: 0.8rem;
+  }
+
+  .log-date {
+    font-size: 0.65rem;
+  }
+
+  .log-action {
+    font-size: 0.75rem;
+  }
+
+  .log-details {
+    font-size: 0.7rem;
+  }
+
+  .card-footer {
+    padding: 0.5rem;
+  }
+
+  .card-footer a {
+    font-size: 0.8rem;
+  }
+
+  .alert {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  /* Réduire l'icône de l'état vide */
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+
+  .empty-state i {
+    font-size: 2rem;
+  }
+
+  .empty-state p {
+    font-size: 0.95rem;
+  }
+}
+
+/* Animation pour l'apparition des éléments */
+@media (max-width: 768px) {
+  .list-group-item {
+    animation: slideInLeft 0.3s ease-in-out;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Animation du spinner */
+  .spinner-border {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+}
+
+/* Amélioration de l'accessibilité */
+@media (max-width: 768px) {
+  /* Amélioration du contraste */
+  .text-muted {
+    color: #495057 !important;
+  }
+
+  /* Amélioration des états vides */
+  .alert {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* Amélioration du header gradient */
+  .card-header {
+    background: linear-gradient(black) !important;
+  }
+
+  /* Zone de touche plus grande pour les liens */
+  .card-footer a {
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+  }
+
+  .card-footer a:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+  }
+}
+
+/* Style pour les écrans de grande taille */
+@media (min-width: 1200px) {
+  .card {
+    max-width: 100%;
+  }
+
+  .list-group-item {
+    padding: 1.5rem 2rem;
+  }
+
+  .log-header {
+    align-items: center;
+  }
+
+  .log-details {
+    max-width: 80%;
+  }
+}

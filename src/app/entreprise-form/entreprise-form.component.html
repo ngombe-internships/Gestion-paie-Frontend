@@ -1,0 +1,137 @@
+<div class="container-fluid py-4">
+  <div class="text-center mb-5">
+    <h2 class="display-4 fw-bold text-primary mb-0">
+      <i class="bi bi-building me-3"></i>
+      Modifier Mon Entreprise
+    </h2>
+    <div class="mt-2">
+      <span class="badge bg-light text-dark fs-6">
+        Modification des informations de base
+      </span>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="alert alert-info text-center shadow-sm border-0" style="border-radius: 12px;">
+    <div class="spinner-border spinner-border-sm me-2 text-info"></div>
+    <strong>Chargement des informations...</strong>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger text-center shadow-sm border-0" style="border-radius: 12px;">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>{{ errorMessage }}</strong>
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success text-center shadow-sm border-0" style="border-radius: 12px;">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    <strong>{{ successMessage }}</strong>
+  </div>
+
+  <div class="card shadow-lg border-0" style="border-radius: 15px;">
+    <div class="card-header" style="background: linear-gradient(135deg, #1f2937, #374151); color: white; border-radius: 15px 15px 0 0;">
+      <h5 class="mb-0">
+        <i class="bi bi-pencil-square me-2"></i>
+        Informations de l'entreprise
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      <form [formGroup]="entrepriseForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="nom" class="form-label fw-semibold">
+              <i class="bi bi-building me-1"></i>Nom de l'entreprise *
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('nom')"
+              id="nom"
+              formControlName="nom"
+              placeholder="Nom de l'entreprise">
+            <div *ngIf="isFieldInvalid('nom')" class="invalid-feedback">
+              {{ getFieldError('nom') }}
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="emailEntreprise" class="form-label fw-semibold">
+              <i class="bi bi-envelope me-1"></i>Email de l'entreprise *
+            </label>
+            <input
+              type="email"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('emailEntreprise')"
+              id="emailEntreprise"
+              formControlName="emailEntreprise"
+              placeholder="email@entreprise.com">
+            <div *ngIf="isFieldInvalid('emailEntreprise')" class="invalid-feedback">
+              {{ getFieldError('emailEntreprise') }}
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="adresseEntreprise" class="form-label fw-semibold">
+              <i class="bi bi-geo-alt me-1"></i>Adresse *
+            </label>
+            <textarea
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('adresseEntreprise')"
+              id="adresseEntreprise"
+              formControlName="adresseEntreprise"
+              rows="3"
+              placeholder="Adresse complète de l'entreprise"></textarea>
+            <div *ngIf="isFieldInvalid('adresseEntreprise')" class="invalid-feedback">
+              {{ getFieldError('adresseEntreprise') }}
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="telephoneEntreprise" class="form-label fw-semibold">
+              <i class="bi bi-telephone me-1"></i>Téléphone *
+            </label>
+            <input
+              type="tel"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('telephoneEntreprise')"
+              id="telephoneEntreprise"
+              formControlName="telephoneEntreprise"
+              placeholder="+33 1 23 45 67 89">
+            <div *ngIf="isFieldInvalid('telephoneEntreprise')" class="invalid-feedback">
+              {{ getFieldError('telephoneEntreprise') }}
+            </div>
+          </div>
+          <div class="col-md-12 mb-4">
+            <label for="logo" class="form-label fw-semibold">
+              <i class="bi bi-image me-1"></i>Logo de l'entreprise
+            </label>
+            <input
+              type="file"
+              class="form-control"
+              id="logo"
+              accept="image/jpeg,image/png,image/gif"
+              (change)="onFileSelected($event)">
+            <div class="form-text">
+              <i class="bi bi-info-circle me-1"></i>
+              Formats acceptés : JPEG, PNG, GIF. Taille maximum : 5MB.
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="d-flex justify-content-between">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="goBack()"
+                [disabled]="isLoading">
+                <i class="bi bi-arrow-left me-2"></i>Retour
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary me-2"
+                [disabled]="isLoading || entrepriseForm.invalid">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                <i class="bi bi-check-lg me-2"></i>
+                {{ isLoading ? 'Mise à jour...' : 'Enregistrer les modifications' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

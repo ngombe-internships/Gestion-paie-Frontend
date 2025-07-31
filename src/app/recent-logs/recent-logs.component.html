@@ -1,0 +1,15 @@
+<div class="card mb-4">
+  <div class="card-header">
+    <strong>Activité récente</strong>
+  </div>
+  <ul class="list-group list-group-flush" *ngIf="!isLoading">
+    <li *ngFor="let log of logs" class="list-group-item">
+      <i class="bi bi-activity me-2"></i>
+      {{log.details}} <span class="text-muted small">({{log.dateAction | date:'short'}})</span>
+    </li>
+    <li *ngIf="logs.length === 0" class="list-group-item text-muted">Aucune activité récente.</li>
+  </ul>
+  <div class="card-footer text-end">
+    <a routerLink="/dashboard/audit-logs" class="btn btn-link">Voir tout l'historique</a>
+  </div>
+</div>

@@ -56,11 +56,22 @@
                                     }
                                 </div>
 
-                                <div class="form-floating">
-                                    <input type="password" class="form-control" id="password" formControlName="password" placeholder="Mot de passe" required>
+                                <div class="form-floating password-toggle-container mb-4">
+                                    <input
+                                        [type]="showPassword ? 'text' : 'password'"
+                                        class="form-control"
+                                        id="password"
+                                        formControlName="password"
+                                        placeholder="Mot de passe"
+                                         required>
                                     <label for="password">
                                         <i class="ri-lock-line me-2"></i>Mot de passe
                                     </label>
+                                    <span
+                                        class="password-toggle-icon"
+                                        [class.visible]="showPassword" (click)="togglePasswordVisibility()">
+                                        <i [class.ri-eye-line]="!showPassword" [class.ri-eye-off-line]="showPassword"></i>
+                                    </span>
                                     @if(isFieldInvalid('password')){
                                         <div class="invalid-feedback">
                                             {{getErrorMessage('password')}}
@@ -88,9 +99,9 @@
                                 </button>
                             </form>
 
-                            <!-- <div class="register-link">
-                                <p>Pas encore de compte ? <a routerLink="/register">S'inscrire ici</a></p>
-                            </div> -->
+                            <div class="register-link">
+                                <p>Mot de passe oublié ? <a  routerLink="/forgot-password">Cliquez ici</a></p>
+                            </div>
                         </div>
                     </div>
                 </div>

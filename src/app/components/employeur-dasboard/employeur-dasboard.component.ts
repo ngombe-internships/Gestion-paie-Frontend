@@ -5,10 +5,11 @@ import { Router } from '@angular/router';
 import { BulletinService } from '../../services/bulletin.service';
 import { catchError, count, map, of } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RecentLogsComponent } from "../../recent-logs/recent-logs.component";
 
 @Component({
   selector: 'app-employeru-dasboard',
-  imports: [],
+  imports: [RecentLogsComponent],
   templateUrl: './employeru-dasboard.component.html',
   styleUrl: './employeru-dasboard.component.css'
 })

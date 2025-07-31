@@ -20,6 +20,9 @@ export class RegisterComponent implements OnInit {
   isLoading: boolean = false;
   employes: Employe [] = [];
 
+  showPassword:boolean = false;
+  showConfirmPassword: boolean = false;
+
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly employeService = inject (EmployeService);
@@ -113,10 +116,12 @@ export class RegisterComponent implements OnInit {
     });
   }
 
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
-
-
-
-
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
 
 }

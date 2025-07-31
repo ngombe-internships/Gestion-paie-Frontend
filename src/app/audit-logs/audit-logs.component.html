@@ -1,0 +1,34 @@
+<div class="container mt-4">
+  <h3>Historique complet des activités</h3>
+  <div *ngIf="isLoading" class="alert alert-info">
+    Chargement des logs...
+  </div>
+  <table class="table" *ngIf="!isLoading">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Utilisateur</th>
+        <th>Action</th>
+        <th>Détail</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of logs">
+        <td>{{ log.dateAction | date:'short' }}</td>
+        <td>{{ log.username }}</td>
+        <td>{{ log.action }}</td>
+        <td>{{ log.details }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <nav *ngIf="totalElements > size">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="page === 0">
+        <button class="page-link" (click)="onPageChange(page - 1)" [disabled]="page === 0">Précédent</button>
+      </li>
+      <li class="page-item" [class.disabled]="(page + 1) * size >= totalElements">
+        <button class="page-link" (click)="onPageChange(page + 1)" [disabled]="(page + 1) * size >= totalElements">Suivant</button>
+      </li>
+    </ul>
+  </nav>
+</div>

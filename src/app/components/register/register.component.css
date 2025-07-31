@@ -218,3 +218,278 @@
         font-weight: 600;
     }
 }
+
+
+
+.password-toggle-icon i {
+    font-size: 1.1rem;
+}
+
+/* Show the icon on hover of the container */
+.password-toggle-container:hover .password-toggle-icon {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Keep the icon visible when the password is shown (controlled by Angular's showPassword boolean) */
+.password-toggle-icon.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Change icon color on hover */
+.password-toggle-icon:hover {
+    color: #495057;
+}
+
+/* Ensure the input has enough right padding for the icon */
+.password-toggle-container input.form-control {
+    padding-right: 2.5rem; /* Space for the eye icon */
+}
+
+/* Hide default browser password reveal icons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
+}
+
+/* For Firefox - to hide the default eye icon */
+input[type="password"] {
+    -moz-appearance: textfield;
+}
+
+/* General form control and button styling (from your provided code) */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+    border: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Card styling if you use it directly in this component's CSS */
+.card {
+    border: none;
+    border-radius: 12px;
+}
+.password-toggle-container {
+    position: relative; /* Essential for positioning the icon */
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 15px; /* Adjust based on your padding */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    opacity: 0; /* Hidden by default */
+    visibility: hidden; /* Hidden by default */
+}
+
+/* === STYLES PASSWORD TOGGLE === */
+.position-relative {
+  position: relative;
+}
+
+.position-relative input.form-control {
+  padding-right: 3rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  z-index: 10;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  opacity: 0;
+  visibility: hidden;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle i {
+  font-size: 1.1rem;
+}
+
+/* Afficher l'icône au hover du conteneur */
+.position-relative:hover .password-toggle {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Afficher l'icône quand le mot de passe est visible */
+.password-toggle.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.password-toggle:hover {
+  color: #495057;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Masquer les icônes par défaut du navigateur pour les champs password */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}
+
+/* Pour Firefox */
+input[type="password"] {
+  -moz-appearance: textfield;
+}
+
+/* Focus pour l'accessibilité */
+.password-toggle:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .position-relative input.form-control {
+    padding-right: 2.5rem;
+  }
+
+  .password-toggle {
+    right: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .position-relative input.form-control {
+    padding-right: 2.25rem;
+  }
+
+  .password-toggle {
+    right: 10px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .password-toggle i {
+    font-size: 1rem;
+  }
+}
+
+/* Styling for the password toggle icon */
+.password-toggle-container {
+    position: relative; /* Essential for positioning the icon */
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 15px; /* Adjust based on your padding */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    opacity: 0; /* Hidden by default */
+    visibility: hidden; /* Hidden by default */
+}
+
+.password-toggle-icon i {
+    font-size: 1.1rem;
+}
+
+/* Show the icon on hover of the container */
+.password-toggle-container:hover .password-toggle-icon {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Keep the icon visible when the password is shown (controlled by Angular's showPassword boolean) */
+.password-toggle-icon.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Change icon color on hover */
+.password-toggle-icon:hover {
+    color: #495057;
+}
+
+/* Ensure the input has enough right padding for the icon */
+.password-toggle-container input.form-control {
+    padding-right: 2.5rem; /* Space for the eye icon */
+}
+
+/* Hide default browser password reveal icons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
+}
+
+/* For Firefox - to hide the default eye icon */
+input[type="password"] {
+    -moz-appearance: textfield;
+}
+
+/* General form control and button styling */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+    border: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Card styling */
+.card {
+    border: none;
+    border-radius: 12px;
+}

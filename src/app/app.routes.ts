@@ -22,21 +22,28 @@ import { ElementPaieListComponent } from './components/element-paie-list/element
 import { EmployeConfigListComponent } from './components/employe-config-list/employe-config-list.component';
 import { EmployeConfigComponent } from './components/employe-config/employe-config.component';
 import { noAuthGuard } from './guard/noAuth.guard';
+import { ChangePasswordComponent } from './change-password/change-password.component';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
+import { PasswordForgotComponent } from './password-forgot/password-forgot.component';
+import { EntrepriseFormComponent } from './entreprise-form/entreprise-form.component';
+import { AuditLogsComponent } from './audit-logs/audit-logs.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent, canActivate:[noAuthGuard]},
-
+  { path: 'reset-password/:token', component: PasswordResetComponent, canActivate:[noAuthGuard] },
+  { path: 'forgot-password', component: PasswordForgotComponent, canActivate:[noAuthGuard] },
    {
     path: 'dashboard',
     component: DasboardComponent,
     canActivate: [authGuard],
     children:[
-        
+
 
       {path: 'overview', component: DasboardOveriewComponent, canActivate:[authGuard]},
 
 
-     {path: 'register/employer-company', component: RegisterEmployerComponent },
+    { path: 'register/employer-company', component: RegisterEmployerComponent },
+    { path: 'register/employer-company/:id', component: RegisterEmployerComponent },
      {path:'register/employer', component: RegisterComponent},
      { path: 'employes', component: EmployeListComponent, canActivate:[authGuard] },
      { path: 'employes/create', component :EmployeFormComponent, canActivate:[authGuard]},
@@ -52,6 +59,8 @@ export const routes: Routes = [
      {path:  'employeBulletin', component: EmployeeBulletinListComponent , canActivate: [authGuard]},
      {path: 'employeur', component:EmployeurListComponent, canActivate: [authGuard]},
      {path: 'entrepriseDetail/:id', component: EntrepriseDetailsComponent , canActivate:[authGuard]},
+     {path: 'entrepriseDetail', component: EntrepriseDetailsComponent , canActivate:[authGuard]},
+
      {path: 'dashEmployeur', component:EmployeurDasboardComponent, canActivate:[authGuard]},
 
 
@@ -62,9 +71,18 @@ export const routes: Routes = [
       { path: 'employe-paie-config/new', component: EmployeConfigComponent, canActivate: [authGuard] },
       { path: 'employe-paie-config/edit/:id', component: EmployeConfigComponent, canActivate: [authGuard] },
 
+
+      { path: 'entreprise/edit', component: EntrepriseFormComponent, canActivate: [authGuard] },
+
+    {path:'change-password',component:ChangePasswordComponent, canActivate:[authGuard]},
+
+    { path: 'audit-logs', component: AuditLogsComponent, canActivate: [authGuard] }
+
     ]
    },
 
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }
+
+
 ];

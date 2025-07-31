@@ -19,7 +19,7 @@
       <p class="welcome-message">Bienvenue, <span class="display-name">{{displayName}}</span> !</p>
     </div>
 
-    
+
 
     <nav class="sidebar-nav">
       <ul>
@@ -34,6 +34,9 @@
           <li><a routerLink="/dashboard/employeur"
                  class="nav-link"
                  (click)="onNavLinkClick()">Liste des employeur</a></li>
+          <li><a routerLink="/dashboard/audit-logs"
+             class="nav-link"
+             (click)="onNavLinkClick()">Historique des activités </a></li>
         }
 
         @if (userRole === 'EMPLOYEUR') {
@@ -41,7 +44,9 @@
                  class="nav-link"
                  (click)="onNavLinkClick()">
                  <i class="bi bi-bar-chart-fill me-2"></i>Tableau de bord</a></li>
-
+          <li><a routerLink="/dashboard/entrepriseDetail"
+                 class="nav-link"
+                 (click)="onNavLinkClick()">Mon Profil</a></li>
           <li><a routerLink="/dashboard/register/employer"
                  class="nav-link"
                  (click)="onNavLinkClick()">Créer le compte d'un Employe</a></li>
@@ -69,10 +74,17 @@
           <li><a routerLink="/dashboard/employeBulletin"
                  class="nav-link"
                  (click)="onNavLinkClick()">Mes Bulletins de Paie</a></li>
+          <li><a routerLink="/dashboard/audit-logs"
+             class="nav-link"
+             (click)="onNavLinkClick()">Historique des activités </a></li>
         }
 
+        <li><a routerLink="/dashboard/change-password"
+              class="nav-link"
+              (click)="onNavLinkClick()">Changer Mot passe</a></li>
         <li><a (click)="logout()"
                class="nav-link logout-link">Déconnexion</a></li>
+
       </ul>
     </nav>
   </aside>

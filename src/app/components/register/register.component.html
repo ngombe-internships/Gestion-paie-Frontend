@@ -36,28 +36,51 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="password" class="form-label fw-semibold">Mot de passe</label>
-              <input type="password" id="password" formControlName="password" class="form-control"
-                     placeholder="Votre mot de passe"
-                     [class.is-invalid]="isFieldInvalid('password')">
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('password')">
-                {{getErrorMessage('password')}}
-              </div>
-            </div>
+         <div class="row">
+  <div class="col-md-6 mb-3">
+    <label for="password" class="form-label fw-semibold">Mot de passe</label>
+    <div class="password-toggle-container">
+      <input
+        [type]="showPassword ? 'text' : 'password'"
+        id="password"
+        formControlName="password"
+        class="form-control"
+        placeholder="Votre mot de passe"
+        [class.is-invalid]="isFieldInvalid('password')">
+      <span
+        class="password-toggle-icon"
+        [class.visible]="showPassword"
+        (click)="togglePasswordVisibility()">
+        <i [class.ri-eye-line]="!showPassword" [class.ri-eye-off-line]="showPassword"></i>
+      </span>
+    </div>
+    <div class="invalid-feedback" *ngIf="isFieldInvalid('password')">
+      {{getErrorMessage('password')}}
+    </div>
+  </div>
 
-            <div class="col-md-6 mb-3">
-              <label for="confirmPassword" class="form-label fw-semibold">Confirmer le mot de passe</label>
-              <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control"
-                     placeholder="Confirmer votre mot de passe"
-                     [class.is-invalid]="isFieldInvalid('confirmPassword') || registerForm.hasError('mismatch')">
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('confirmPassword') || registerForm.hasError('mismatch')">
-                {{getErrorMessage('confirmPassword')}}
-              </div>
-            </div>
-          </div>
-
+  <div class="col-md-6 mb-3">
+    <label for="confirmPassword" class="form-label fw-semibold">Confirmer le mot de passe</label>
+    <div class="password-toggle-container">
+      <input
+        [type]="showConfirmPassword ? 'text' : 'password'"
+        id="confirmPassword"
+        formControlName="confirmPassword"
+        class="form-control"
+        placeholder="Confirmer votre mot de passe"
+        [class.is-invalid]="isFieldInvalid('confirmPassword') || registerForm.hasError('mismatch')">
+      <span
+        class="password-toggle-icon"
+        [class.visible]="showConfirmPassword"
+        (click)="toggleConfirmPasswordVisibility()">
+        <i [class.ri-eye-line]="!showConfirmPassword" [class.ri-eye-off-line]="showConfirmPassword"></i>
+      </span>
+    </div>
+    <div class="invalid-feedback" *ngIf="isFieldInvalid('confirmPassword') || registerForm.hasError('mismatch')">
+      {{getErrorMessage('confirmPassword')}}
+    </div>
+  </div>
+</div>
 
           <div class="d-grid mt-4">
             <button type="submit" class="btn btn-primary btn-lg fw-bold" [disabled]="registerForm.invalid || isLoading">

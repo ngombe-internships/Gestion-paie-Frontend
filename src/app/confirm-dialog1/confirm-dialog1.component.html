@@ -1,0 +1,8 @@
+<h1 mat-dialog-title>{{ data.title }}</h1>
+<div mat-dialog-content>
+  <p>{{ data.message }}</p>
+</div>
+<div mat-dialog-actions align="end">
+  <button class="btn btn-secondary me-2" (click)="onCancel()">{{ data.cancelButtonText }}</button>
+  <button class="btn" [ngClass]="'btn-' + data.buttonType" (click)="onConfirm()">{{ data.confirmButtonText }}</button>
+</div>

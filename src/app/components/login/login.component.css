@@ -1,281 +1,533 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* Assurer qu'il n'y a pas de padding sur le body */
+}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
-            background: #f8f9fa;
-            min-height: 100vh;
-            margin: 0; /* Assurez-vous qu'il n'y a pas de marge par défaut */
-            display: flex; /* Utilisation de flexbox pour centrer le contenu */
-            align-items: center;
-            justify-content: center;
-        }
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    width: 80%;
+    max-width: 100vw; /* Éviter le débordement horizontal */
+    box-sizing: border-box;
+}
 
-        .login-container {
-            /* Pas besoin de min-height: 100vh; ici car le body gère le centrage global */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            width: 100%; /* Permet au conteneur de prendre toute la largeur disponible */
-        }
+.login-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 900px; /* Augmenté légèrement */
+    width: 90%; /* Limité à 90% de la largeur */
+    min-height: 500px;
+    display: flex;
+    box-sizing: border-box;
+}
 
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            max-width: 800px;
-            width: 700px;
-            min-height: 500px; /* Conservez une hauteur minimale pour le design */
-            display: flex; /* Permet aux panneaux d'être flexibles à l'intérieur */
-        }
+.left-panel {
+    background: linear-gradient(135deg, #6610f2 0%, #00A7E1 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 30px; /* Padding ajusté */
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    flex: 0 0 350px; /* Largeur fixe pour le panneau gauche */
+    min-width: 300px; /* Largeur minimale */
+}
 
-        .left-panel {
-            background: linear-gradient(135deg, #6610f2 0%, #00A7E1 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            color: white;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            flex: 1; /* Permet au panneau de gauche de grandir */
-        }
+.left-panel::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    animation: float 20s ease-in-out infinite;
+    z-index: 1;
+}
 
-        .left-panel::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            animation: float 20s ease-in-out infinite;
-            z-index: 1; /* Assure que le grain est en arrière-plan */
-        }
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+}
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
+.logo-container {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 30px;
+}
 
-        .logo-container {
-            position: relative;
-            z-index: 2; /* Assure que le logo est au-dessus du grain */
-            margin-bottom: 30px;
-        }
+.logo-placeholder {
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
 
-        .logo-placeholder {
-            width: 120px;
-            height: 120px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
+.logo-placeholder i {
+    font-size: 48px;
+    color: white;
+}
 
-        .logo-placeholder i {
-            font-size: 48px;
-            color: white;
-        }
+.brand-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
 
-        .brand-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
+.brand-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    font-weight: 300;
+    line-height: 1.6;
+}
 
-        .brand-subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 300;
-            line-height: 1.6;
-        }
+.right-panel {
+    padding: 60px 50px; /* Padding réduit pour éviter l'étirement */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: white;
+    flex: 1;
+    box-sizing: border-box;
+    max-width: 450px; /* Limitation de la largeur du panneau droit */
+}
 
-        .right-panel {
-            padding: 80px 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background: white;
-            flex: 1; /* Permet au panneau de droite de grandir */
-        }
+.form-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+    white-space: nowrap;
+}
 
-        .form-title {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-           white-space: nowrap;
-           margin-right: -20px;
-        }
+.form-subtitle {
+    color: #666;
+    margin-bottom: 40px;
+    font-size: 1rem;
+    text-align: center;
+}
 
-        .form-subtitle {
-            color: #666;
-            margin-bottom: 40px;
-            font-size: 1rem;
-        }
+.form-floating {
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-        .form-floating {
-            margin-bottom: 20px;
-        }
+.form-floating > .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    height: 60px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-        .form-floating > .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            height: 60px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
+.form-floating > .form-control:focus {
+    border-color: #6610f2;
+    box-shadow: 0 0 0 0.2rem rgba(102, 16, 242, 0.25);
+}
 
-        .form-floating > .form-control:focus {
-            /* border-color: #6610f2;
-            box-shadow: 0 0 0 0.2rem rgba(102, 16, 242, 0.25); */
-        }
+.form-floating > label {
+    color: #666;
+    font-weight: 500;
+}
 
-        .form-floating > label {
-            color: #666;
-            font-weight: 500;
-        }
+.btn-login {
+    background: linear-gradient(135deg, #6610f2 0%, #00A7E1 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 15px 30px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-        .btn-login {
-            background: linear-gradient(135deg, #6610f2 0%, #00A7E1 100%);
-            border: none;
-            border-radius: 12px;
-            padding: 15px 30px;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            color: white; /* Assurez-vous que le texte du bouton est blanc */
-        }
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 16, 242, 0.3);
+}
 
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 16, 242, 0.3);
-        }
+.btn-login:disabled {
+    opacity: 0.7;
+    transform: none;
+    cursor: not-allowed;
+}
 
-        .btn-login:disabled {
-            opacity: 0.7;
-            transform: none;
-            cursor: not-allowed; /* Indique que le bouton est désactivé */
-        }
+.alert {
+    border-radius: 12px;
+    border: none;
+    font-weight: 500;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-        .alert {
-            border-radius: 12px;
-            border: none;
-            font-weight: 500;
-        }
+.register-link {
+    text-align: center;
+    margin-top: 30px;
+    color: #666;
+}
 
-        .register-link {
-            text-align: center;
-            margin-top: 30px;
-            color: #666;
-        }
+.register-link a {
+    color: #6610f2;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
 
-        .register-link a {
-            color: #6610f2;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
+.register-link a:hover {
+    color: #4c0bce;
+    text-decoration: underline;
+}
 
-        .register-link a:hover {
-            color: #4c0bce;
-            text-decoration: underline;
-        }
+.is-invalid {
+    border-color: #dc3545 !important;
+}
 
-        /* Angular specific classes (handled by Angular, but for visual representation) */
-        .is-invalid {
-            border-color: #dc3545 !important;
-        }
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
 
-        .invalid-feedback {
-            display: block; /* S'assurer qu'il est visible quand il est là */
-            color: #dc3545;
-            font-size: 0.875rem;
-            margin-top: 5px;
-        }
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
 
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-        }
+/* Styling for the password toggle icon */
+.password-toggle-container {
+    position: relative;
+}
 
-    .w{
-      width: 250px;
+.password-toggle-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.password-toggle-icon i {
+    font-size: 1.1rem;
+}
+
+.password-toggle-container:hover .password-toggle-icon {
+    opacity: 1;
+    visibility: visible;
+}
+
+.password-toggle-icon.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.password-toggle-icon:hover {
+    color: #495057;
+}
+
+.password-toggle-container input.form-control {
+    padding-right: 2.5rem;
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
+}
+
+input[type="password"] {
+    -moz-appearance: textfield;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+    border: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+/* Responsive Design Amélioré */
+
+/* Tablettes et écrans moyens (768px - 1024px) */
+@media (max-width: 1024px) {
+    .right-panel {
+        padding: 60px 40px;
     }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .login-card {
-                flex-direction: column; /* Empile les panneaux verticalement sur mobile */
-                margin: 20px;
-                border-radius: 15px;
-                min-height: auto; /* Laisse la hauteur s'adapter au contenu */
-            }
+    .form-title {
+        font-size: 1.8rem;
+        white-space: normal; /* Permettre le retour à la ligne */
+        margin-right: 0;
+    }
+}
 
-            .left-panel, .right-panel {
-                flex: none; /* Désactive flex-grow sur mobile pour éviter les problèmes de hauteur */
-                width: 100%; /* Prend toute la largeur disponible */
-            }
+/* Tablettes (768px et moins) */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 15px;
+    }
 
-            .left-panel {
-                padding: 20px 20px;
-                border-radius: 15px 15px 0 0; /* Coins arrondis en haut */
-            }
+    .login-card {
+        flex-direction: column;
+        margin: 0;
+        border-radius: 15px;
+        min-height: auto;
+        width: 100%;
+        max-width: 100%;
+    }
 
-            .right-panel {
-                padding: 10px 30px;
-                border-radius: 0 0 15px 15px; /* Coins arrondis en bas */
-                margin-left: 15px;
-              }
+    .left-panel, .right-panel {
+        flex: none;
+        width: 100%;
+    }
 
-            .brand-title {
-                font-size: 2rem;
-            }
+    .left-panel {
+        padding: 30px 20px;
+        border-radius: 15px 15px 0 0;
+        min-height: 200px;
+    }
 
-            .form-title {
-                font-size: 1.75rem;
-            }
+    .right-panel {
+        padding: 40px 30px;
+        border-radius: 0 0 15px 15px;
+        margin-left: 0; /* Suppression du margin-left problématique */
+    }
 
-            .logo-placeholder {
-                width: 80px;
-                height: 80px;
-                margin-bottom: 15px;
-            }
+    .brand-title {
+        font-size: 2rem;
+    }
 
-            .logo-placeholder i {
-                font-size: 32px;
-            }
-        }
+    .form-title {
+        font-size: 1.75rem;
+        white-space: normal;
+        margin-right: 0;
+    }
 
-        @media (max-width: 576px) {
-            .left-panel {
-                padding: 20px 25px;
-                min-height: 200px;
-            }
+    .logo-placeholder {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 15px;
+    }
 
-            .right-panel {
-                padding: 30px 20px;
-            }
+    .logo-placeholder i {
+        font-size: 32px;
+    }
+}
 
-            .brand-title {
-                font-size: 1.5rem;
-            }
+/* Petits écrans et mobiles (576px et moins) */
+@media (max-width: 576px) {
+    body {
+        padding: 0;
+    }
 
-            .brand-subtitle {
-                font-size: 0.9rem;
-            }
-        }
+    .login-container {
+        padding: 10px;
+        min-height: 100vh;
+        align-items: stretch;
+    }
 
+    .login-card {
+        border-radius: 10px;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        box-shadow: none; /* Suppression de l'ombre sur très petits écrans */
+    }
 
-        
+    .left-panel {
+        padding: 20px 15px;
+        min-height: 180px;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .right-panel {
+        padding: 30px 20px;
+        border-radius: 0 0 10px 10px;
+        margin-left: 0;
+    }
+
+    .brand-title {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+
+    .brand-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .form-title {
+        font-size: 1.5rem;
+        white-space: normal;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    .form-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 30px;
+    }
+
+    .logo-placeholder {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 10px;
+    }
+
+    .logo-placeholder i {
+        font-size: 28px;
+    }
+
+    .form-floating {
+        margin-bottom: 15px;
+    }
+
+    .form-floating > .form-control {
+        height: 55px;
+        font-size: 15px;
+        border-radius: 10px;
+    }
+
+    .btn-login {
+        padding: 12px 25px;
+        font-size: 15px;
+        border-radius: 10px;
+    }
+
+    .register-link {
+        margin-top: 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Très petits écrans (480px et moins) */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 5px;
+    }
+
+    .right-panel {
+        padding: 25px 15px;
+    }
+
+    .left-panel {
+        padding: 15px 10px;
+        min-height: 150px;
+    }
+
+    .brand-title {
+        font-size: 1.3rem;
+    }
+
+    .form-title {
+        font-size: 1.3rem;
+    }
+
+    .logo-placeholder {
+        width: 60px;
+        height: 60px;
+    }
+
+    .logo-placeholder i {
+        font-size: 24px;
+    }
+}
+
+/* Écrans très larges (1200px et plus) */
+@media (min-width: 1200px) {
+    .login-card {
+        max-width: 1000px; /* Légèrement plus large pour les très grands écrans */
+        width: 85%; /* Limité à 85% pour éviter l'étirement excessif */
+    }
+
+    .left-panel {
+        flex: 0 0 400px; /* Panneau gauche un peu plus large */
+        padding: 50px 40px;
+    }
+
+    .right-panel {
+        padding: 80px 60px;
+        max-width: 500px; /* Panneau droit limité */
+    }
+
+    .brand-title {
+        font-size: 2.8rem;
+    }
+
+    .form-title {
+        font-size: 2.2rem;
+    }
+}
+
+/* Écrans extra larges (1400px et plus) */
+@media (min-width: 1400px) {
+    .login-card {
+        max-width: 1100px; /* Maximum absolu */
+        width: 80%; /* Encore plus limité */
+    }
+
+    .left-panel {
+        flex: 0 0 450px; /* Panneau gauche maximal */
+    }
+
+    .right-panel {
+        max-width: 550px; /* Panneau droit maximal */
+        padding: 100px 80px;
+    }
+}

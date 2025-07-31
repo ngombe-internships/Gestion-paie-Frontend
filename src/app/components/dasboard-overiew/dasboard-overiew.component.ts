@@ -1,12 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { DashboardMetric, DashboardService } from '../../services/dashboard.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RecentLogsComponent } from "../../recent-logs/recent-logs.component";
 
 @Component({
   selector: 'app-dasboard-overiew',
-  imports: [],
+  imports: [RecentLogsComponent],
   templateUrl: './dasboard-overiew.component.html',
   styleUrl: './dasboard-overiew.component.css'
 })

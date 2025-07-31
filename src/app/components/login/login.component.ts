@@ -1,11 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule,RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -15,7 +15,7 @@ export class LoginComponent implements OnInit {
   errorMessage: string | null = null;
   isLoading: boolean = false;
   returnUrl: string | null = null;
-
+  showPassword = false;
 
 
   private readonly fb = inject(FormBuilder);
@@ -89,5 +89,12 @@ export class LoginComponent implements OnInit {
     });
   }
 
+   togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+   goToPasswordForgot(): void {
+    this.router.navigate(['forgot-password']);
+  }
 
 }

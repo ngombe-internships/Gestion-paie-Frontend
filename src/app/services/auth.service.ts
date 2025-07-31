@@ -1,3 +1,4 @@
+import { ApiResponse } from './../model/ApiResponse';
 // src/app/services/auth.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -6,7 +7,6 @@ import { catchError, tap } from 'rxjs/operators';
 import { LoginDto } from '../model/loginDto'; // Assuming you create these interfaces
 import { RegisterDto } from '../model/registerDto'; // Assuming you create these interfaces
 import { environment } from '../../environment';
-import { ApiResponse } from '../model/ApiResponse';
 import { RegisterEmployeeDto } from '../model/registerEmployeeDto';
 
 // Interfaces pour les DTOs front-end (à créer si ce n'est pas déjà fait)
@@ -18,6 +18,24 @@ export interface LoginResponse {
   displayName : string;
   entrepriseId?: number;
 }
+
+interface ChangePasswordPayload {
+
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+interface PasswordResetRequestDto {
+  emailOrUsername: string;
+}
+
+interface PasswordResetDto {
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 
 
 
@@ -176,6 +194,41 @@ export class AuthService {
     return this.loggedIn.getValue();
   }
 
+
+  changePassword(payload: ChangePasswordPayload): Observable<ApiResponse<string>>{
+    return this.http.post<ApiResponse<string>>(`${this.baseUrl}/change-password`,payload);
+  }
+
+
+  passwordResetRequest(emailOrUsername: string):Observable<ApiResponse<string>>{
+
+    return this.http.post<ApiResponse<string>>(`${this.baseUrl}/password-reset-request`,{emailOrUsername})
+    .pipe(
+      catchError((error: HttpErrorResponse) =>{
+        if(error.status ===429) {
+          return throwError(()=> ({
+            status:429,
+            message: error.error?.error || 'Trop de tentatives. Veuillez réessayer plus tard'
+          }));
+        }
+        return throwError(() => error)
+      })
+    );
+  }
+
+
+
+  resetPassword(resetDto: PasswordResetDto):Observable<ApiResponse<string>>{
+    return this.http.post<ApiResponse<string>>(`${this.baseUrl}/password-reset`, resetDto);
+    }
+
+
+
+
+
+
+
+
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Une erreur inconnue est survenue.';
     if (error.error instanceof ErrorEvent) {
@@ -188,13 +241,15 @@ export class AuthService {
       } else if (error.status === 401) {
         errorMessage = 'Identifiants invalides. Veuillez vérifier votre nom d\'utilisateur et votre mot de passe.';
       } else if (error.status === 403) {
-        errorMessage = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
+        errorMessage = 'Votre compte a  été désactiver ou Vous n\'êtes pas autorisé à accéder à cette ressource. ';
       } else {
         errorMessage = `Erreur de serveur: ${error.status} ${error.statusText || ''} - ${error.error?.message || 'Erreur inconnue'}`;
       }
     }
     console.error(errorMessage);
-    return throwError(() => new Error(errorMessage));
+    return throwError(() => error);
   }
-  
+
 }
+
+

@@ -3,25 +3,23 @@
   <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
       <div class="card shadow-sm p-4">
-        <h2 class="card-title text-center mb-4">Créer un compte Employeur</h2>
+        <h2 class="card-title text-center mb-4">
+          {{ isEditMode ? "Modifier une entreprise" : "Créer un compte Employeur" }}
+        </h2>
 
-        @if(errorMessage){
-          <div class="alert alert-danger mb-3" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            {{errorMessage}}
-          </div>
-        }
-        @if(successMessage){
-          <div class="alert alert-success mb-3" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
-            {{successMessage}}
-          </div>
-        }
+        <div *ngIf="errorMessage" class="alert alert-danger mb-3" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{errorMessage}}
+        </div>
+        <div *ngIf="successMessage" class="alert alert-success mb-3" role="alert">
+          <i class="fas fa-check-circle me-2"></i>
+          {{successMessage}}
+        </div>
 
         <form [formGroup]="registerEmployerForm" (ngSubmit)="onSubmit()">
 
-          <!-- SECTION 1: Informations du compte -->
-          <div class="account-section mb-5">
+          <!-- SECTION 1: Informations du compte (création uniquement) -->
+          <div class="account-section mb-5" *ngIf="!isEditMode">
             <div class="section-header mb-4">
               <h5 class="text-primary fw-bold mb-2">
                 <i class="fas fa-user me-2"></i>Informations du compte
@@ -35,31 +33,56 @@
                 <input type="text" id="username" formControlName="username" class="form-control"
                        placeholder="Votre nom d'utilisateur"
                        [class.is-invalid]="isFieldInvalid('username')">
-                @if(isFieldInvalid('username')){
-                  <div class="invalid-feedback">{{getErrorMessage('username')}}</div>
-                }
+                <div *ngIf="isFieldInvalid('username')" class="invalid-feedback">{{getErrorMessage('username')}}</div>
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="password" class="form-label fw-semibold">Mot de passe</label>
-                <input type="password" id="password" formControlName="password" class="form-control"
-                       placeholder="Votre mot de passe"
-                       [class.is-invalid]="isFieldInvalid('password')">
-                @if(isFieldInvalid('password')){
-                  <div class="invalid-feedback">{{getErrorMessage('password')}}</div>
-                }
+                <div class="password-toggle-container">
+                  <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    id="password"
+                    formControlName="password"
+                    class="form-control"
+                    placeholder="Votre mot de passe"
+                    [class.is-invalid]="isFieldInvalid('password')">
+                  <span
+                    class="password-toggle-icon"
+                    [class.visible]="showPassword"
+                    (click)="togglePasswordVisibility()">
+                    <i [class.ri-eye-line]="!showPassword" [class.ri-eye-off-line]="showPassword"></i>
+                  </span>
+                </div>
+                <div *ngIf="isFieldInvalid('password')" class="invalid-feedback">{{getErrorMessage('password')}}</div>
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="confirmPassword" class="form-label fw-semibold">Confirmer le mot de passe</label>
-                <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control"
-                       placeholder="Confirmer votre mot de passe"
-                       [class.is-invalid]="isFieldInvalid('confirmPassword') || registerEmployerForm.hasError('mismatch')">
-                @if(isFieldInvalid('confirmPassword') || registerEmployerForm.hasError('mismatch')) {
-                  <div class="invalid-feedback">
-                    {{getErrorMessage('confirmPassword')}}
-                  </div>
-                }
+                <div class="password-toggle-container">
+                  <input
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                    id="confirmPassword"
+                    formControlName="confirmPassword"
+                    class="form-control"
+                    placeholder="Confirmer votre mot de passe"
+                    [class.is-invalid]="isFieldInvalid('confirmPassword') || registerEmployerForm.hasError('mismatch')">
+                  <span
+                    class="password-toggle-icon"
+                    [class.visible]="showConfirmPassword"
+                    (click)="toggleConfirmPasswordVisibility()">
+                    <i [class.ri-eye-line]="!showConfirmPassword" [class.ri-eye-off-line]="showConfirmPassword"></i>
+                  </span>
+                </div>
+                <div *ngIf="isFieldInvalid('confirmPassword') || registerEmployerForm.hasError('mismatch')" class="invalid-feedback">
+                  {{getErrorMessage('confirmPassword')}}
+                </div>
+
+                <!-- MESSAGE SPÉCIAL POUR LES MOTS DE PASSE NON CORRESPONDANTS -->
+                <div *ngIf="!passwordsMatch() && registerEmployerForm.get('password')?.value && registerEmployerForm.get('confirmPassword')?.value"
+                     class="text-danger mt-1 small">
+                  <i class="fas fa-exclamation-triangle me-1"></i>
+                  Les mots de passe ne correspondent pas
+                </div>
               </div>
             </div>
           </div>
@@ -79,9 +102,7 @@
                 <input type="text" id="nomEntreprise" formControlName="nomEntreprise" class="form-control"
                        placeholder="Nom de votre entreprise"
                        [class.is-invalid]="isFieldInvalid('nomEntreprise')">
-                @if(isFieldInvalid('nomEntreprise')){
-                  <div class="invalid-feedback">{{getErrorMessage('nomEntreprise')}}</div>
-                }
+                <div *ngIf="isFieldInvalid('nomEntreprise')" class="invalid-feedback">{{getErrorMessage('nomEntreprise')}}</div>
               </div>
 
               <div class="col-md-6 mb-3">
@@ -89,9 +110,7 @@
                 <input type="text" id="numeroSiret" formControlName="numeroSiret" class="form-control"
                        placeholder="14 chiffres"
                        [class.is-invalid]="isFieldInvalid('numeroSiret')">
-                @if(isFieldInvalid('numeroSiret')){
-                  <div class="invalid-feedback">{{getErrorMessage('numeroSiret')}}</div>
-                }
+                <div *ngIf="isFieldInvalid('numeroSiret')" class="invalid-feedback">{{getErrorMessage('numeroSiret')}}</div>
               </div>
 
               <div class="col-12 mb-3">
@@ -99,9 +118,7 @@
                 <input type="text" id="adresseEntreprise" formControlName="adresseEntreprise" class="form-control"
                        placeholder="Adresse complète de votre entreprise"
                        [class.is-invalid]="isFieldInvalid('adresseEntreprise')">
-                @if(isFieldInvalid('adresseEntreprise')){
-                  <div class="invalid-feedback">{{getErrorMessage('adresseEntreprise')}}</div>
-                }
+                <div *ngIf="isFieldInvalid('adresseEntreprise')" class="invalid-feedback">{{getErrorMessage('adresseEntreprise')}}</div>
               </div>
 
               <div class="col-md-6 mb-3">
@@ -109,9 +126,7 @@
                 <input type="email" id="emailEntreprise" formControlName="emailEntreprise" class="form-control"
                        placeholder="contact@entreprise.com"
                        [class.is-invalid]="isFieldInvalid('emailEntreprise')">
-                @if(isFieldInvalid('emailEntreprise')){
-                  <div class="invalid-feedback">{{getErrorMessage('emailEntreprise')}}</div>
-                }
+                <div *ngIf="isFieldInvalid('emailEntreprise')" class="invalid-feedback">{{getErrorMessage('emailEntreprise')}}</div>
               </div>
 
               <div class="col-md-6 mb-3">
@@ -119,18 +134,14 @@
                 <input type="text" id="telephoneEntreprise" formControlName="telephoneEntreprise" class="form-control"
                        placeholder="0123456789"
                        [class.is-invalid]="isFieldInvalid('telephoneEntreprise')">
-                @if(isFieldInvalid('telephoneEntreprise')){
-                  <div class="invalid-feedback">{{getErrorMessage('telephoneEntreprise')}}</div>
-                }
+                <div *ngIf="isFieldInvalid('telephoneEntreprise')" class="invalid-feedback">{{getErrorMessage('telephoneEntreprise')}}</div>
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="dateCreation" class="form-label fw-semibold">Date de création</label>
                 <input type="date" id="dateCreation" formControlName="dateCreation" class="form-control"
                        [class.is-invalid]="isFieldInvalid('dateCreation')">
-                @if(isFieldInvalid('dateCreation')){
-                  <div class="invalid-feedback">{{getErrorMessage('dateCreation')}}</div>
-                }
+                <div *ngIf="isFieldInvalid('dateCreation')" class="invalid-feedback">{{getErrorMessage('dateCreation')}}</div>
               </div>
 
               <div class="col-md-6 mb-3">
@@ -142,9 +153,9 @@
                     {{ selectedFile ? selectedFile.name : 'Choisir un logo' }}
                   </button>
                 </div>
-                @if(selectedFile && !isValidImage(selectedFile)) {
-                  <div class="invalid-feedback d-block">Le fichier doit être une image (JPEG, PNG, GIF).</div>
-                }
+                <div *ngIf="selectedFile && !isValidImage(selectedFile)" class="invalid-feedback d-block">
+                  Le fichier doit être une image (JPEG, PNG, GIF).
+                </div>
               </div>
             </div>
           </div>
@@ -152,16 +163,10 @@
           <!-- Bouton de soumission -->
           <div class="d-grid gap-2 mt-4">
             <button type="submit" class="btn btn-success btn-lg fw-bold" [disabled]="registerEmployerForm.invalid || isLoading">
-              @if(isLoading){
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Enregistrement en cours...
-              } @else {
-                <i class="fas fa-check-circle me-2"></i>
-                Créer le compte employeur
-              }
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              {{ isEditMode ? "Mettre à jour l'entreprise" : "Créer le compte employeur" }}
             </button>
           </div>
-
 
         </form>
       </div>

@@ -4,4 +4,8 @@ export interface EmployeurList {
   usernameEmployeur: string;
   nomEntreprise: string;
   dateCreationEntreprise: string
+  nombreEmployes: number;
+  active: boolean;
+  dateCreationSysteme?: string;      // ou Date
+  dateDerniereMiseAJour?: string;
 }

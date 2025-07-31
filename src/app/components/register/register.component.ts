@@ -124,4 +124,13 @@ export class RegisterComponent implements OnInit {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
+   passwordsMatch(): boolean {
+
+    const password = this.registerForm.get('password')?.value;
+    const confirmPassword = this.registerForm.get('confirmPassword')?.value;
+
+    // Retourne true si les deux champs sont vides OU s'ils correspondent
+    return (!password && !confirmPassword) || (password === confirmPassword);
+  }
+
 }

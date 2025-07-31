@@ -54,6 +54,9 @@
                   </span>
                 </div>
                 <div *ngIf="isFieldInvalid('password')" class="invalid-feedback">{{getErrorMessage('password')}}</div>
+              <div class="help-text">
+                    Utilisez au moins 6 caractères 
+               </div>
               </div>
 
               <div class="col-md-6 mb-3">
@@ -78,11 +81,13 @@
                 </div>
 
                 <!-- MESSAGE SPÉCIAL POUR LES MOTS DE PASSE NON CORRESPONDANTS -->
-                <div *ngIf="!passwordsMatch() && registerEmployerForm.get('password')?.value && registerEmployerForm.get('confirmPassword')?.value"
-                     class="text-danger mt-1 small">
+                @if(!passwordsMatch() && registerEmployerForm.get('password')?.value && registerEmployerForm.get('confirmPassword')?.value){
+                  <div class="text-danger mt-1 small">
                   <i class="fas fa-exclamation-triangle me-1"></i>
                   Les mots de passe ne correspondent pas
                 </div>
+                }
+
               </div>
             </div>
           </div>

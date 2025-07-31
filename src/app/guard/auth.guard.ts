@@ -10,7 +10,7 @@ export const authGuard: CanActivateFn = (
   const authService = inject(AuthService);
   const router = inject(Router);
 
- 
+
   return authService.isAuthenticated$.pipe(
     take(1), // Prenez la première valeur émise et complétez l'observable.
              // Ceci est crucial pour que le guard réagisse une seule fois à la valeur actuelle/suivante.

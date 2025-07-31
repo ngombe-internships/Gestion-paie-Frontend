@@ -199,19 +199,16 @@ export class RegisterEmployerComponent implements OnInit {
     }
   }
 
-  // NOUVELLE MÉTHODE pour gérer les erreurs du backend
+
   private handleBackendErrors(err: any): void {
     if (err.error) {
-      // Si le backend renvoie des erreurs de validation spécifiques par champ
       if (err.error.errors && typeof err.error.errors === 'object') {
-        // Traiter les erreurs par champ (ex: {numeroSiret: "Numéro SIRET invalide", email: "Email déjà utilisé"})
         const fieldErrors = err.error.errors;
         let errorMessages = [];
 
         for (const [field, message] of Object.entries(fieldErrors)) {
           const control = this.registerEmployerForm.get(field);
           if (control) {
-            // Ajouter l'erreur personnalisée au contrôle
             control.setErrors({ backendError: message });
             control.markAsTouched();
           }
@@ -220,11 +217,9 @@ export class RegisterEmployerComponent implements OnInit {
 
         this.errorMessage = errorMessages.join(', ');
       }
-      // Si le backend renvoie un message d'erreur général avec des détails
       else if (err.error.message) {
         this.errorMessage = err.error.message;
       }
-      // Si le backend renvoie juste une chaîne d'erreur
       else if (typeof err.error === 'string') {
         this.errorMessage = err.error;
       }
@@ -235,7 +230,6 @@ export class RegisterEmployerComponent implements OnInit {
       this.errorMessage = 'Erreur de connexion au serveur.';
     }
 
-    // Scroll vers le haut pour voir le message d'erreur
     this.scrollToTop();
     this.clearMessagesAfterDelay();
   }

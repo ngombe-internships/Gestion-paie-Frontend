@@ -493,3 +493,8 @@ input[type="password"] {
     border: none;
     border-radius: 12px;
 }
+.help-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }

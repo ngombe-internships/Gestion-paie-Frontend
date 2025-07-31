@@ -7,7 +7,6 @@ import { EmployeDetailsComponent } from './employe/employe-detail/employe-detail
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { authGuard } from './guard/auth.guard';
-import { RegisterEmployerComponent } from './components/register-employer/register-employer.component';
 import { adminGuard } from './guard/admin.guard';
 import { DasboardComponent } from './components/dasboard/dasboard.component';
 import { BulletinListComponent } from './components/bulletin-list/bulletin-list.component';
@@ -27,6 +26,7 @@ import { PasswordResetComponent } from './password-reset/password-reset.componen
 import { PasswordForgotComponent } from './password-forgot/password-forgot.component';
 import { EntrepriseFormComponent } from './entreprise-form/entreprise-form.component';
 import { AuditLogsComponent } from './audit-logs/audit-logs.component';
+import { RegisterEmployerComponent } from './components/register-employeur/register-employer.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent, canActivate:[noAuthGuard]},

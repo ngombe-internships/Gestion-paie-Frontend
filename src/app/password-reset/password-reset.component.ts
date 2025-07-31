@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { AuthService } from './../services/auth.service';
 import { Component, inject, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
@@ -5,7 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-password-reset',
-  imports: [ReactiveFormsModule,RouterLink],
+  imports: [ReactiveFormsModule,RouterLink,CommonModule],
   templateUrl: './password-reset.component.html',
   styleUrl: './password-reset.component.css'
 })
@@ -19,7 +20,9 @@ export class PasswordResetComponent implements OnInit {
   errorMessage: string | null = null;
   sucessMessage: string | null = null;
   isLoading: boolean = false;
+
   showNewPassword = false;
+  showConfirmNewPassword = false;
 
 
   private readonly fb = inject(FormBuilder);
@@ -123,6 +126,24 @@ export class PasswordResetComponent implements OnInit {
         this.markAllAsTouched(control);
       }
     })
+  }
+
+
+  toggleNewPasswordVisibility(): void {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmNewPasswordVisibility(): void {
+    this.showConfirmNewPassword = !this.showConfirmNewPassword;
+  }
+
+   passwordsMatch(): boolean {
+
+    const newPassword= this.passwordResetForm.get('newPassword')?.value;
+    const confirmPassword = this.passwordResetForm.get('confirmPassword')?.value;
+
+    // Retourne true si les deux champs sont vides OU s'ils correspondent
+    return (!newPassword && !confirmPassword) || (newPassword === confirmPassword);
   }
 
 }

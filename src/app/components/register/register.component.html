@@ -57,7 +57,11 @@
     <div class="invalid-feedback" *ngIf="isFieldInvalid('password')">
       {{getErrorMessage('password')}}
     </div>
+    <div class="help-text">
+                    Utilisez au moins 6 caractères avec un mélange de lettres, chiffres et symboles
+    </div>
   </div>
+
 
   <div class="col-md-6 mb-3">
     <label for="confirmPassword" class="form-label fw-semibold">Confirmer le mot de passe</label>
@@ -79,6 +83,12 @@
     <div class="invalid-feedback" *ngIf="isFieldInvalid('confirmPassword') || registerForm.hasError('mismatch')">
       {{getErrorMessage('confirmPassword')}}
     </div>
+    @if(!passwordsMatch() && registerForm.get('password')?.value && registerForm.get('confirmPassword')?.value){
+       <div class="text-danger mt-1 small">
+           <i class="fas fa-exclamation-triangle me-1"></i>
+           Les mots de passe ne correspondent pas
+       </div>
+    }
   </div>
 </div>
 

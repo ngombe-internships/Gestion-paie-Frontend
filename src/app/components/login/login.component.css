@@ -52,7 +52,7 @@ body {
     top: -50%;
     left: -50%;
     width: 200%;
-    height: 200%;
+
     animation: float 20s ease-in-out infinite;
     z-index: 1;
 }
@@ -71,14 +71,14 @@ body {
 .logo-placeholder {
     width: 120px;
     height: 120px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
+
+
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
     backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+
 }
 
 .logo-placeholder i {
@@ -493,7 +493,7 @@ input[type="password"] {
 @media (min-width: 1200px) {
     .login-card {
         max-width: 1000px; /* Légèrement plus large pour les très grands écrans */
-        width: 85%; /* Limité à 85% pour éviter l'étirement excessif */
+       /* Limité à 85% pour éviter l'étirement excessif */
     }
 
     .left-panel {

@@ -230,25 +230,29 @@ export class AuthService {
 
 
   private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'Une erreur inconnue est survenue.';
-    if (error.error instanceof ErrorEvent) {
-      // Erreur côté client
-      errorMessage = `Erreur: ${error.error.message}`;
-    } else {
-      // Erreur côté serveur
-      if (error.status === 400 && error.error && error.error.message) {
+  let errorMessage = 'Une erreur inconnue est survenue.';
+  if (error.error instanceof ErrorEvent) {
+    errorMessage = `Erreur: ${error.error.message}`;
+  } else {
+    // Gestion des erreurs backend
+    if (error.status === 400 && error.error && error.error.message) {
+      errorMessage = error.error.message;
+    } else if (error.status === 401) {
+      // <-- Ici tu dois vérifier le message du backend
+      if (error.error && error.error.message) {
         errorMessage = error.error.message;
-      } else if (error.status === 401) {
-        errorMessage = 'Identifiants invalides. Veuillez vérifier votre nom d\'utilisateur et votre mot de passe.';
-      } else if (error.status === 403) {
-        errorMessage = 'Votre compte a  été désactiver ou Vous n\'êtes pas autorisé à accéder à cette ressource. ';
       } else {
-        errorMessage = `Erreur de serveur: ${error.status} ${error.statusText || ''} - ${error.error?.message || 'Erreur inconnue'}`;
+        errorMessage = 'Identifiants invalides. Veuillez vérifier votre nom d\'utilisateur et votre mot de passe.';
       }
+    } else if (error.status === 403) {
+      errorMessage = error.error?.message || 'Votre compte a été désactivé ou vous n\'êtes pas autorisé à accéder à cette ressource.';
+    } else {
+      errorMessage = error.error?.message || `Erreur de serveur: ${error.status} ${error.statusText || ''}`;
     }
-    console.error(errorMessage);
-    return throwError(() => error);
   }
+  console.error(errorMessage);
+  return throwError(() => ({ ...error, message: errorMessage })); // <-- Ajoute le message personnalisé à l'objet d'erreur renvoyé
+}
 
 }
 

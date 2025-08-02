@@ -6,6 +6,7 @@ import { map, Observable } from 'rxjs';
 import { Entreprise } from '../model/entreprise';
 import { EntrepriseDto } from '../model/entrepriseDto';
 import { EntrepriseUpdateDto } from '../model/entrepriseUpdateDto';
+import { PagedResponse } from './bulletin.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,11 +20,29 @@ export class EntrepriseService {
   private readonly baseUrlEmployeur = environment.apiUrl + '/api/employer/entreprise';
   private readonly http = inject(HttpClient);
 
-  getEmployersList(): Observable<EmployeurList[]> {
-    return this.http.get<ApiResponse<EmployeurList[]>>(`${this.baseUrl}`).pipe(
-      map(response => response.data )
-    );
+
+  getEmployersList1(
+  nomEntreprise: string = '',
+  usernameEmployeur: string = '',
+  status: string = '', // 'active', 'inactive', ou ''
+  page: number = 0,
+  size: number = 10
+): Observable<ApiResponse<PagedResponse<EmployeurList>>> {
+  let params: any = { nomEntreprise, usernameEmployeur, page, size };
+  if (status) params.active = status === 'active'; // backend attend un booléen
+
+  return this.http.get<ApiResponse<PagedResponse<EmployeurList>>>(`${this.baseUrl}`, { params });
+}
+
+getEmployeurCounts(
+    nomEntreprise: string = '',
+    usernameEmployeur: string = ''
+  ): Observable<{actifs: number, inactifs: number}> {
+    let params: any = { nomEntreprise, usernameEmployeur };
+    return this.http.get<{actifs: number, inactifs: number}>(`${this.baseUrl}/count`, { params });
   }
+
+
 
    getMyEmployeProfile(id: number): Observable<EntrepriseDto> {
     return this.http.get<ApiResponse<EntrepriseDto>>(`${this.baseUrlAdmin}/${id}`).pipe(

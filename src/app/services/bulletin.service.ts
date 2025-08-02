@@ -61,13 +61,18 @@ export class BulletinService {
   }
 
   //methode pour employeur
-  getBulletinsForEmployeur(searchTerm: string= ''): Observable<ApiResponse<BulletinPaieEmployeurDto[]>> {
-    let url = `${this.baseUrl}/employeur`;
-      if (searchTerm) {
-          url += `?searchTerm=${encodeURIComponent(searchTerm)}`;
-      }
-      return this.http.get<ApiResponse<BulletinPaieEmployeurDto[]>>(url);
+  getBulletinsForEmployeurPaginated(
+  page: number, size: number, search: string = '', statuts: string[] = []
+   ): Observable<ApiResponse<PagedResponse<BulletinPaieEmployeurDto>>> {
+  let url = `${this.baseUrl}/employeur/paginated?page=${page}&size=${size}`;
+  if (search && search.trim() !== '') {
+    url += `&search=${encodeURIComponent(search)}`;
   }
+  if (statuts.length) {
+    url += `&statuts=${statuts.join(',')}`;
+  }
+  return this.http.get<ApiResponse<PagedResponse<BulletinPaieEmployeurDto>>>(url);
+}
 
   //methode pour employe
   getMyBulletins(): Observable<BulletinPaieResponseDto[]> {
@@ -281,4 +286,12 @@ export interface EntrepriseResponseDto {
   telephoneEntreprise?: string;
   numeroSiret?: string;
   dateCreation?: string;
+}
+
+export interface PagedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
 }

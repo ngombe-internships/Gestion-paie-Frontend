@@ -18,7 +18,17 @@ export class EmployeurListComponent implements OnInit {
      employeurs: EmployeurList[] = [];
      isLoading: boolean = true;
      errorMessage: string | null = null;
-     searchText: string = '';
+     showStatus: 'all' | 'active' | 'inactive' = 'active';     searchTextEntreprise = '';
+     searchTextUsername = '';
+
+     currentPage = 0;
+     pageSize = 10;
+    totalPages = 0;
+    totalElements = 0;
+
+     actifsCount = 0;
+    inactifsCount = 0;
+    totalCount = 0;
 
 
      private readonly entrepriseService = inject(EntrepriseService)
@@ -28,31 +38,47 @@ export class EmployeurListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEmployeur();
+    this.loadCounts();
   }
 
-  loadEmployeur(): void {
-    this.isLoading = true;
-    this.errorMessage = null;
-    this.entrepriseService.getEmployersList().subscribe({
-      next: (employeurs) => {
-        this.employeurs = employeurs.sort((a,b) => {
-          if(a.active && !b.active){
-            return -1;
-          }
-          if(!a.active && b.active){
-            return 1;
-          }
-        return a.nomEntreprise.localeCompare(b.nomEntreprise);
-        });
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des employes : ', error);
-        this.errorMessage = 'Impossible de charger la liste des employes.';
-        this.isLoading = false;
-      }
-    });
-  }
+ loadEmployeur(page: number = 0, size: number = 10): void {
+  this.isLoading = true;
+  this.errorMessage = null;
+
+   let status: string = '';
+      if (this.showStatus === 'active') status = 'active';
+      else if (this.showStatus === 'inactive') status = 'inactive';
+  this.entrepriseService.getEmployersList1(
+    this.searchTextEntreprise,
+    this.searchTextUsername,
+    status,
+    page,
+    size
+  ).subscribe({
+    next: (response) => {
+      this.employeurs = response.data.content;
+      this.totalPages = response.data.totalPages;
+      this.isLoading = false;
+    },
+    error: (error) => {
+      this.errorMessage = 'Impossible de charger la liste des entreprises';
+      this.isLoading = false;
+    }
+  });
+}
+
+ loadCounts(): void {
+      this.entrepriseService.getEmployeurCounts(this.searchTextEntreprise, this.searchTextUsername).subscribe({
+        next: (data) => {
+          this.actifsCount = data.actifs;
+          this.inactifsCount = data.inactifs;
+          this.totalCount = data.actifs + data.inactifs;
+        },
+        error: (error) => {
+          // ignore erreur de comptage
+        }
+      });
+    }
 
    goBackToList(id: number | undefined): void {
     if(id){
@@ -119,16 +145,43 @@ export class EmployeurListComponent implements OnInit {
 }
 
 
-   get filteredEmployeurs(): EmployeurList[]{
-    if(!this.searchText){
-      return this.employeurs;
+
+   onSearchEntreprise() {
+  this.currentPage = 0;
+  this.loadEmployeur();
+   this.loadCounts();
+}
+clearSearchEntreprise() {
+  this.searchTextEntreprise = '';
+  this.searchTextUsername = '';
+  this.currentPage = 0;
+  this.loadEmployeur();
+  this.loadCounts();
+}
+showActiveEmployeurs() {
+      this.showStatus = 'active';
+      this.currentPage = 0;
+      this.loadEmployeur();
+       this.loadCounts();
     }
-    const lowerCaseSearchText =this.searchText.toLowerCase();
-    return this.employeurs.filter(emp =>
-      emp.nomEntreprise.toLowerCase().includes(lowerCaseSearchText) ||
-      emp.usernameEmployeur.toLowerCase().includes(lowerCaseSearchText) ||
-      emp.entrepriseId.toString().includes(lowerCaseSearchText)
-    )
-     }
+ showInactiveEmployeurs() {
+      this.showStatus = 'inactive';
+      this.currentPage = 0;
+      this.loadEmployeur();
+       this.loadCounts();
+    }
+ showAllEmployeurs() {
+      this.showStatus = 'all';
+      this.currentPage = 0;
+      this.loadEmployeur();
+       this.loadCounts();
+    }
+
+goToPage(page: number): void {
+  if (page >= 0 && page < this.totalPages) {
+    this.currentPage = page;
+    this.loadEmployeur();
+  }
+}
 
 }

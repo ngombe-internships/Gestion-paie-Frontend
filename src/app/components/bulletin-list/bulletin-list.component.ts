@@ -20,10 +20,15 @@ export class BulletinListComponent implements OnInit {
   searchText: string = '';
 
   //variable de pagination
-  currentPage: number = 0;
-  pageSize: number = 10;
-  totalPages: number = 10;
-  pages: number[] = [];
+  currentPage = 0;
+  pageSize = 10;
+  totalPages = 0;
+  statutFilter = 'ACTIFS'; // 'ACTIFS', 'ARCHIVÉS', 'ANNULÉS'
+  statutOptions = [
+  { label: 'Actifs', value: 'ACTIFS' },
+  { label: 'Archivés', value: 'ARCHIVÉS' },
+  { label: 'Annulés', value: 'ANNULÉS' }
+ ];
 
   private readonly bulletinService = inject(BulletinService);
   private readonly authService = inject(AuthService);
@@ -34,33 +39,41 @@ export class BulletinListComponent implements OnInit {
   ngOnInit(): void {
     if (this.authService.hasRole('EMPLOYEUR')){
      this.fetchEmployeurBulletins();
-  } else {
-    this.error = 'Acces non autorise. Vous devez etre un employeur pour voir cette Page.';
-    this.isLoading = false;
-    this.router.navigate(['/access-denied']);
-  }
+    } else {
+     this.error = 'Acces non autorise. Vous devez etre un employeur pour voir cette Page.';
+     this.isLoading = false;
+     this.router.navigate(['/access-denied']);
+    }
   }
 
-    fetchEmployeurBulletins(searchTem: string = ''): void {
-    this.isLoading = true;
-     // S'assurer que le service retourne bien une ApiResponse<BulletinPaieEmployeurDto[]>
-
-     this.bulletinService.getBulletinsForEmployeur(this.searchText).subscribe({
-      next:(response) => {
-         this.bulletins = response.data;
-         this.isLoading= false;
-      },
-      error: (err)=>{
-         console.error('Erreur lors du chargement des bulletins:', err);
-        this.error = 'Une erreur est survenue lors du chargement des bulletins. Veuillez réessayer.';
-        this.isLoading = false;
-      }
-     });
-   }
-
-   searchBulletins(): void {
-    this.fetchEmployeurBulletins(this.searchText);
+  getStatutList(): string[] {
+  if (this.statutFilter === 'ARCHIVÉS') return ['ARCHIVÉ'];
+  if (this.statutFilter === 'ANNULÉS') return ['ANNULÉ'];
+    return ['GÉNÉRÉ', 'VALIDÉ', 'ENVOYÉ'];
   }
+
+  fetchEmployeurBulletins(): void {
+  this.isLoading = true;
+  this.error = '';
+  this.bulletinService.getBulletinsForEmployeurPaginated(
+    this.currentPage, this.pageSize, this.searchText, this.getStatutList()
+  ).subscribe({
+    next: (response) => {
+      this.bulletins = response.data.content;
+      this.totalPages = response.data.totalPages;
+      this.isLoading = false;
+    },
+    error: (err) => {
+      this.error = "Erreur lors du chargement des bulletins.";
+      this.isLoading = false;
+    }
+  });
+}
+
+   searchBulletins() {
+  this.currentPage = 0;
+  this.fetchEmployeurBulletins();
+}
   // Méthodes d'action existantes (viewBulletin, validerBulletin, etc.)
   viewBulletin(id: number): void {
     this.router.navigate(['/dashboard/bulletins', id]);
@@ -193,22 +206,24 @@ export class BulletinListComponent implements OnInit {
     }
   }
 
-  goToPage(page: number): void {
-    if(page >= 0 && page < this.totalPages && page !== this.currentPage) {
-      this.currentPage = page;
-    }
+ goToPage(page: number): void {
+  if (page >= 0 && page < this.totalPages) {
+    this.currentPage = page;
+    this.fetchEmployeurBulletins();
   }
+}
 
-  previousPage(): void {
-    if(this.currentPage > 0){
-      this.goToPage(this.currentPage -1)
-    }
-  }
+filterByStatut(statut: string) {
+  this.statutFilter = statut;
+  this.currentPage = 0; // Revient à la première page
+  this.fetchEmployeurBulletins();
+}
 
-  nextPage(): void {
-    if(this.currentPage < this.totalPages - 1) {
-      this.goToPage(this.currentPage + 1);
-    }
-  }
+
+  onPageSizeChange(size: number): void {
+  this.pageSize = size;
+  this.currentPage = 0;
+  this.fetchEmployeurBulletins();
+}
 
 }

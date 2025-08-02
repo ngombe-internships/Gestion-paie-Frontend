@@ -5,6 +5,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { EmployeCreate } from '../model/employeCreate';
 import { environment } from '../../environment';
+import { PagedResponse } from './bulletin.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,10 +17,18 @@ export class EmployeService {
   constructor() { }
 
 
-  getAllEmployes(): Observable<Employe[]> {
-    return this.http.get<ApiResponse<Employe[]>>(`${this.baseUrl}`).pipe(
-      map(response => response.data)
-    );
+  getAllEmployesForRegister(): Observable<Employe[]> {
+  return this.http.get<ApiResponse<Employe[]>>(`${this.baseUrl}/all`).pipe(
+    map(res => res.data)
+  );
+}
+
+   getEmployesPaginated(page: number = 0, size: number = 10, search: string = ''): Observable<ApiResponse<PagedResponse<Employe>>> {
+    let url = `${this.baseUrl}?page=${page}&size=${size}`;
+    if (search && search.trim() !== '') {
+      url += `&search=${encodeURIComponent(search.trim())}`;
+    }
+    return this.http.get<ApiResponse<PagedResponse<Employe>>>(url);
   }
 
   getEmployeById(id: number) : Observable <Employe> {

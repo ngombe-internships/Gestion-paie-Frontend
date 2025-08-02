@@ -1,115 +1,183 @@
-<div class="container-fluid py-4">
-  <!-- Titre avec style amélioré -->
-  <div class="text-center mb-5">
-    <h2 class="display-4 fw-bold text-primary mb-0">
-      <i class="bi bi-people-fill me-3"></i>
-        Liste des Employeurs
-    </h2>
-     <div class="mt-2">
-      <span class="badge bg-light text-dark fs-6">Gestion des Employeurs et leurs Entreprise</span>
-    </div>
+<div class="card shadow-lg border-0 mb-4" style="border-radius: 15px;">
+  <div class="card-header bg-gradient ">
+    <h3 class="card-title mb-0 fw-semibold">
+      <i class="bi bi-search me-2"></i>
+      Rechercher un employeur
+    </h3>
   </div>
-
-  @if(isLoading) {
-    <div class="alert alert-info text-center shadow-sm border-0" style="border-radius: 12px;">
-      <div class="spinner-border spinner-border-sm me-2 text-ingo">
-        <span class="visually-hidden">Loadind...</span>
-      </div>
-      <strong>Chargement des employeur</strong>
-    </div>
-  }
-  @else if (errorMessage){
-    <div class="alert alert-danger text-center shadow-sm border-0 "style="border-radius: 12px">
-      <i class="bi bi-exclamation-triangle-fill me-2"></i>
-      <strong>{{errorMessage}}</strong>
-    </div>
-  } @else if (employeurs.length === 0){
-    <div class="alert alert-warning text-center shadow-sm border-0" style="border-radius:12px ;">
-      <i class="bi bi-inbox me-2"></i>
-      <strong>Aucun employeur trouvé</strong>
-    </div>
-  }@else{
-      <div class="card shadow-lg border-0" style="border-radius: 15px;">
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-          <thead style="background: linear-gradient(135deg, #1f2937, #374151); color: white;">
-          <tr>
-            <th class="py-3 fw-semibold">
-              <i class="bi bi-hash me-2"></i>Matricle
-            </th>
-            <th class="py-3  fw-semibold">
-              <i class="bi bi-briefcase me-2">Nom de utilisateur</i>
-            </th>
-            <th class="py-3  fw-semibold">
-               <i class="bi bi-briefcase me-2"></i>Nom de l'Entreprise
-            </th>
-
-            <th class="py-3  fw-semibold">
-               <i class="bi bi-calendar-date me-2"></i>Année de création
-            </th>
-            <th class="py-3  fw-semibold text-center">
-              <i class="bi bi-briefcase me-2"></i>Nb Employés
-            </th>
-             <th class="py-3  fw-semibold text-center">
-              <i class="bi bi-briefcase me-2"></i>Créé le
-            </th>
-             <th class="py-3  fw-semibold text-center">
-              <i class="bi bi-briefcase me-2"></i>Modifié le
-            </th>
-
-            <th class="py-3  fw-semibold text-center rounded-top-right-3">
-               <i class="bi bi-gear me-2"></i>Actions
-            </th>
-          </tr>
-         </thead>
-          <tbody>
-           @for(employeur of filteredEmployeurs; track employeur.entrepriseId ){
-            <tr [ngClass]="{'table-danger': !employeur.active, 'text-muted': !employeur.active}">
-                <td class="py-3  text-primary">{{employeur.entrepriseId}}</td>
-                <td class="py-3 ">{{employeur.usernameEmployeur}}</td>
-                <td class="py-3  fw">{{employeur.nomEntreprise}}</td>
-                <td class="py-3  fw text-muted">{{employeur.dateCreationEntreprise | date: 'dd-MM-yyyy' }}</td>
-                <td class="py-3  fw text-center">
-                    <span class="badge bg-secondary rounded-pill py-2 px-3 fs-6">
-                        {{ employeur.nombreEmployes }}
-                    </span>
-                </td>
-                <td>{{ employeur.dateCreationSysteme | date:'dd-MM-yyyy HH:mm' }}</td>
-<td>
-  <span *ngIf="employeur.dateDerniereMiseAJour; else jamais">
-    {{ employeur.dateDerniereMiseAJour | date:'dd-MM-yyyy HH:mm' }}
-  </span>
-  <ng-template #jamais>Jamais modifiée</ng-template>
-</td>
-                <td class="py-3  text-center">
-                    <button class="btn btn-outline-info btn-sm me-2"
-                            (click)="goBackToList(employeur.entrepriseId)"
-                            title="Voir Détails">
-                        <i class="bi bi-eye"></i> Détails
-                    </button>
-                    <button class="btn btn-sm"
-                            [ngClass]="employeur.active ? 'btn-outline-danger' : 'btn-outline-success'"
-                            (click)="toggleEntrepriseStatus(employeur.entrepriseId, employeur.active)"
-                            [title]="employeur.active ? 'Désactiver cette entreprise' : 'Activer cette entreprise'">
-                        <i class="bi" [class.bi-toggle-off]="employeur.active" [class.bi-toggle-on]="!employeur.active"></i>
-                        {{ employeur.active ? 'Désactiver' : 'Activer' }}
-                    </button>
-                    <button class="btn btn-outline-primary btn-sm ms-2"
-                            (click)="editEntreprise(employeur.entrepriseId)"
-                            title="Modifier l'entreprise">
-                        <i class="bi bi-pencil-square"></i> Modifier
-                    </button>
-                </td>
-            </tr>
-        } @empty {
-            <tr>
-                <td colspan="7" class="text-center py-4 text-muted">Aucune entreprise trouvée pour votre recherche.</td>
-            </tr>
-        }
-          </tbody>
-          </table>
+  <div class="card-body p-4">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="searchTextEntreprise" class="form-label fw-semibold text-secondary">
+          <i class="bi bi-funnel-fill me-2 text-primary"></i>
+          Nom de l'entreprise :
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text bg-light border-end-0">
+            <i class="bi bi-search text-muted"></i>
+          </span>
+          <input type="text"
+                 id="searchTextEntreprise"
+                 class="form-control border-start-0 shadow-sm"
+                 [(ngModel)]="searchTextEntreprise"
+                 (keyup.enter)="onSearchEntreprise()"
+                 placeholder="Entrez le nom de l'entreprise..."
+                 style="border-radius: 0 8px 8px 0;">
         </div>
       </div>
-  }
+      <div class="col-md-6">
+        <label for="searchTextUsername" class="form-label fw-semibold text-secondary">
+          <i class="bi bi-funnel-fill me-2 text-primary"></i>
+          Nom d'utilisateur :
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text bg-light border-end-0">
+            <i class="bi bi-search text-muted"></i>
+          </span>
+          <input type="text"
+                 id="searchTextUsername"
+                 class="form-control border-start-0 shadow-sm"
+                 [(ngModel)]="searchTextUsername"
+                 (keyup.enter)="onSearchEntreprise()"
+                 placeholder="Entrez le nom d'utilisateur..."
+                 style="border-radius: 0 8px 8px 0;">
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 text-center">
+       <button class="btn btn-secondary btn-lg px-4 shadow-sm me-3" [class.active]="showStatus==='all'" (click)="showAllEmployeurs()">
+        <i class="bi bi-list me-2"></i>
+        Tous ({{totalCount}})
+      </button>
 
+      <button class="btn btn-success btn-lg px-4 me-3 shadow-sm" [class.active]="showStatus==='active'" (click)="showActiveEmployeurs()">
+        <i class="bi bi-check-circle me-2"></i>
+        Actifs ({{actifsCount}})
+      </button>
+      <button class="btn btn-danger btn-lg px-4 me-3 shadow-sm" [class.active]="showStatus==='inactive'" (click)="showInactiveEmployeurs()">
+        <i class="bi bi-x-circle me-2"></i>
+        Inactifs ({{inactifsCount}})
+      </button>
+
+      <button class="btn btn-primary btn-lg px-4 ms-3 shadow-sm" (click)="onSearchEntreprise()">
+        <i class="bi bi-search me-2"></i>
+        Rechercher
+      </button>
+      <button class="btn btn-outline-secondary btn-lg px-4 ms-3 shadow-sm" (click)="clearSearchEntreprise()">
+        <i class="bi bi-arrow-clockwise me-2"></i>
+        Réinitialiser
+      </button>
+    </div>
+  </div>
 </div>
+@if (isLoading) {
+  <div class="alert alert-info text-center shadow-sm border-0" style="border-radius: 12px;">
+    <div class="spinner-border spinner-border-sm me-2 text-info" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <strong>Chargement des employeurs...</strong>
+  </div>
+} @else if(errorMessage){
+  <div class="alert alert-danger text-center shadow-sm border-0" style="border-radius: 12px;">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>{{errorMessage}}</strong>
+  </div>
+} @else if (employeurs.length === 0){
+  <div class="alert alert-warning text-center shadow-sm border-0" style="border-radius: 12px;">
+    <i class="bi bi-inbox me-2"></i>
+    <strong>Aucun employeur trouvé</strong>
+  </div>
+} @else {
+  <!-- Tableau des employeurs -->
+  <div class="card shadow-lg border-0" style="border-radius: 15px;">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead style="background: linear-gradient(135deg, #1f2937, #374151); color: white;">
+          <tr>
+            <th class="py-3 px-4 fw-semibold">
+              <i class="bi bi-hash me-2"></i>ID
+            </th>
+            <th class="py-3 px-4 fw-semibold">
+              <i class="bi bi-person me-2"></i>Nom d'utilisateur
+            </th>
+            <th class="py-3 px-4 fw-semibold">
+              <i class="bi bi-building me-2"></i>Nom de l'entreprise
+            </th>
+            <th class="py-3 px-4 fw-semibold">
+              <i class="bi bi-calendar-date me-2"></i>Année de création
+            </th>
+            <th class="py-3 px-4 fw-semibold text-center">
+              <i class="bi bi-people me-2"></i>Nb Employés
+            </th>
+            <th class="py-3 px-4 fw-semibold">
+              <i class="bi bi-calendar me-2"></i>Créé le
+            </th>
+            <th class="py-3 px-4 fw-semibold">
+              <i class="bi bi-pencil me-2"></i>Modifié le
+            </th>
+            <th class="py-3 px-4 fw-semibold text-center">
+              <i class="bi bi-gear me-2"></i>Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(employeur of employeurs; track employeur.entrepriseId){
+            <tr [ngClass]="{'table-danger': !employeur.active, 'text-muted': !employeur.active}">
+              <td class="py-3 px-4 text-primary">{{employeur.entrepriseId}}</td>
+              <td class="py-3 px-4">{{employeur.usernameEmployeur}}</td>
+              <td class="py-3 px-4">{{employeur.nomEntreprise}}</td>
+              <td class="py-3 px-4 text-muted">{{employeur.dateCreationEntreprise | date: 'yyyy' }}</td>
+              <td class="py-3 px-4 text-center">
+                <span class="badge bg-secondary rounded-pill py-2 px-3 fs-6">
+                  {{ employeur.nombreEmployes }}
+                </span>
+              </td>
+              <td class="py-3 px-4">{{ employeur.dateCreationSysteme | date:'dd-MM-yyyy HH:mm' }}</td>
+              <td class="py-3 px-4">
+                <span *ngIf="employeur.dateDerniereMiseAJour; else jamais">
+                  {{ employeur.dateDerniereMiseAJour | date:'dd-MM-yyyy HH:mm' }}
+                </span>
+                <ng-template #jamais>Jamais modifiée</ng-template>
+              </td>
+              <td class="py-3 px-4 text-center">
+                <button class="btn btn-outline-info btn-sm me-2"
+                        (click)="goBackToList(employeur.entrepriseId)"
+                        title="Voir Détails">
+                  <i class="bi bi-eye"></i> Détails
+                </button>
+                <button class="btn btn-sm"
+                        [ngClass]="employeur.active ? 'btn-outline-danger' : 'btn-outline-success'"
+                        (click)="toggleEntrepriseStatus(employeur.entrepriseId, employeur.active)"
+                        [title]="employeur.active ? 'Désactiver cette entreprise' : 'Activer cette entreprise'">
+                  <i class="bi" [class.bi-toggle-off]="employeur.active" [class.bi-toggle-on]="!employeur.active"></i>
+                  {{ employeur.active ? 'Désactiver' : 'Activer' }}
+                </button>
+                <button class="btn btn-outline-primary btn-sm ms-2"
+                        (click)="editEntreprise(employeur.entrepriseId)"
+                        title="Modifier l'entreprise">
+                  <i class="bi bi-pencil-square"></i> Modifier
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-center align-items-center my-3 flex-wrap">
+        <button class="btn btn-secondary me-2"
+          [disabled]="currentPage === 0"
+          (click)="goToPage(currentPage - 1)">
+          Précédent
+        </button>
+        <span class="me-2">
+          Page {{ currentPage + 1 }} sur {{ totalPages }}
+        </span>
+        <button class="btn btn-secondary"
+          [disabled]="currentPage >= totalPages - 1"
+          (click)="goToPage(currentPage + 1)">
+          Suivant
+        </button>
+      </div>
+    </div>
+  </div>
+}

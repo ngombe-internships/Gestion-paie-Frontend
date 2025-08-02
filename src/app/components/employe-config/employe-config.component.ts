@@ -92,7 +92,7 @@ export class EmployeConfigComponent implements OnInit {
   }
 
   loadDropdowns(): void {
-    this.employeService.getAllEmployes().subscribe(
+    this.employeService.getAllEmployesForRegister().subscribe(
       data => this.employes = data,
       error => console.error('Erreur lors du chargement des employés', error)
     );

@@ -12,7 +12,7 @@
 
   <!-- Section de recherche améliorée -->
   <div class="card shadow-lg border-0 mb-4" style="border-radius: 15px;">
-    <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 15px 15px 0 0;">
+    <div class="card-header bg-gradient " >
       <h3 class="card-title mb-0 fw-semibold">
         <i class="bi bi-search me-2"></i>
         Rechercher un employé
@@ -153,37 +153,23 @@
             }
           </tbody>
         </table>
+        <div class="d-flex justify-content-center align-items-center my-3 flex-wrap">
+           <button class="btn btn-secondary me-2"
+            [disabled]="currentPage === 0"
+           (click)="goToPage(currentPage - 1)">
+             Précédent
+             </button>
+            <span class="me-2">
+                Page {{ currentPage + 1 }} sur {{ totalPages }}
+            </span>
+          <button class="btn btn-secondary"
+             [disabled]="currentPage >= totalPages - 1"
+              (click)="goToPage(currentPage + 1)">
+             Suivant
+           </button>
+</div>
       </div>
     </div>
   }
 </div>
-<style>
-  .table-hover tbody tr:hover {
-    background-color: rgba(99, 102, 241, 0.05);
-    transform: translateX(5px);
-    transition: all 0.2s ease;
-  }
-
-  .btn-group .btn {
-    margin: 0 2px;
-    border-radius: 6px !important;
-  }
-
-  .card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .card:hover {
-    transform: translateY(-2px);
-  }
-
-  .input-group-text {
-    border-radius: 8px 0 0 8px;
-  }
-
-  .badge {
-    font-size: 0.75em;
-    padding: 0.35em 0.65em;
-  }
-</style>
 

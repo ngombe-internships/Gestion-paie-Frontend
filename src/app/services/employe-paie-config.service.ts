@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environment';
 import { Observable } from 'rxjs';
 import { EmployePaieConfig } from '../model/employeConfig';
+import { PagedResponse } from './bulletin.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +16,11 @@ export class EmployePaieConfigService {
   private baseUrl = environment.apiUrl + '/api/employe-paie-config'
 
 
-  getEmployePaieConfigs(): Observable<EmployePaieConfig[]> {
-    return this.http.get<EmployePaieConfig[]>(this.baseUrl);
- }
+ getEmployePaieConfigs(): Observable<EmployePaieConfig[]> {
+  // Utilise le endpoint sécurisé pour "mon entreprise"
+  return this.http.get<EmployePaieConfig[]>(this.baseUrl + '/my-company');
+}
+
    getEmployePaieConfigById(id: number): Observable<EmployePaieConfig> {
     return this.http.get<EmployePaieConfig>(`${this.baseUrl}/${id}`);
   }
@@ -47,6 +50,24 @@ export class EmployePaieConfigService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
 
   }
+
+
+   searchEmployePaieConfigs(
+    employeId?: number,
+    elementPaieId?: number,
+    status: string = 'all',
+    searchTerm: string = '',
+    page: number = 0,
+    size: number = 10
+  ): Observable<PagedResponse<EmployePaieConfig>> {
+    const params: any = { status, searchTerm, page, size };
+    if (employeId) params.employeId = employeId;
+    if (elementPaieId) params.elementPaieId = elementPaieId;
+    return this.http.get<PagedResponse<EmployePaieConfig>>(
+      `${this.baseUrl}/my-company/search`, { params }
+    );
+  }
+
 
 
 

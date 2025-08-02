@@ -11,7 +11,7 @@
 
   <!-- Section de recherche améliorée -->
   <div class="card shadow-lg border-0 mb-4" style="border-radius: 15px;">
-    <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 15px 15px 0 0;">
+    <div class="card-header bg-gradient ">
       <h3 class="card-title mb-0 fw-semibold">
         <i class="bi bi-search me-2"></i>
         Rechercher un employé
@@ -41,6 +41,40 @@
 
     </div>
   </div>
+  <div class="d-flex justify-content-end mb-3">
+  <div class="btn-group" role="group" aria-label="Filtre Statut des bulletins">
+    <button
+      type="button"
+      class="btn"
+      [ngClass]="{
+        'btn-outline-primary': statutFilter !== 'ACTIFS',
+        'btn-primary': statutFilter === 'ACTIFS'
+      }"
+      (click)="filterByStatut('ACTIFS')">
+      Voir bulletin actif
+    </button>
+    <button
+      type="button"
+      class="btn"
+      [ngClass]="{
+        'btn-outline-secondary': statutFilter !== 'ARCHIVÉS',
+        'btn-secondary': statutFilter === 'ARCHIVÉS'
+      }"
+      (click)="filterByStatut('ARCHIVÉS')">
+     Voir bulletin  archivés
+    </button>
+    <button
+      type="button"
+      class="btn"
+      [ngClass]="{
+        'btn-outline-warning': statutFilter !== 'ANNULÉS',
+        'btn-warning': statutFilter === 'ANNULÉS'
+      }"
+      (click)="filterByStatut('ANNULÉS')">
+      Voir bulletin annulés
+    </button>
+  </div>
+</div>
 
   @if (isLoading) {
     <div class="alert alert-info text-center shadow-sm border-0" style="border-radius: 12px;">
@@ -83,7 +117,7 @@
               <th class="py-3 px-4 fw-semibold text-center">
                 <i class="bi bi-info-circle me-2"></i>Statut
               </th>
-              <th class="py-3 px-4 fw-semibold text-center" style="width: 35%;">
+              <th class="py-3 px-4 fw-semibold text-center">
                 <i class="bi bi-gear me-2"></i>Actions
               </th>
             </tr>
@@ -91,7 +125,7 @@
           <tbody>
             @for (bulletin of bulletins; track bulletin.id) {
               <tr class="border-0" style="border-bottom: 1px solid #e5e7eb !important;">
-                <td class="py-3 px-4 fw-semibold text-primary">{{ bulletin.id }}</td>
+                <td class="py-3 px-4 fw-semibold text-primary " >{{ bulletin.id }}</td>
                 <td class="py-3 px-4">
                   {{ bulletin.employe?.nom }} {{ bulletin.employe?.prenom }} ({{ bulletin.employe?.matricule }})
                 </td>
@@ -101,12 +135,12 @@
                 </td>
                 <td class="py-3 px-4 text-center">
                   {{ (bulletin.datePaiement && bulletin.datePaiement.length > 0) ? (bulletin.datePaiement | date:'shortDate') : 'N/A' }}
-                </td> <td class="py-3 px-4 text-center">
+                </td> <td class="py-3 px-4 text-center" >
                   <span class="status-badge status-{{ bulletin.statusBulletin | lowercase }}">
                     {{ bulletin.statusBulletin }}
                   </span>
                 </td>
-            <td class="py-3 px-4 text-muted">
+            <td class="py-3 px-4 text-muted" >
   <button (click)="viewBulletin(bulletin.id!)" class="btn btn-outline-info btn-sm-lg me-1" title="Voir le bulletin">
     <i class="bi bi-eye"></i> Voir
   </button>
@@ -135,23 +169,30 @@
             }
           </tbody>
         </table>
-        <!-- @if(totalPages > 1) {
-          <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center flex-wrap">
-              <li class="page-item" [class.disabled]="currentPage ===0 ">
-                <a class="page-link" href="#" (click)="previousPage()">Précedent</a>
-              </li>
-              @for (page of pages; track page){
-                <li class="page-item" [class.active]="currentPage === page">
-                  <a href="#" class="page-link" (click)="goToPage(page)">{{page + 1}}</a>
-                </li>
-              }
-              <li class="page-item" [class.disable]="currentPage === totalPages - 1">
-               <a href="#" class="page-link" (click)="nextPage()">Suivant</a>
-              </li>
-            </ul>
-          </nav>
-        } -->
+      <div class="d-flex justify-content-center align-items-center my-3 flex-wrap">
+  <!-- Sélecteur du nombre d'éléments par page (optionnel) -->
+  <label for="pageSize" class="me-2 mb-0">Éléments par page:</label>
+  <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" class="form-select w-auto me-3">
+    <option *ngFor="let size of [10, 20, 50, 100]" [value]="size">{{size}}</option>
+  </select>
+
+  <span class="me-2 text-muted">Total: {{ totalPages }}</span>
+
+  <!-- Pagination simple -->
+  <button class="btn btn-outline-secondary me-2"
+          [disabled]="currentPage === 0"
+          (click)="goToPage(currentPage - 1)">
+    Précédent
+  </button>
+  <span class="me-2">
+    Page {{ currentPage + 1 }} sur {{ totalPages }}
+  </span>
+  <button class="btn btn-outline-secondary"
+          [disabled]="currentPage >= totalPages - 1"
+          (click)="goToPage(currentPage + 1)">
+    Suivant
+  </button>
+</div>
       </div>
     </div>
   }

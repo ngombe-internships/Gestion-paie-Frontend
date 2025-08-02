@@ -16,8 +16,13 @@ export class EmployeListComponent implements OnInit {
   employes : Employe[] = [];
   isLoading : boolean = true;
   errorMessage : string | null = null;
-
   searchText: string = '';
+
+   // Pagination variables
+  currentPage = 0;
+  pageSize = 10;
+  totalPages = 0;
+  totalElements = 0;
 
 
 
@@ -34,9 +39,11 @@ export class EmployeListComponent implements OnInit {
   loadEmployes(): void {
     this.isLoading = true;
     this.errorMessage = null;
-    this.employeService.getAllEmployes().subscribe({
-      next: (data) => {
-        this.employes = data;
+   this.employeService.getEmployesPaginated(this.currentPage, this.pageSize, this.searchText).subscribe({
+      next: (response) => {
+        this.employes = response.data.content;
+        this.totalPages = response.data.totalPages;
+        this.totalElements = response.data.totalElements;
         this.isLoading = false;
       },
       error: (error) => {
@@ -45,28 +52,6 @@ export class EmployeListComponent implements OnInit {
         this.isLoading = false;
       }
     });
-  }
-
-  onSearch (): void {
-    this.isLoading = true;
-    this.errorMessage = null;
-
-    this.employeService.searchEmployes(this.searchText).subscribe({
-      next: (data) => {
-        this.employes = data;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Erreur lors de la recherche : ', error);
-        this.errorMessage = 'Une erreur est survenue lors de la recherche. ';
-        this.isLoading = false;
-      }
-    });
-  }
-
- clearSearch(): void {
-      this.searchText ='';
-      this.loadEmployes();
   }
 
   viewEmployeDetails (id: number | undefined) : void {
@@ -119,6 +104,31 @@ export class EmployeListComponent implements OnInit {
       console.error('Employee ID is undefined, cannot generate bulletin.');
     }
   }
+
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.loadEmployes();
+    }
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 0;
+    this.loadEmployes();
+  }
+
+  onSearch(): void {
+    this.currentPage = 0;
+    this.loadEmployes();
+  }
+
+  clearSearch(): void {
+    this.searchText = '';
+    this.currentPage = 0;
+    this.loadEmployes();
+  }
+
 
 
 

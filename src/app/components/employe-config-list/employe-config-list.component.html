@@ -1,18 +1,5 @@
 <div class="employe-paie-config-list">
-  <h2 class="display-4 fw-bold mb-0" style="color: #0d6efd;">
-    <i class="bi bi-gear-fill me-3"></i>
-    Configurations de Paie des Employés
-  </h2>
-  <div class="mt-2">
-    <span class="badge bg-light text-dark fs-6">Gérer les éléments de paie par employé</span>
-  </div>
-
-  <div *ngIf="isLoading" class="alert alert-info text-center mt-3">
-    Chargement des configurations...
-  </div>
-  <div *ngIf="error" class="alert alert-danger text-center mt-3">
-    {{ error }}
-  </div>
+  <!-- ... titres et badges ... -->
 
   <div class="card mt-4 mb-3 shadow-sm">
     <div class="card-header bg-white">
@@ -23,12 +10,12 @@
         <div class="col-md-4">
           <label for="searchTerm" class="form-label">Recherche Globale</label>
           <input type="text" class="form-control" id="searchTerm" [(ngModel)]="searchTerm"
-                 (input)="currentPage = 1" placeholder="Rechercher par employé ou élément...">
+                 (input)="onFiltersChange()" placeholder="Rechercher par employé ou élément...">
         </div>
 
         <div class="col-md-3">
           <label for="filterEmploye" class="form-label">Filtrer par Employé</label>
-          <select class="form-select" id="filterEmploye" [(ngModel)]="filterEmployeId" (change)="currentPage = 1">
+          <select class="form-select" id="filterEmploye" [(ngModel)]="filterEmployeId" (change)="onFiltersChange()">
             <option [ngValue]="null">Tous les employés</option>
             <option *ngFor="let employe of allEmployes" [ngValue]="employe.id">
               {{ employe.nom }} {{ employe.prenom }} ({{ employe.matricule }})
@@ -38,28 +25,12 @@
 
         <div class="col-md-3">
           <label for="filterElementPaie" class="form-label">Filtrer par Élément de Paie</label>
-          <select class="form-select" id="filterElementPaie" [(ngModel)]="filterElementPaieId" (change)="currentPage = 1">
+          <select class="form-select" id="filterElementPaie" [(ngModel)]="filterElementPaieId" (change)="onFiltersChange()">
             <option [ngValue]="null">Tous les éléments de paie</option>
             <option *ngFor="let element of allElementPaies" [ngValue]="element.id">
               {{ element.designation }} ({{ element.code }})
             </option>
           </select>
-        </div>
-
-        <div class="col-md-2">
-          <label class="form-label">Statut</label>
-          <div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="filterStatus" id="statusActive"
-                     value="active" [(ngModel)]="filterStatus" (change)="currentPage = 1">
-              <label class="form-check-label" for="statusActive">Actives</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="filterStatus" id="statusAll"
-                     value="all" [(ngModel)]="filterStatus" (change)="currentPage = 1">
-              <label class="form-check-label" for="statusAll">Toutes</label>
-            </div>
-          </div>
         </div>
       </div>
       <div class="row mt-3">
@@ -71,11 +42,25 @@
       </div>
     </div>
   </div>
+  <div class="btn-group d-flex justify-content-end">
+  <button type="button"
+          class="btn btn-outline-primary"
+          [class.active]="filterStatus==='active'"
+          (click)="filterStatus='active'; onFiltersChange()">
+    Actives
+  </button>
+  <button type="button"
+          class="btn btn-outline-secondary"
+          [class.active]="filterStatus==='all'"
+          (click)="filterStatus='all'; onFiltersChange()">
+    Toutes
+  </button>
+</div>
 
   <div class="card mt-5 shadow-sm">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
       <h4 class="mb-0" style="color: #0d6efd;"><i class="bi bi-table me-2"></i>Liste des Configurations</h4>
-      <span class="badge bg-primary fs-6">{{ filteredConfigs.length }} résultat(s)</span>
+      <span class="badge bg-primary fs-6">{{ totalElements }} résultat(s)</span>
     </div>
     <div class="card-body">
       <div class="table-responsive">
@@ -84,7 +69,6 @@
             <tr>
               <th class="px-3 py-2">Employé</th>
               <th class="px-3 py-2">Élément de Paie</th>
-              <th class="px-3 py-2">Montant/Taux</th>
               <th class="px-3 py-2">Valeur</th>
               <th class="px-3 py-2">Date Début</th>
               <th class="px-3 py-2">Date Fin</th>
@@ -92,28 +76,24 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngIf="paginatedConfigs.length === 0 && !isLoading && !error">
+            <tr *ngIf="configs.length === 0 && !isLoading && !error">
               <td colspan="6" class="text-center py-4">Aucune configuration trouvée.</td>
             </tr>
-            <tr *ngFor="let config of paginatedConfigs; trackBy: trackByConfigId">
+            <tr *ngFor="let config of configs; trackBy: trackByConfigId">
               <td>{{ getEmployeFullName(config.employe) }}</td>
               <td>{{ getElementPaieDesignation(config.elementPaie) }}</td>
-              <td>{{config.montant | number:'1.2-2'}}</td>
               <td>
-                <span *ngIf="getElementPaieFormula(config.elementPaie) === 'MONTANT_FIXE'">Montant</span>
-                <span *ngIf="getElementPaieFormula(config.elementPaie) === 'POURCENTAGE_BASE'">Taux</span>
+                <span *ngIf="getElementPaieFormula(config.elementPaie) === 'MONTANT_FIXE'">
+                  {{ config.montant | number:'1.2-2' }}
+                </span>
+                <span *ngIf="getElementPaieFormula(config.elementPaie) === 'POURCENTAGE_BASE'">
+                  {{ config.taux | number:'1.4-4' }}
+                </span>
+                <span *ngIf="getElementPaieFormula(config.elementPaie) !== 'MONTANT_FIXE' && getElementPaieFormula(config.elementPaie) !== 'POURCENTAGE_BASE'">
+                  -
+                </span>
               </td>
-              <td>
-                 <span *ngIf="getElementPaieFormula(config.elementPaie) === 'MONTANT_FIXE'">
-                    {{ config.montant | number:'1.2-2' }}
-                 </span>
-                 <span *ngIf="getElementPaieFormula(config.elementPaie) === 'POURCENTAGE_BASE'">
-                    {{ config.taux | number:'1.4-4' }}
-                 </span>
-                  <span *ngIf="getElementPaieFormula(config.elementPaie) !== 'MONTANT_FIXE' && getElementPaieFormula(config.elementPaie) !== 'POURCENTAGE_BASE'">
-                        -
-                  </span>
-              </td>
+              <td>{{ config.dateDebut ? (config.dateDebut| date:'dd/MM/yyyy') : 'N/A' }}</td>
               <td>{{ config.dateFin ? (config.dateFin | date:'dd/MM/yyyy') : 'N/A' }}</td>
               <td class="text-center">
                 <button title="Modifier" class="btn btn-outline-info btn-sm me-2" (click)="onEditConfig(config.id)">

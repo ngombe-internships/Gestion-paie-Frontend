@@ -6,10 +6,9 @@ import { EmployePaieConfigService } from '../../services/employe-paie-config.ser
 import { EmployeService } from '../../services/employe.service';
 import { ElementpaieService } from '../../services/elementpaie.service';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 
@@ -19,8 +18,7 @@ import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.comp
   templateUrl: './employe-config-list.component.html',
   styleUrl: './employe-config-list.component.css'
 })
-export class EmployeConfigListComponent  implements OnInit{
-
+export class EmployeConfigListComponent implements OnInit {
   configs: EmployePaieConfig[] = [];
   allEmployes: Employe[] = [];
   allElementPaies: ElementPaie[] = [];
@@ -32,165 +30,134 @@ export class EmployeConfigListComponent  implements OnInit{
   filterEmployeId: number | null = null;
   filterElementPaieId: number | null = null;
   filterStatus: 'active' | 'all' = 'active';
+  activeCount = 0;
+  totalCount = 0;
 
-  //pagination
-  currentPage = 1;
-  itemsPerpage = 5;
+  currentPage = 0;
+  itemsPerPage = 10;
 
+  totalPages = 0;
+  totalElements = 0;
 
-   private readonly employePaieConfigService = inject(EmployePaieConfigService);
-    private readonly employeService = inject(EmployeService);
-    private readonly elementpaieService = inject(ElementpaieService);
-     private readonly router = inject(Router);
-    private readonly toastrService = inject(ToastrService);
-   private readonly dialog = inject ( MatDialog);
+  private readonly employePaieConfigService = inject(EmployePaieConfigService);
+  private readonly employeService = inject(EmployeService);
+  private readonly elementpaieService = inject(ElementpaieService);
+  private readonly router = inject(Router);
+  private readonly toastrService = inject(ToastrService);
+  private readonly dialog = inject(MatDialog);
 
-    trackByConfigId(index: number, config: EmployePaieConfig): number | undefined {
+  ngOnInit(): void {
+    this.loadEmployesAndElements();
+    this.loadConfigs();
+  }
+
+  loadEmployesAndElements(): void {
+    // Charge tous les employés et éléments de paie pour le filtrage
+    this.employeService.getAllEmployesForRegister().subscribe({
+      next: (employes) => this.allEmployes = employes,
+      error: () => this.allEmployes = []
+    });
+    this.elementpaieService.getAll().subscribe({
+      next: (elements) => this.allElementPaies = elements,
+      error: () => this.allElementPaies = []
+    });
+  }
+
+  loadConfigs(page: number = 1): void {
+    this.isLoading = true;
+    this.error = null;
+    this.currentPage = page;
+
+    this.employePaieConfigService.searchEmployePaieConfigs(
+      this.filterEmployeId ?? undefined,
+      this.filterElementPaieId ?? undefined,
+      this.filterStatus,
+      this.searchTerm,
+      this.currentPage - 1,
+      this.itemsPerPage
+    ).subscribe({
+      next: (response) => {
+        this.configs = response.content;
+        this.totalPages = response.totalPages;
+        this.totalElements = response.totalElements;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.error = 'Erreur lors du chargement des configurations.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  trackByConfigId(index: number, config: EmployePaieConfig): number | undefined {
     return config.id;
   }
 
-
-  ngOnInit(): void {
-  this.loadData();
-  }
-
-  loadData(): void {
-    this.isLoading = true;
-    this.error = null;
-
-      forkJoin([
-        this.employePaieConfigService.getEmployePaieConfigs(),
-        this.employeService.getAllEmployes(),
-        this.elementpaieService.getAll()
-      ]) . subscribe ({
-        next: ([configs,employes, elementPaies]) =>{
-
-          this.configs = configs;
-          this.allEmployes = employes;
-          this.allElementPaies = elementPaies
-
-          // Ajoutez ces logs pour déboguer
-      console.log('Configs:', configs);
-      console.log('Employes:', employes);
-      console.log('ElementPaies:', elementPaies);
-
-          this.isLoading = false
-        },
-        error: (err) => {
-          this.error = 'Erreur lors du chargement des données.';
-          console.error('Error loading data:', err);
-          this.isLoading = false;
-        }
-      })
-  }
-
   getEmployeFullName(employeId: number): string {
-      console.log('Recherche employeId', employeId, 'dans', this.allEmployes.map(e => e.id));
     const employe = this.allEmployes.find(emp => emp.id === employeId);
-    return employe? `${employe.nom} ${employe.prenom} (${employe.matricule})` : 'N/A';
+    return employe ? `${employe.nom} ${employe.prenom} (${employe.matricule})` : 'N/A';
   }
 
   getElementPaieDesignation(elementPaieId: number): string {
     const element = this.allElementPaies.find(el => el.id === elementPaieId);
-    return element ? `${element.designation} (${element.code})`: 'N/A';
+    return element ? `${element.designation} (${element.code})` : 'N/A';
   }
 
-  get filteredConfigs(): EmployePaieConfig[]{
-    let filtered = this.configs;
-
-    if(this.filterEmployeId) {
-      filtered = filtered.filter(config => config.employe === this.filterEmployeId)
-    }
-
-    if(this.filterElementPaieId){
-      filtered = filtered.filter(config => config.elementPaie === this.filterElementPaieId);
-    }
-
-    if (this.filterStatus === 'active') {
-      const today = new Date();
-
-      filtered = filtered.filter(config => {
-        const dateDebut = new Date(config.dateDebut);
-        const dateFin = config.dateFin ? new Date(config.dateFin) : null;
-        return dateDebut <= today && (!dateFin || dateFin >= today);
-      });
-    }
-
-    if (this.searchTerm) {
-      const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(config =>
-        this.getEmployeFullName(config.employe).toLowerCase().includes(lowerCaseSearchTerm) ||
-        this.getElementPaieDesignation(config.elementPaie).toLowerCase().includes(lowerCaseSearchTerm)
-      );
-    }
-
-    return filtered;
+  getElementPaieFormula(elementPaieId: number): string {
+    const element = this.allElementPaies.find(el => el.id === elementPaieId);
+    return element?.formuleCalcul || '';
   }
 
-  get paginatedConfigs(): EmployePaieConfig[]{
-    const startIndex = (this.currentPage - 1) * this.itemsPerpage;
-    return this.filteredConfigs.slice(startIndex, startIndex + this.itemsPerpage);
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.filteredConfigs.length / this.itemsPerpage);
-  }
-
-  changePage (pageNumber: number): void {
-    if(pageNumber >=1 && pageNumber <= this.totalPages){
-      this.currentPage = pageNumber;
+  // Pagination
+  changePage(pageNumber: number): void {
+    if (pageNumber >= 1 && pageNumber <= this.totalPages) {
+      this.loadConfigs(pageNumber);
     }
   }
 
-   onNewConfig(): void {
+  // Filtrage et recherche
+  onFiltersChange(): void {
+    this.loadConfigs(1);
+  }
+
+  // Actions
+  onNewConfig(): void {
     this.router.navigate(['/dashboard/employe-paie-config/new']);
   }
-
   onEditConfig(id: number | undefined): void {
     if (id) {
       this.router.navigate([`/dashboard/employe-paie-config/edit/${id}`]);
     }
   }
-
   onDeleteConfig(id: number | undefined): void {
-  if (!id) return;
-
-  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-    width: '400px',
-    data: {
-      title: 'Confirmation de suppression',
-      message: 'Êtes-vous sûr de vouloir supprimer cette configuration ?',
-      confirmText: 'Supprimer',
-      cancelText: 'Annuler'
-    }
-  });
-
-  dialogRef.afterClosed().subscribe(confirmed => {
-    if (confirmed) {
-      this.employePaieConfigService.deleteEmployePaieConfig(id).subscribe({
-        next: () => {
-          this.toastrService.success('Configuration supprimée avec succès !');
-          this.loadData();
-        },
-        error: (err) => {
-          this.error = 'Erreur lors de la suppression de la configuration.';
-          this.toastrService.error(
-            'Une erreur est survenue lors de la suppression',
-            'Erreur',
-            { timeOut: 5000 }
-          );
-
-          // Optionnel : logger l'erreur dans un service de logging
-          // this.errorLoggingService.logError('DeleteConfigError', err);
-        }
-      });
-    }
-  });
-}
-
-  getElementPaieFormula(elementPaieId: number): string {
-  const element = this.allElementPaies.find(el => el.id === elementPaieId);
-  return element?.formuleCalcul || '';
-}
+    if (!id) return;
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Confirmation de suppression',
+        message: 'Êtes-vous sûr de vouloir supprimer cette configuration ?',
+        confirmText: 'Supprimer',
+        cancelText: 'Annuler'
+      }
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.employePaieConfigService.deleteEmployePaieConfig(id).subscribe({
+          next: () => {
+            this.toastrService.success('Configuration supprimée avec succès !');
+            this.loadConfigs(this.currentPage);
+          },
+          error: () => {
+            this.error = 'Erreur lors de la suppression de la configuration.';
+            this.toastrService.error(
+              'Une erreur est survenue lors de la suppression',
+              'Erreur',
+              { timeOut: 5000 }
+            );
+          }
+        });
+      }
+    });
+  }
 
 }

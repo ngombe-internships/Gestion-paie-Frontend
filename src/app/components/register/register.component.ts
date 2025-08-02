@@ -40,7 +40,7 @@ export class RegisterComponent implements OnInit {
 
 
   loadEmployes(): void {
-    this.employeService.getAllEmployes().subscribe({
+    this.employeService.getAllEmployesForRegister().subscribe({
       next: (data) => {
         this.employes = data;
       },

@@ -1,6 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { AuditLog, AuditLogsService } from '../services/audit-logs.service';
 import { CommonModule } from '@angular/common';
+import { AuditLogDialogComponent } from '../audit-log-dialog/audit-log-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-audit-logs',
@@ -17,7 +19,7 @@ export class AuditLogsComponent implements OnInit {
 
   constructor() {}
   private readonly auditLogService= inject (AuditLogsService);
-
+  private readonly dialog = inject(MatDialog);
   ngOnInit() {
     this.loadLogs();
   }
@@ -37,5 +39,32 @@ export class AuditLogsComponent implements OnInit {
 
   onPageChange(newPage: number) {
     this.loadLogs(newPage);
+  }
+
+  openExportDialog() {
+    const dialogRef = this.dialog.open(AuditLogDialogComponent, {
+      width: '400px',
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.from && result.to) {
+        this.exportPdf(result.from, result.to);
+      }
+    });
+  }
+
+  exportPdf(from: string, to: string) {
+    this.auditLogService.exportAuditLogsPdf(from, to).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `audit-logs-${from}-to-${to}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        alert('Erreur lors de l\'export PDF');
+      }
+    });
   }
 }

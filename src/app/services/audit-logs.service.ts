@@ -29,6 +29,16 @@ export class AuditLogsService {
     if (params.action) httpParams = httpParams.set('action', params.action);
     return this.http.get<AuditLogPage>(this.baseUrl, { params: httpParams });
   }
+
+  exportAuditLogsPdf(from: string, to: string): Observable<Blob> {
+    return this.http.post(
+      `${this.baseUrl}/pdf`,
+      { from, to },
+      { responseType: 'blob' }
+    );
+  }
+
+
 }
 
 export interface AuditLog {

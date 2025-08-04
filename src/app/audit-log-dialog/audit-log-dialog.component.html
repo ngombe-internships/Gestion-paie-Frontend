@@ -1,0 +1,13 @@
+<h2>Exporter les logs PDF</h2>
+  <form (ngSubmit)="export()">
+    <div class="form-group">
+      <label for="from">Date de début</label>
+      <input type="date" [(ngModel)]="from" name="from" required class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="to">Date de fin</label>
+      <input type="date" [(ngModel)]="to" name="to" required class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Exporter</button>
+    <button type="button" class="btn btn-secondary" (click)="close()">Annuler</button>
+  </form>

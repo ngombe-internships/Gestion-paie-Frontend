@@ -1,13 +1,52 @@
 <h2>Exporter les logs PDF</h2>
-  <form (ngSubmit)="export()">
-    <div class="form-group">
-      <label for="from">Date de début</label>
-      <input type="date" [(ngModel)]="from" name="from" required class="form-control">
+<form (ngSubmit)="export()" #exportForm="ngForm">
+  <div class="form-group mb-3">
+    <label for="from" class="form-label">Date de début *</label>
+    <input
+      type="date"
+      [(ngModel)]="from"
+      name="from"
+      required
+      class="form-control"
+      #fromInput="ngModel">
+    <div *ngIf="fromInput.invalid && fromInput.touched" class="text-danger mt-1">
+      La date de début est obligatoire
     </div>
-    <div class="form-group">
-      <label for="to">Date de fin</label>
-      <input type="date" [(ngModel)]="to" name="to" required class="form-control">
+  </div>
+
+  <div class="form-group mb-3">
+    <label for="to" class="form-label">Date de fin *</label>
+    <input
+      type="date"
+      [(ngModel)]="to"
+      name="to"
+      required
+      class="form-control"
+      [min]="from"
+      #toInput="ngModel">
+    <div *ngIf="toInput.invalid && toInput.touched" class="text-danger mt-1">
+      La date de fin est obligatoire
     </div>
-    <button type="submit" class="btn btn-primary">Exporter</button>
-    <button type="button" class="btn btn-secondary" (click)="close()">Annuler</button>
-  </form>
+    <div *ngIf="from && to && to < from" class="text-danger mt-1">
+      La date de fin doit être postérieure à la date de début
+    </div>
+  </div>
+
+  <div class="alert alert-warning" *ngIf="dateRangeError">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ dateRangeError }}
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <button type="button" class="btn btn-secondary" (click)="close()">
+      Annuler
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="!exportForm.valid || (from && to && to < from) || isExporting">
+      <span *ngIf="isExporting" class="spinner-border spinner-border-sm me-2"></span>
+      {{ isExporting ? 'Export en cours...' : 'Exporter' }}
+    </button>
+  </div>
+</form>

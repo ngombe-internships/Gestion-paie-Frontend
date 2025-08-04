@@ -3,10 +3,9 @@
   <div *ngIf="isLoading" class="alert alert-info">
     Chargement des logs...
   </div>
-  <!-- <div class="d-flex justify-content-between align-items-center mb-2">
+  <div class="d-flex justify-content-between align-items-center mb-2">
     <button class="btn btn-success" (click)="openExportDialog()">Exporter PDF</button>
-    <h3>Historique complet des activités</h3>
-  </div> -->
+  </div>
   <table class="table" *ngIf="!isLoading">
     <thead>
       <tr>

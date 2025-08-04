@@ -63,7 +63,7 @@ export class AuditLogsComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: (err) => {
-        alert('Erreur lors de l\'export PDF');
+        console.log('Erreur lors de l\'export PDF')
       }
     });
   }

@@ -3,13 +3,15 @@
   margin: 0 auto;
 }
 table {
-  width: 120px;
+  width: 100%;
   border-collapse: collapse;
   margin-bottom: 1em;
+  table-layout: auto;
 }
 th, td {
   border: 1px solid #ccc;
-  padding: 0.3em 0.6em;
+ padding: 0.75em 1em; /* Plus d’air */
+  white-space: nowrap;
 }
 form label {
   display: block;
@@ -33,7 +35,9 @@ button {
 /* Petits écrans - Mobile (max-width: 576px) */
 @media (max-width: 576px) {
   .elementpaie-admin {
-    padding: 0.5rem;
+    max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
   }
 
   .display-4 {
@@ -81,10 +85,7 @@ button {
     padding: 0.4rem 0.8rem;
   }
 
-  /* Tableau responsive */
-  .table-responsive {
-    font-size: 0.8rem;
-  }
+ 
 
   .table th,
   .table td {

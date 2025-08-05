@@ -56,7 +56,7 @@
                     <span class="info-label">Salaire imposable:</span>
                     <span class="info-value">{{ formatNumber(bulletinData?.salaireImposable) }} FCFA</span>
                 </div>
-                 
+
             </div>
         </div>
 
@@ -82,21 +82,28 @@
     </thead>
     <tbody>
       <!--Affichage des gains-->
-      @for(ligne of bulletinData?.lignesPaie; track ligne.designation) {
-      @if (ligne.type === 'GAIN'){
-         <tr>
-            <td>{{ ligne.designation }}</td>
-            <td>{{ ligne.nombre ? (ligne.nombre | number:'1.2-2') : '' }}</td>
-            <td>{{ ligne.baseApplique ? (ligne.baseApplique | number:'1.2-2') : '' }}</td>
-            <td>{{ ligne.tauxAffiche? (ligne.tauxAffiche  | number:'1.2-2')  : '' }}</td>
-            <td>{{ ligne.montantFinal | number:'1.2-2' }}</td>
-            <td></td>
-            <td></td>
-           <td></td>
-       </tr>
-
-       }
-      }
+   @for(ligne of bulletinData?.lignesPaie; track ligne.designation) {
+    @if (ligne.type === 'GAIN'){
+     <tr>
+        <td>{{ ligne.designation }}</td>
+        <td>{{ ligne.nombre ? (ligne.nombre | number:'1.2-2') : '' }}</td>
+        <!-- PATCH : Si la ligne est "Salaire de base", affiche rien ou "--" dans BASE -->
+        <td>
+          {{ ligne.designation === 'Salaire de base' ? '' : (ligne.baseApplique ? (ligne.baseApplique | number:'1.2-2') : '') }}
+        </td>
+        <!-- PATCH : Pour "Salaire de base", affiche le taux horaire dans TAUX, sinon tauxAffiche -->
+        <td>
+          {{ ligne.designation === 'Salaire de base'
+              ? (ligne.tauxApplique ? (ligne.tauxApplique | number:'1.2-2') : '--')
+              : (ligne.tauxAffiche ? ligne.tauxAffiche : '--') }}
+        </td>
+        <td>{{ ligne.montantFinal | number:'1.2-2' }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+   }
+}
 
       <!-- Ligne Salaire Brut -->
      <tr class="salaire-brut-row">

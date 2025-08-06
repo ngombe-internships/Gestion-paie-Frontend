@@ -3,58 +3,49 @@
   <div *ngIf="error" class="error">{{ error }}</div>
   <div *ngIf="loading">Chargement...</div>
 
-<div class="top-section">
-  <div class="left-column">
-    <!--Bouton pour dupliquer-->
-    <button type="button" (click)="duplicateDefaultTemplate()" [disabled]="loading">
-      Dupliquer le template par défaut
-    </button>
+  <div class="top-section">
+    <div class="left-column">
+      <button type="button" (click)="duplicateDefaultTemplate()" [disabled]="loading">
+        Dupliquer le template par défaut
+      </button>
 
-    <ul class="template-list">
-      <li *ngFor="let tpl of templates" [class.selected]="tpl === selectedTemplate"
-          (click)="selectTemplate(tpl)">
-        <span>{{ tpl.nom }}</span>
-        <span *ngIf="tpl.isDefault" class="default">Par défaut</span>
+      <ul class="template-list">
+        <li *ngFor="let tpl of templates" [class.selected]="tpl === selectedTemplate"
+            (click)="selectTemplate(tpl)">
+          <span>{{ tpl.nom }}</span>
+          <span *ngIf="tpl.isDefault" class="default">Par défaut</span>
 
-        <div class="template-actions">
-          <button (click)="setAsDefault(tpl); $event.stopPropagation()" *ngIf="!tpl.isDefault">
-            Définir par défaut
-          </button>
-          <button (click)="unsetAsDefault(tpl); $event.stopPropagation()" *ngIf="tpl.isDefault && canUnsetDefault()">
-            Quitter le mode par défaut
-          </button>
-          <button class="delete-btn" (click)="deleteTemplate(tpl); $event.stopPropagation()">
-            Supprimer
-          </button>
-        </div>
-      </li>
-    </ul>
+          <div class="template-actions">
+            <button (click)="setAsDefault(tpl); $event.stopPropagation()" *ngIf="!tpl.isDefault">
+              Définir par défaut
+            </button>
+            <button (click)="unsetAsDefault(tpl); $event.stopPropagation()" *ngIf="tpl.isDefault && canUnsetDefault()">
+              Quitter le mode par défaut
+            </button>
+            <button class="delete-btn" (click)="deleteTemplate(tpl); $event.stopPropagation()">
+              Supprimer
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="right-column">
+      <div *ngIf="selectedTemplate" class="template-edit">
+        <input [(ngModel)]="selectedTemplate.nom" placeholder="Nom du template" />
+        <label>
+          <input type="checkbox" [(ngModel)]="selectedTemplate.isDefault" />
+          Par défaut
+        </label>
+        <button (click)="updateTemplate()" [disabled]="loading" class="btn-save">Enregistrer</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="createTemplate()" class="new-template-form">
+        <input placeholder="Nom du template" formControlName="nom">
+        <label><input type="checkbox" formControlName="isDefault"> Par défaut</label>
+        <button type="submit" [disabled]="form.invalid">Créer</button>
+      </form>
+    </div>
   </div>
-
-  <div class="right-column">
-  <!-- Bloc d’édition du template sélectionné -->
-  <div *ngIf="selectedTemplate" class="template-edit">
-    <input [(ngModel)]="selectedTemplate.nom" placeholder="Nom du template" />
-    <label>
-     <input type="checkbox" [(ngModel)]="selectedTemplate.isDefault" />
-        Par défaut
-    </label>
-   <button (click)="updateTemplate()" [disabled]="loading" class="btn-save">Enregistrer</button>
-  </div>
-  <form [formGroup]="form" (ngSubmit)="createTemplate()" class="new-template-form">
-    <input placeholder="Nom du template" formControlName="nom">
-    <label><input type="checkbox" formControlName="isDefault"> Par défaut</label>
-    <button type="submit" [disabled]="form.invalid">Créer</button>
-  </form>
-
- </div>
-
-
-</div>
-
-
-
-
 
   <div *ngIf="selectedTemplate" class="main-content">
     <div class="preview-panel">
@@ -66,13 +57,9 @@
     </div>
 
     <div class="config-panel">
-
-
-      <!-- Configuration des éléments -->
       <div class="elements-panel">
         <h3>Éléments du Template</h3>
 
-        <!-- Liste des éléments configurés -->
         <div class="elements-config-list">
           <div *ngFor="let cfg of selectedTemplate.elementsConfig; trackBy: trackByElementId"
                class="element-config-item">
@@ -88,81 +75,86 @@
             </div>
 
             <div *ngIf="cfg.active" class="element-details">
-            <div class="config-row">
-               <!-- Pour Montant fixe -->
-              <div *ngIf="cfg.formuleCalculOverride === 'MONTANT_FIXE'">
-               <label>
-                   Montant par défaut :
-                 <input type="number"
-                 step="0.01"
-                 [(ngModel)]="cfg.montantDefaut"
-                 (change)="updateElementConfig(cfg)"
-                 placeholder="Montant (ex: 10000)">
-               </label>
-              </div>
+              <div class="config-row">
+                <!-- Pour Montant fixe -->
+                <div *ngIf="cfg.formuleCalculOverride === 'MONTANT_FIXE'">
+                  <label>
+                    Montant par défaut :
+                    <input type="number"
+                           step="0.01"
+                           [(ngModel)]="cfg.montantDefaut"
+                           (change)="updateElementConfig(cfg)"
+                           placeholder="Montant (ex: 10000)">
+                  </label>
+                </div>
 
-              <!-- NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT -->
-              <div *ngIf="cfg.formuleCalculOverride === 'NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT'">
+                <!-- NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT -->
+                <div *ngIf="cfg.formuleCalculOverride === 'NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT'">
                   <label>
                     Nombre par défaut :
-                    <input type="number" step="1"
-                    [(ngModel)]="cfg.nombreDefaut"
-                     (change)="updateElementConfig(cfg)">
-                 </label>
-                 <label>
-                   Taux par défaut :
-                   <input type="number" step="0.0001"
-                   [(ngModel)]="cfg.tauxDefaut"
-                   (change)="updateElementConfig(cfg)">
+                    <input type="number"
+                           step="1"
+                           [(ngModel)]="cfg.nombreDefaut"
+                           (change)="updateElementConfig(cfg)">
                   </label>
                   <label>
-                     Montant par défaut :
-                  <input type="number" step="0.01"
-                    [(ngModel)]="cfg.montantDefaut"
-                    (change)="updateElementConfig(cfg)">
-                    </label>
+                    Taux par défaut (%):
+                    <input type="number"
+                           step="0.01"
+                           [ngModel]="(cfg.tauxDefaut || 0) * 100"
+                           (ngModelChange)="updateTaux($event, cfg)"
+                           placeholder="Ex: 5 pour 5%">
+                  </label>
+                  <label>
+                    Montant par défaut :
+                    <input type="number"
+                           step="0.01"
+                           [(ngModel)]="cfg.montantDefaut"
+                           (change)="updateElementConfig(cfg)">
+                  </label>
                 </div>
 
                 <!-- TAUX_DEFAUT_X_MONTANT_DEFAUT -->
-<div *ngIf="cfg.formuleCalculOverride === 'TAUX_DEFAUT_X_MONTANT_DEFAUT'">
-  <label>
-    Taux par défaut :
-    <input type="number" step="0.0001"
-           [(ngModel)]="cfg.tauxDefaut"
-           (change)="updateElementConfig(cfg)">
-  </label>
-  <label>
-    Montant par défaut :
-    <input type="number" step="0.01"
-           [(ngModel)]="cfg.montantDefaut"
-           (change)="updateElementConfig(cfg)">
-  </label>
-</div>
-
-
+                <div *ngIf="cfg.formuleCalculOverride === 'TAUX_DEFAUT_X_MONTANT_DEFAUT'">
+                  <label>
+                    Taux par défaut (%):
+                    <input type="number"
+                           step="0.01"
+                           [ngModel]="(cfg.tauxDefaut || 0) * 100"
+                           (ngModelChange)="updateTaux($event, cfg)"
+                           placeholder="Ex: 5 pour 5%">
+                  </label>
+                  <label>
+                    Montant par défaut :
+                    <input type="number"
+                           step="0.01"
+                           [(ngModel)]="cfg.montantDefaut"
+                           (change)="updateElementConfig(cfg)">
+                  </label>
+                </div>
 
                 <!-- Pour Pourcentage base -->
-               <div *ngIf="cfg.formuleCalculOverride === 'POURCENTAGE_BASE'">
-               <label>
-                 Taux par défaut :
-                 <input type="number"
-                 step="0.0001"
-                 [(ngModel)]="cfg.tauxDefaut"
-                 (change)="updateElementConfig(cfg)"
-                 placeholder="Taux (ex: 0.03 pour 3%)">
-               </label>
-            </div>
+                <div *ngIf="cfg.formuleCalculOverride === 'POURCENTAGE_BASE'">
+                  <label>
+                    Taux par défaut (%):
+                    <input type="number"
+                           step="0.01"
+                           [ngModel]="(cfg.tauxDefaut || 0) * 100"
+                           (ngModelChange)="updateTaux($event, cfg)"
+                           placeholder="Ex: 5 pour 5%">
+                  </label>
+                </div>
 
-            <!-- Pour les autres formules, rien ou un texte d'info -->
-            <div *ngIf="[
-  'MONTANT_FIXE',
-  'POURCENTAGE_BASE',
-  'TAUX_DEFAUT_X_MONTANT_DEFAUT',
-  'NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT'
-].indexOf(cfg.formuleCalculOverride || '') === -1">
-  <small class="text-muted">Pas de valeur à définir</small>
-</div>
-        </div>
+                <!-- Pour les autres formules -->
+                <div *ngIf="[
+                  'MONTANT_FIXE',
+                  'POURCENTAGE_BASE',
+                  'TAUX_DEFAUT_X_MONTANT_DEFAUT',
+                  'NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT'
+                ].indexOf(cfg.formuleCalculOverride || '') === -1">
+                  <small class="text-muted">Pas de valeur à définir</small>
+                </div>
+              </div>
 
               <div class="config-row">
                 <label>
@@ -175,8 +167,6 @@
                     <option value="NOMBRE_BASE_TAUX">Nombre × Base × Taux</option>
                     <option value="TAUX_DEFAUT_X_MONTANT_DEFAUT">Taux par défaut × Montant par défaut</option>
                     <option value="NOMBRE_X_TAUX_DEFAUT_X_MONTANT_DEFAUT">Nombre × Taux par défaut × Montant par défaut</option>
-
-
                   </select>
                 </label>
               </div>

@@ -310,7 +310,17 @@ canUnsetDefault(): boolean {
 }
 
 
+updateTaux(event: number, cfg: any) {
+  // Si event est null/undefined, on met 0
+  const tauxPourcentage = event || 0;
+  // Convertit le pourcentage en décimal
+  cfg.tauxDefaut = tauxPourcentage / 100;
+  this.updateElementConfig(cfg);
 
+  // Debug pour vérifier la conversion
+  console.log('Taux saisi (%) :', tauxPourcentage);
+  console.log('Taux converti (décimal) :', cfg.tauxDefaut);
+}
 
 
 

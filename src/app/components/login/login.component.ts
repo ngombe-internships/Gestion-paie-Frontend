@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
       });
       this.activatedRoute.queryParams.subscribe(params => {
         this.returnUrl = params['returnUrl'] || null;
-        console.log('LoginComponent - returnUrl recupere: ', this.returnUrl);
+        //console.log('LoginComponent - returnUrl recupere: ', this.returnUrl);
       });
   }
 
@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit {
 
       this.authService.login ({username, password}).subscribe({
         next: (response) => {
-          console.log('Connexion reussie: ', response);
+          //console.log('Connexion reussie: ', response);
           this.isLoading = false;
           if(this.returnUrl){
             this.router.navigateByUrl(this.returnUrl);
@@ -53,7 +53,7 @@ export class LoginComponent implements OnInit {
 
         },
         error:(err) => {
-          console.error('Erreur de connexion: ', err);
+         // console.error('Erreur de connexion: ', err);
           this.errorMessage = err.message || 'Echec de la connexion. Veuillez reessayer';
           this.isLoading = false;
         }

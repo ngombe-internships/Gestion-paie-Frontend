@@ -6,7 +6,7 @@ export interface BulletinPaie {
   heuresSup?: number,
   heuresFerie ?: number,
   heuresNuit? : number,
-
+  avancesSurSalaires: number;
   periodePaie?: string;
   dateCreationBulletin?: string; // Utilisez string pour la compatibilité avec les dates ISO 8601
   statusBulletin?: 'GÉNÉRÉ' | 'VALIDÉ' | 'ENVOYÉ' | 'ARCHIVÉ' | 'ANNULÉ';
@@ -28,6 +28,7 @@ export interface BulletinPaieCreateDto {
   heuresSup: number;
   heuresFerie: number;
   heuresNuit: number;
+  avancesSurSalaires: number;
   datePaiement: string;
   methodePaiement: string;
 }

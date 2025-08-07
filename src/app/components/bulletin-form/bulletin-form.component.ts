@@ -82,7 +82,7 @@ export class BulletinFormComponent implements OnInit {
       heuresSup: [0, [Validators.min(0)]],
       heuresFerie: [0, [Validators.min(0)]],
       heuresNuit: [0, [Validators.min(0)]],
-
+      avancesSurSalaires: [0, [Validators.min(0)]],
       datePaiement: [null, Validators.required], // Rendre obligatoire la date de paiement
       methodePaiement: [this.methodePaiementOptions[0], Validators.required] // Rendre obligatoire la méthode de paiement
 
@@ -157,6 +157,7 @@ export class BulletinFormComponent implements OnInit {
         heuresSup: this.formGroup.get('heuresSup')?.value || 0,
         heuresFerie: this.formGroup.get('heuresFerie')?.value || 0,
         heuresNuit: this.formGroup.get('heuresNuit')?.value || 0,
+        avancesSurSalaires: this.formGroup.get('avancesSurSalaires')?.value || 0,
         datePaiement: this.formGroup.get('datePaiement')?.value,
         methodePaiement: this.formGroup.get('methodePaiement')?.value
 

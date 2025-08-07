@@ -8,8 +8,6 @@ table {
   margin-bottom: 1em;
   table-layout: auto;
 }
-
-
 th, td {
   border: 1px solid #ccc;
  padding: 0.75em 1em; /* Plus d’air */
@@ -30,6 +28,12 @@ button {
   margin-right: 0.3em;
   margin-bottom: 5px;
 }
+
+.taille{
+  font-size: 36px;
+
+}
+
 
 
 /* CSS Responsive pour element-paie-list.component.html */
@@ -191,38 +195,4 @@ button {
     padding-left: 0.5rem;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

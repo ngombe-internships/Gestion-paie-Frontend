@@ -11,5 +11,5 @@ import { FormsModule } from '@angular/forms';
   template:'<router-outlet></router-outlet>'
 })
 export class AppComponent {
-  title = 'paie';
+  title = 'maalipo';
 }

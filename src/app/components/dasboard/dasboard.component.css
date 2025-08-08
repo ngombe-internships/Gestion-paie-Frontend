@@ -340,16 +340,16 @@
   }
 
   .sidebar {
-    position: fixed;
-    left: 0;
+    position: static;
+    left: auto;
     width: 280px;
-    height: 100vh;
+    height: auto;
     transition: none;
   }
 
   .content {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    margin-left: 0;
+    width: auto;
   }
 }
 

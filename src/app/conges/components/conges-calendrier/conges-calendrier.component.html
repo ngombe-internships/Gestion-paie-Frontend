@@ -1,0 +1,322 @@
+<div class="calendrier-container">
+  <!-- En-tête moderne -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">
+          <i class="bi bi-calendar3 text-primary"></i>
+          Calendrier des Congés
+        </h1>
+        <!-- <p class="page-subtitle">Planification et suivi des effectifs</p> -->
+      </div>
+      <!-- <div class="header-actions">
+        <button class="btn btn-outline-primary btn-sm" (click)="refresh()" [disabled]="isLoading">
+          <i class="bi bi-arrow-clockwise"></i>
+          <span class="d-none d-md-inline">Actualiser</span>
+        </button>
+        <button class="btn btn-success btn-sm" (click)="exporterCalendrier()" [disabled]="isLoading">
+          <i class="bi bi-download"></i>
+          <span class="d-none d-md-inline">Exporter</span>
+        </button>
+      </div> -->
+    </div>
+  </div>
+
+  <!-- Navigation mois moderne -->
+  <div class="month-navigation">
+    <button class="nav-btn prev" (click)="changerMois('prev')" [disabled]="isLoading">
+      <i class="bi bi-chevron-left"></i>Precedent
+    </button>
+
+    <div class="month-display">
+      <h2 class="month-title">{{ nomMoisCourant }} {{ selectedYear }}</h2>
+      <button class="btn-today" (click)="allerAujourdhui()" [disabled]="isLoading">
+        <i class="bi bi-house"></i>
+        Aujourd'hui
+      </button>
+    </div>
+
+    <button class="nav-btn next" (click)="changerMois('next')" [disabled]="isLoading">
+      <i class="bi bi-chevron-right"></i>Suivant
+    </button>
+  </div>
+
+<!-- Statistiques compactes -->
+<div class="row g-3 mb-4" *ngIf="!isLoading && !error">
+  <div class="col-md-3">
+    <div class="card border-primary stats-card">
+      <div class="card-body text-center bg-primary bg-opacity-10">
+        <h3 class="stats-number text-primary">{{ getEffectifTotalConfigures() }}</h3>
+        <p class="stats-label text-primary">Effectif Total</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-success stats-card">
+      <div class="card-body text-center bg-success bg-opacity-10">
+        <h3 class="stats-number text-success">{{ getJoursOuvrables() }}</h3>
+        <p class="stats-label text-success">Jours Ouvrables</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-warning stats-card">
+      <div class="card-body text-center bg-warning bg-opacity-10">
+        <h3 class="stats-number text-warning">{{ getTotalAbsencesMois() }}</h3>
+        <p class="stats-label text-warning">Absences</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-danger stats-card">
+      <div class="card-body text-center bg-danger bg-opacity-10">
+        <h3 class="stats-number text-danger">{{ getJoursRisque() }}</h3>
+        <p class="stats-label text-danger">Alertes</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Onglets -->
+  <div class="view-tabs">
+    <button class="tab-btn" [class.active]="currentView === 'calendrier'" (click)="changerVue('calendrier')">
+      <i class="bi bi-calendar3"></i>
+      <span>Calendrier</span>
+    </button>
+    <button class="tab-btn" [class.active]="currentView === 'effectifs'" (click)="changerVue('effectifs')">
+      <i class="bi bi-people"></i>
+      <span>Effectifs</span>
+    </button>
+    <button class="tab-btn" [class.active]="currentView === 'conflits'" (click)="changerVue('conflits')">
+      <i class="bi bi-exclamation-triangle"></i>
+      <span>Alertes</span>
+    </button>
+  </div>
+
+  <!-- États de chargement -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement du calendrier...</p>
+  </div>
+
+  <div *ngIf="error && !isLoading" class="error-state">
+    <i class="bi bi-exclamation-triangle"></i>
+    <h3>Erreur de chargement</h3>
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="refresh()">
+      <i class="bi bi-arrow-clockwise"></i>
+      Réessayer
+    </button>
+  </div>
+
+  <!-- Vue Calendrier PROFESSIONNELLE -->
+  <div *ngIf="currentView === 'calendrier' && !isLoading && !error" class="calendar-view">
+    <div class="calendar-container-modern">
+      <!-- En-têtes des jours -->
+      <div class="calendar-header-grid">
+        <div *ngFor="let jour of JOURS_SEMAINE" class="day-header">
+          {{ jour }}
+        </div>
+      </div>
+
+      <!-- Grille des jours -->
+      <div class="calendar-grid">
+        <div
+          *ngFor="let jour of getJoursDuMois()"
+          class="day-cell"
+          [ngClass]="getJourClassSimple(jour)">
+
+          <!-- Numéro du jour -->
+          <div class="day-number" *ngIf="jour.jour">
+            <span class="number">{{ jour.jour }}</span>
+            <span *ngIf="jour.isToday" class="today-indicator">•</span>
+          </div>
+
+          <!-- Contenu du jour -->
+          <div class="day-content" *ngIf="jour.jour">
+
+            <!-- Jour férié avec nom -->
+            <div *ngIf="jour.jourFerieInfo" class="holiday-info">
+              <i class="bi bi-star-fill"></i>
+              <span class="holiday-name">{{ jour.jourFerieInfo.nom }}</span>
+            </div>
+
+            <!-- Jour ouvrable -->
+            <div *ngIf="jour.jourData?.jourOuvrable && !jour.jourFerieInfo" class="work-info">
+
+              <!-- Présents (seulement si pas tous là) -->
+              <div *ngIf="shouldShowPresents(jour)" class="presence-indicator">
+                <i class="bi bi-person-check"></i>
+                <span>{{ jour.jourData.presents }}</span>
+              </div>
+
+              <!-- Absents (seulement si > 0) -->
+              <div *ngIf="jour.jourData.absents > 0" class="absence-indicator">
+                <i class="bi bi-person-x"></i>
+                <span>{{ jour.jourData.absents }} absent{{ jour.jourData.absents > 1 ? 's' : '' }}</span>
+              </div>
+
+              <!-- Alerte sous-effectif -->
+              <div *ngIf="jour.jourData.sousEffectif" class="alert-indicator">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Alerte</span>
+              </div>
+            </div>
+
+            <!-- Weekend -->
+            <div *ngIf="jour.isWeekend && !jour.jourFerieInfo" class="weekend-info">
+              <i class="bi bi-moon"></i>
+            </div>
+
+
+
+            <!-- Détails des absents -->
+            <div *ngIf="showDetailsFor === jour.jour" class="absents-details">
+              <div class="details-title">Employés absents :</div>
+              <div *ngFor="let absence of getAbsencesJour(jour)" class="absent-person">
+                <span class="name">{{ absence.employePrenom }} {{ absence.employeNom }}</span>
+                <span class="type">{{ getTypeCongeLabel(absence.typeConge) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vue Effectifs -->
+  <div *ngIf="currentView === 'effectifs' && !isLoading && !error" class="effectifs-view">
+    <div class="data-table-container">
+      <div class="table-header">
+        <h3>Effectifs journaliers - {{ nomMoisCourant }} {{ selectedYear }}</h3>
+      </div>
+
+      <div *ngIf="!effectifs || effectifs.length === 0" class="empty-state">
+        <i class="bi bi-calendar2-x"></i>
+        <h4>Aucune donnée d'effectif</h4>
+        <p>Aucune donnée disponible pour ce mois.</p>
+      </div>
+
+      <div *ngIf="effectifs && effectifs.length > 0" class="table-responsive">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Jour</th>
+              <th>Total</th>
+              <th>Présents</th>
+              <th>Absents</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let effectif of effectifs" [class.alert-row]="effectif.conflitPotentiel">
+              <td>{{ effectif.date | date:'dd/MM' }}</td>
+              <td>{{ effectif.date | date:'EEEE':'fr' | titlecase }}</td>
+              <td>
+                <span class="badge info">{{ effectif.effectifTotal }}</span>
+              </td>
+              <td>
+                <span class="badge success">{{ effectif.effectifPresent }}</span>
+              </td>
+              <td>
+                <span class="badge" [class.warning]="getAbsentsCount(effectif) > 0" [class.muted]="getAbsentsCount(effectif) === 0">
+                  {{ getAbsentsCount(effectif) }}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatutBadgeClass(effectif)">
+                  <i class="bi" [ngClass]="getStatutIconClass(effectif)"></i>
+                  {{ getStatutLabel(effectif) }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vue Conflits -->
+  <div *ngIf="currentView === 'conflits' && !isLoading && !error" class="conflits-view">
+    <div class="data-table-container">
+      <div class="table-header">
+        <h3>Alertes d'effectif</h3>
+      </div>
+
+      <div *ngIf="getConflitsDuMois().length === 0" class="empty-state success">
+        <i class="bi bi-check-circle-fill"></i>
+        <h4>Aucune alerte</h4>
+        <p>Tous les effectifs sont suffisants ce mois.</p>
+      </div>
+
+      <div *ngIf="getConflitsDuMois().length > 0">
+        <div class="alert-summary">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <strong>{{ getConflitsDuMois().length }}</strong> jour(s) en sous-effectif détecté(s).
+        </div>
+
+        <div class="table-responsive">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Jour</th>
+                <th>Présents</th>
+                <th>Requis</th>
+                <th>Déficit</th>
+
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let conflit of getConflitsDuMois()" class="alert-row">
+                <td>{{ conflit.date | date:'dd/MM' }}</td>
+                <td>{{ conflit.date | date:'EEEE':'fr' | titlecase }}</td>
+                <td>
+                  <span class="badge danger">{{ conflit.presents }}</span>
+                </td>
+                <td>
+                  <span class="badge info">{{ getEffectifTotalConfigures() }}</span>
+                </td>
+                <td>
+                  <span class="badge warning">{{ getDeficitJour(conflit) }}</span>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Légende moderne -->
+  <div class="legend-container" *ngIf="currentView === 'calendrier' && !isLoading && !error">
+    <h4>Légende</h4>
+    <div class="legend-grid">
+      <div class="legend-item">
+        <div class="legend-sample today-sample"></div>
+        <span>Aujourd'hui</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-sample holiday-sample"></div>
+        <span>Jour férié</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-sample absence-sample"></div>
+        <span>Avec absences</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-sample alert-sample"></div>
+        <span>Sous-effectif</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-sample weekend-sample"></div>
+        <span>Weekend</span>
+      </div>
+    </div>
+  </div>
+</div>

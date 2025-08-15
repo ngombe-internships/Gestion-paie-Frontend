@@ -2,7 +2,7 @@ import { DashboardMetric } from './dashboard.service';
 import { Employe } from './../model/employe';
 import { HttpClient, HttpParams, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { EmployeCreate } from '../model/employeCreate';
 import { environment } from '../../environment';
 import { PagedResponse } from './bulletin.service';
@@ -13,6 +13,7 @@ import { PagedResponse } from './bulletin.service';
 export class EmployeService {
   private readonly baseUrl = environment.apiUrl + '/api/employes';
   private readonly http = inject(HttpClient);
+
 
   constructor() { }
 
@@ -74,9 +75,8 @@ export class EmployeService {
     return this.http.get<ApiResponse<number>>(`${this.baseUrl}/count`)
   }
 
+
 }
-
-
 
 interface ApiResponse <T> {
   message : string;

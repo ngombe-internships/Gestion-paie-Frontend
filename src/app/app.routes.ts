@@ -44,6 +44,15 @@ import { AuditLogsComponent } from './audit-logs/audit-logs.component';
 import { authGuard } from './guard/auth.guard';
 import { adminGuard } from './guard/admin.guard';
 import { noAuthGuard } from './guard/noAuth.guard';
+import { CongesSoldesComponent } from './conges/components/conges-soldes/conges-soldes.component';
+import { CongesDemandesComponent } from './conges/components/conges-demandes/conges-demandes.component';
+import { CongesCalendrierComponent } from './conges/components/conges-calendrier/conges-calendrier.component';
+import { MesCongesComponent } from './conges/components/employe/mes-conges/mes-conges.component';
+import { MonSoldeComponent } from './conges/components/employe/mon-solde/mon-solde.component';
+import { NouvelleDemandeComponent } from './conges/components/employe/nouvelle-demande/nouvelle-demande.component';
+import { JoursFeriesComponent } from './conges/components/jours-feries/jours-feries.component';
+import { TypeConge } from './conges/models/demande-conge.model';
+import { TypesCongesComponent } from './conges/components/types-conges/types-conges.component';
 
 export const routes: Routes = [
   // === ROUTES PUBLIQUES ===
@@ -93,6 +102,18 @@ export const routes: Routes = [
       { path: 'employe-paie-config/new', component: EmployeConfigComponent, canActivate: [authGuard] },
       { path: 'employe-paie-config/edit/:id', component: EmployeConfigComponent, canActivate: [authGuard] },
 
+      // === CONGÉS ===
+       { path: 'conges/demandes', component: CongesDemandesComponent ,canActivate:[authGuard]},
+       { path: 'conges/calendrier', component: CongesCalendrierComponent ,canActivate:[authGuard]},
+      { path: 'conges/types', component: TypesCongesComponent,canActivate:[authGuard] },
+       { path: 'conges/soldes', component: CongesSoldesComponent,canActivate:[authGuard] },
+       { path: 'conges/jours-feries', component: JoursFeriesComponent,canActivate:[authGuard] },
+
+
+      // === CONGÉS EMPLOYÉ ===
+      {path: 'conges/mes-demandes', component: MesCongesComponent, canActivate: [authGuard] },
+      {path:'conges/mon-solde', component: MonSoldeComponent, canActivate: [authGuard] },
+      {path:'conges/nouvelle-demande', component: NouvelleDemandeComponent, canActivate: [authGuard] },
       // --- Administration ---
       { path: 'employeur', component: EmployeurListComponent, canActivate: [authGuard] },
       { path: 'audit-logs', component: AuditLogsComponent, canActivate: [authGuard] }

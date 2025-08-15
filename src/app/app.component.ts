@@ -3,10 +3,11 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastComponent } from "./toast/toast.component";
+import { DocumentViewerModalComponent } from "./shared/components/document-viewer-modal/document-viewer-modal.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CommonModule, FormsModule, ToastComponent],
+  imports: [RouterOutlet, CommonModule, FormsModule, ToastComponent, DocumentViewerModalComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   template:'<router-outlet></router-outlet>'

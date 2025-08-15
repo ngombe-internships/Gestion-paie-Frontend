@@ -1,0 +1,392 @@
+<div class="nouvelle-demande-container">
+  <!-- En-tête -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">
+          Nouvelle Demande de Congé
+        </h1>
+        <p class="page-subtitle">Créez une nouvelle demande de congé</p>
+      </div>
+      <div class="header-right">
+        <div class="solde-info-card" *ngIf="solde && !isLoadingSolde">
+          <div class="solde-label">Mon solde disponible</div>
+          <div class="solde-value" [class]="getSoldeCouleur()">
+            {{ getSoldeInfo() }}
+          </div>
+        </div>
+        <div class="solde-loading" *ngIf="isLoadingSolde">
+          <div class="spinner-border spinner-border-sm text-primary" role="status">
+            <span class="visually-hidden">Chargement du solde...</span>
+          </div>
+          <span class="ms-2 text-muted">Chargement du solde...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulaire principal -->
+  <div class="form-container">
+    <form [formGroup]="demandeForm" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- Type de congé -->
+      <div class="form-group mb-4">
+        <label for="typeConge" class="form-label">
+          Type de congé <span class="text-danger">*</span>
+        </label>
+       <select formControlName="typeConge" class="form-select">
+  <option value="" disabled>Sélectionnez un type de congé</option>
+  <option value="CONGE_PAYE">Congé payé annuel</option>
+  <option value="CONGE_MALADIE">Congé maladie</option>
+  <option value="CONGE_MATERNITE">Congé maternité</option>
+  <option value="CONGE_PATERNITE">Congé paternité</option>
+  <option value="CONGE_SANS_SOLDE">Congé sans solde</option>
+  <option value="CONGE_FORMATION">Congé formation</option>
+  <option value="CONGE_DEUIL">Congé deuil</option>
+</select>
+
+
+        <!-- Affichage du solde pour les congés payés -->
+        <div class="form-text" *ngIf="demandeForm.get('typeConge')?.value === 'CONGE_PAYE' && solde">
+          <div class="d-flex align-items-center">
+            <span>
+              Solde disponible :
+              <strong class="text-success">{{ solde.soldeDisponible }}</strong> jour(s)
+              <small class="text-muted">(sur {{ solde.soldeAcquisTotal }} acquis)</small>
+            </span>
+          </div>
+        </div>
+
+        <div class="invalid-feedback" *ngIf="isFieldInvalid('typeConge')">
+          {{ getFieldError('typeConge') }}
+        </div>
+      </div>
+
+      <!-- Période de congé -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label for="dateDebut" class="form-label">
+            Date de début <span class="text-danger">*</span>
+          </label>
+          <input
+            type="date"
+            id="dateDebut"
+            class="form-control"
+            formControlName="dateDebut"
+            [class.is-invalid]="isFieldInvalid('dateDebut')"
+            [min]="minDateDebut">
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('dateDebut')">
+            {{ getFieldError('dateDebut') }}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="dateFin" class="form-label">
+            Date de fin <span class="text-danger">*</span>
+          </label>
+          <input
+            type="date"
+            id="dateFin"
+            class="form-control"
+            formControlName="dateFin"
+            [class.is-invalid]="isFieldInvalid('dateFin')"
+            [min]="demandeForm.get('dateDebut')?.value || minDateDebut">
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('dateFin')">
+            {{ getFieldError('dateFin') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Calcul automatique de la durée -->
+      <div class="alert alert-info mb-4" *ngIf="joursOuvrablesSelectionnes > 0">
+        <div class="d-flex align-items-center">
+          <div class="flex-grow-1">
+            <h6 class="alert-heading mb-1">Durée calculée</h6>
+            <div class="row">
+              <div class="col-md-8">
+                <strong class="fs-5 text-primary">{{ getDureeLabel() }}</strong>
+                <div class="mt-1 text-muted">
+                  Du {{ formatDate(demandeForm.get('dateDebut')?.value) }}
+                  au {{ formatDate(demandeForm.get('dateFin')?.value) }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <!-- Validation du solde pour congés payés -->
+                <div *ngIf="demandeForm.get('typeConge')?.value === 'CONGE_PAYE' && solde">
+                  <div *ngIf="solde.soldeDisponible >= joursOuvrablesSelectionnes" class="text-success">
+                    <i class="bi bi-check-circle-fill me-1"></i>
+                    <strong>Solde suffisant</strong>
+                    <div class="small">Reste {{ solde.soldeDisponible - joursOuvrablesSelectionnes }} jour(s)</div>
+                  </div>
+                  <div *ngIf="solde.soldeDisponible < joursOuvrablesSelectionnes" class="text-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    <strong>Solde insuffisant</strong>
+                    <div class="small">Manque {{ joursOuvrablesSelectionnes - solde.soldeDisponible }} jour(s)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Raison / Motif -->
+      <div class="form-group mb-4">
+        <label for="raison" class="form-label">
+          Raison / Motif
+          <span class="text-danger" *ngIf="isFieldRequired('raison')">*</span>
+        </label>
+        <textarea
+          id="raison"
+          class="form-control"
+          rows="4"
+          formControlName="raison"
+          [class.is-invalid]="isFieldInvalid('raison')"
+          placeholder="Précisez la raison de votre demande de congé..."
+          maxlength="500"></textarea>
+        <div class="form-text">
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">
+              Décrivez le motif de votre demande
+              <span *ngIf="isFieldRequired('raison')">(obligatoire pour ce type de congé)</span>
+            </small>
+            <small class="text-muted">
+              {{ demandeForm.get('raison')?.value?.length || 0 }}/500
+            </small>
+          </div>
+        </div>
+        <div class="invalid-feedback" *ngIf="isFieldInvalid('raison')">
+          {{ getFieldError('raison') }}
+        </div>
+      </div>
+
+      <!-- Documents justificatifs -->
+      <div class="form-group mb-4" *ngIf="getCurrentTypeConge() && getCurrentTypeConge() !== 'CONGE_PAYE'">
+  <label for="documentsJustificatifs" class="form-label">
+    Documents justificatifs
+    <span class="text-danger" *ngIf="isFieldRequired('documentsJustificatifs')">*</span>
+  </label>
+
+  <input
+    type="file"
+    id="documentsJustificatifs"
+    class="form-control"
+    [class.is-invalid]="isFieldInvalid('documentsJustificatifs')"
+    multiple
+    accept=".pdf,.jpg,.jpeg,.png"
+    (change)="onFileSelect($event)">
+
+  <div class="form-text">
+    <i class="bi bi-info-circle text-info me-1"></i>
+    Formats acceptés : PDF, JPG, PNG (Max 5MB par fichier)
+    <span *ngIf="isDocumentRequiredForCurrentType()" class="text-danger">
+      - Documents obligatoires pour ce type de congé
+    </span>
+  </div>
+
+  <!-- Liste des fichiers sélectionnés -->
+  <div class="selected-files mt-2" *ngIf="selectedFiles.length > 0">
+    <div class="row g-2">
+      <div class="col-12" *ngFor="let file of selectedFiles; let i = index">
+        <div class="file-item">
+          <div class="d-flex align-items-center">
+            <i class="bi me-2" [ngClass]="getFileIcon(file.name)"></i>
+            <div class="flex-grow-1">
+              <div class="file-name">{{ file.name }}</div>
+              <small class="text-muted">{{ formatFileSize(file.size) }}</small>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeFile(i)">
+              <i class="bi bi-trash"></i>supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="invalid-feedback" *ngIf="isFieldInvalid('documentsJustificatifs')">
+    {{ getFieldError('documentsJustificatifs') }}
+  </div>
+</div>
+      <!-- Résumé de la demande -->
+      <div class="card border-primary mb-4" *ngIf="joursOuvrablesSelectionnes > 0">
+        <div class="card-header bg-primary text-white">
+          <h6 class="mb-0">
+            <i class="bi bi-clipboard-check me-2"></i>
+            Résumé de votre demande
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="summary-item mb-2">
+                <span class="summary-label">Type de congé :</span>
+                <div class="mt-1">
+                  <span class="badge bg-light text-dark border">
+                    {{ getTypeCongeLabel(demandeForm.get('typeConge')?.value) }}
+                  </span>
+                </div>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Durée totale :</span>
+                <div class="mt-1">
+                  <strong class="text-primary">{{ getDureeLabel() }}</strong>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="summary-item">
+                <span class="summary-label">Période :</span>
+                <div class="mt-1">
+                  <div><strong>Du:</strong> {{ formatDate(demandeForm.get('dateDebut')?.value) }}</div>
+                  <div><strong>Au:</strong> {{ formatDate(demandeForm.get('dateFin')?.value) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="selectedFiles.length > 0">
+            <div class="col-12">
+              <div class="summary-item">
+                <span class="summary-label">Documents joints :</span>
+                <div class="mt-1">
+                  <span class="badge bg-info me-1">{{ selectedFiles.length }} fichier(s)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages informatifs selon le type -->
+      <div class="alert alert-warning mb-4" *ngIf="demandeForm.get('typeConge')?.value === 'CONGE_PAYE' && joursOuvrablesSelectionnes > 0">
+        <h6 class="alert-heading">
+          <i class="bi bi-exclamation-triangle me-1"></i>
+          Information congés payés
+        </h6>
+        <ul class="mb-0">
+          <li>Un préavis peut être requis selon votre convention collective</li>
+          <li>La validation dépend de la charge de travail et des congés déjà planifiés</li>
+          <li>Votre responsable sera notifié automatiquement de cette demande</li>
+        </ul>
+      </div>
+
+      <div class="alert alert-info mb-4" *ngIf="demandeForm.get('typeConge')?.value && demandeForm.get('typeConge')?.value !== 'CONGE_PAYE'">
+        <h6 class="alert-heading">
+          <i class="bi bi-info-circle me-1"></i>
+          Informations importantes
+        </h6>
+        <ul class="mb-0">
+          <li *ngIf="isDocumentRequired(demandeForm.get('typeConge')?.value)">
+            Les documents justificatifs sont obligatoires pour ce type de congé
+          </li>
+          <li>Le traitement peut prendre quelques jours selon la nature de la demande</li>
+          <li>Vous recevrez une notification dès que votre demande sera traitée</li>
+        </ul>
+      </div>
+
+      <!-- Actions du formulaire -->
+      <div class="form-actions">
+        <div class="d-flex justify-content-between align-items-center">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="annuler()"
+            [disabled]="isSubmitting">
+            <i class="bi bi-x-circle me-1"></i>
+            Annuler
+          </button>
+
+          <div class="d-flex gap-2">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              *ngIf="demandeForm.dirty || selectedFiles.length > 0"
+              (click)="resetForm()"
+              [disabled]="isSubmitting">
+              <i class="bi bi-arrow-clockwise me-1"></i>
+              Réinitialiser
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="demandeForm.invalid || isSubmitting || (demandeForm.get('typeConge')?.value === 'CONGE_PAYE' && !validerSolde().valide)">
+              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              <i *ngIf="!isSubmitting" class="bi bi-check-circle me-1"></i>
+              <span *ngIf="isSubmitting">Envoi en cours...</span>
+              <span *ngIf="!isSubmitting">Soumettre la demande</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Section d'aide -->
+  <div class="help-section mt-5">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-info text-white">
+            <h6 class="mb-0">
+              <i class="bi bi-question-circle me-2"></i>
+              Aide et conseils
+            </h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <i class="bi bi-check text-success me-2"></i>
+                Vérifiez votre solde avant de soumettre
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check text-success me-2"></i>
+                Respectez les délais de préavis
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check text-success me-2"></i>
+                Joignez tous les documents nécessaires
+              </li>
+              <li class="mb-0">
+                <i class="bi bi-check text-success me-2"></i>
+                Consultez votre responsable en cas de doute
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-warning text-dark">
+            <h6 class="mb-0">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              Documents requis par type
+            </h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <i class="bi bi-calendar-x text-primary me-2"></i>
+                <strong>Congés payés :</strong> Aucun document requis
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-file-medical text-warning me-2"></i>
+                <strong>Congés maladie :</strong> Certificat médical obligatoire
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-heart text-info me-2"></i>
+                <strong>Congés maternité/paternité :</strong> Justificatifs officiels
+              </li>
+              <li class="mb-0">
+                <i class="bi bi-emoji-frown text-dark me-2"></i>
+                <strong>Congés deuil :</strong> Acte de décès requis
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

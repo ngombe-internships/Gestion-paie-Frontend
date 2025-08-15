@@ -1,0 +1,151 @@
+<div class="mon-solde-container pro-style">
+  <!-- En-tête -->
+  <div class="page-header shadow-sm rounded p-3 bg-white mb-4">
+    <div class="header-content d-flex justify-content-between align-items-center flex-wrap">
+      <div class="header-left">
+        <h1 class="page-title mb-1 text-primary fw-bold">
+          <i class="bi bi-wallet2 me-2"></i> Mon Solde de Congés
+        </h1>
+        <p class="page-subtitle text-muted">Consultez votre solde et historique</p>
+      </div>
+      <div class="header-actions d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" (click)="refresh()" [disabled]="isLoading">
+          <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-md-inline">Actualiser</span>
+        </button>
+       <button class="btn btn-primary btn-sm" (click)="naviguerVersNouvelleDemandeAbsolue()">
+              <i class="bi bi-plus-lg"></i>
+              <span class="d-none d-md-inline">Nouvelle demande</span>
+       </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chargement -->
+  <div *ngIf="isLoading" class="loading-state text-center py-4 text-muted">
+    <div class="spinner-border text-primary mb-2"></div>
+    <p>Chargement de votre solde...</p>
+  </div>
+
+  <!-- Erreur -->
+  <div *ngIf="error && !isLoading" class="alert alert-danger text-center">
+    <i class="bi bi-exclamation-triangle me-1"></i> {{ error }}
+    <div class="mt-2">
+      <button class="btn btn-primary btn-sm" (click)="refresh()">
+        <i class="bi bi-arrow-clockwise"></i> Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div *ngIf="!isLoading && !error && solde">
+    <!-- Carte solde -->
+    <div class="card shadow-sm rounded border-0 mb-4">
+      <div class="card-body d-flex flex-wrap justify-content-between align-items-center">
+        <div>
+          <h4 class="fw-bold mb-0">{{ solde.prenom }} {{ solde.nom }}</h4>
+          <small class="text-muted">Matricule : {{ solde.matricule }}</small>
+          <p class="mt-2 mb-0"><i class="bi bi-calendar3"></i> {{ stats.ancienneteAnnees }} an{{ stats.ancienneteAnnees > 1 ? 's' : '' }} d'ancienneté</p>
+          <small class="text-muted">Embauché le {{ formatDate(solde.dateEmbauche) }}</small>
+          <div *ngIf="solde.enPeriodeEssai" class="mt-2">
+            <span class="badge bg-warning"><i class="bi bi-clock-history"></i> Période d'essai</span>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <div class="solde-circle position-relative mb-2">
+            <svg width="120" height="120">
+              <circle stroke="#e9ecef" stroke-width="8" fill="transparent" r="54" cx="60" cy="60"/>
+              <circle
+                [attr.stroke]="getCouleurBadgeSolde() === 'success' ? '#198754' : getCouleurBadgeSolde() === 'warning' ? '#fd7e14' : '#dc3545'"
+                stroke-width="8" fill="transparent" r="54" cx="60" cy="60"
+                [style.stroke-dasharray]="339.29"
+                [style.stroke-dashoffset]="339.29 - (339.29 * getPourcentageSolde()) / 100"
+                stroke-linecap="round"/>
+            </svg>
+            <div class="position-absolute top-50 start-50 translate-middle">
+              <div class="fw-bold fs-4">{{ solde.soldeDisponible }}</div>
+              <small class="text-muted">jour{{ solde.soldeDisponible > 1 ? 's' : '' }}</small>
+            </div>
+          </div>
+          <small class="text-muted">Disponible</small>
+        </div>
+      </div>
+
+      <div class="card-footer bg-light d-flex justify-content-around text-center">
+        <div>
+          <i class="bi bi-plus-circle text-success fs-5"></i>
+          <div class="fw-bold">{{ solde.soldeAcquisTotal }}</div>
+          <small class="text-muted">Acquis</small>
+        </div>
+        <div>
+          <i class="bi bi-dash-circle text-danger fs-5"></i>
+          <div class="fw-bold">{{ solde.soldePris }}</div>
+          <small class="text-muted">Pris</small>
+        </div>
+        <div>
+          <i class="bi bi-wallet2 text-primary fs-5"></i>
+          <div class="fw-bold">{{ solde.soldeDisponible }}</div>
+          <small class="text-muted">Restant</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique -->
+    <div *ngIf="showHistorique" class="card shadow-sm border-0 mt-4">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i> Historique des congés</h5>
+        <button class="btn btn-light btn-sm" (click)="toggleHistorique()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <div class="card-body p-0">
+        <div *ngIf="isHistoriqueLoading" class="p-3 text-center text-muted">
+          <div class="spinner-border spinner-border-sm text-primary me-2"></div> Chargement...
+        </div>
+        <div *ngIf="historiqueError && !isHistoriqueLoading" class="alert alert-danger m-3">
+          {{ historiqueError }}
+        </div>
+        <div *ngIf="!isHistoriqueLoading && !historiqueError">
+          <table class="table table-hover table-striped mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Période</th>
+                <th>Type</th>
+                <th>Jours pris</th>
+                <th>Statut</th>
+                <th>Date décision</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="historique.length === 0">
+                <td colspan="5" class="text-center text-muted py-3">Aucun congé pris cette année</td>
+              </tr>
+              <tr *ngFor="let item of historique">
+                <td>{{ formatDate(item.dateDebut) }} - {{ formatDate(item.dateFin) }}</td>
+                <td>{{ item.typeConge }}</td>
+                <td>{{ item.joursOuvrablesPris }}</td>
+                <td>
+                  <span class="badge" [ngClass]="'bg-' + getStatutClass(item.statut)">
+                    {{ item.statut }}
+                  </span>
+                </td>
+                <td>{{ item.dateApprobation ? formatDate(item.dateApprobation) : '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Infos légales -->
+    <div class="alert alert-info mt-4">
+      <h6 class="fw-bold"><i class="bi bi-info-circle me-1"></i> À savoir</h6>
+      <ul class="mb-0">
+        <li>1,5 jour acquis par mois travaillé</li>
+        <li>18 jours ouvrables/an minimum</li>
+        <li>+2 jours par année au-delà de 5 ans</li>
+        <li>Non reportables l'année suivante</li>
+      </ul>
+    </div>
+  </div>
+</div>

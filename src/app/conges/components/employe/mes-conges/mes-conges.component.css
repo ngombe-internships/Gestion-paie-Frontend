@@ -1,0 +1,311 @@
+/* ============================
+   Style Professionnel Mes Congés
+   ============================ */
+
+/* Conteneur principal */
+.mes-conges-container {
+  padding: 1.5rem;
+  background: #f5f6fa;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  color: #333;
+}
+
+/* ----- En-tête ----- */
+.page-header {
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+  color: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.header-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left h1 {
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.header-left p {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.header-actions .btn {
+  margin-left: 0.5rem;
+}
+
+/* ----- Statistiques rapides ----- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.stat-card.total {
+  background: #ffffff;
+}
+
+.stat-card.pending {
+  background: #fff4e5;
+  color: #d98b00;
+}
+
+.stat-card.approved {
+  background: #e8f7e8;
+  color: #1e7e34;
+}
+
+.stat-card.rejected {
+  background: #fdecea;
+  color: #b02a37;
+}
+
+/* ----- Filtres ----- */
+.filters-section {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group label {
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.filter-btn {
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #f8f9fa;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background: #e2e6ea;
+}
+
+.filter-btn.active {
+  border-color: #0d6efd;
+  background: #0d6efd;
+  color: white;
+}
+
+.filter-btn.pending.active {
+  background: #ffc107;
+  border-color: #e0a800;
+}
+
+.filter-btn.approved.active {
+  background: #28a745;
+  border-color: #218838;
+}
+
+.filter-btn.rejected.active {
+  background: #dc3545;
+  border-color: #b02a37;
+}
+
+/* ----- États de chargement et erreur ----- */
+.loading-state,
+.error-state,
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #555;
+}
+
+.loading-state .spinner {
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #0d6efd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-state i {
+  font-size: 2rem;
+  color: #dc3545;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state i {
+  font-size: 2rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+/* ----- Liste des demandes ----- */
+.demandes-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.demande-card {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.demande-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Couleurs selon statut */
+.demande-card.en-attente {
+  border-left: 4px solid #ffc107;
+}
+
+.demande-card.approuvee {
+  border-left: 4px solid #28a745;
+}
+
+.demande-card.refusee {
+  border-left: 4px solid #dc3545;
+}
+
+/* Boutons d’action */
+.demande-actions {
+  margin-top: 1rem;
+}
+
+.demande-actions .btn {
+  font-size: 0.8rem;
+}
+/* Styles pour le tableau */
+.table-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table-header h5 {
+  margin: 0;
+  color: #495057;
+}
+
+.table-responsive {
+  margin: 0;
+}
+
+.table th {
+  border-bottom: 2px solid #495057;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.table td {
+  vertical-align: middle;
+  padding: 1rem 0.75rem;
+}
+
+.periode-info strong {
+  font-size: 0.9rem;
+}
+
+.type-info {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.raison-cell-full {
+  max-width: 300px;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+}
+
+
+
+.motif-rejet-text {
+  background: #fff5f5;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid #dc3545;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.motif-rejet-text strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* Responsive du tableau */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.8rem;
+  }
+
+  .raison-cell-full {
+    max-width: none;
+    width: 100%;
+  }
+
+  .raison-cell {
+    max-width: 150px;
+  }
+}

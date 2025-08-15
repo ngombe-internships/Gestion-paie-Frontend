@@ -1,0 +1,964 @@
+<div class="conges-demandes-container">
+  <!-- Notification toast -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <div class="toast" [class.show]="showNotification" role="alert">
+      <div class="toast-header" [ngClass]="{
+        'bg-success text-white': notificationType === 'success',
+        'bg-danger text-white': notificationType === 'error',
+        'bg-warning text-dark': notificationType === 'warning'
+      }">
+        <i class="bi me-2" [ngClass]="{
+          'bi-check-circle': notificationType === 'success',
+          'bi-exclamation-triangle': notificationType === 'error' || notificationType === 'warning'
+        }"></i>
+        <strong class="me-auto">{{
+          notificationType === 'success' ? 'Succès' :
+          notificationType === 'error' ? 'Erreur' : 'Attention'
+        }}</strong>
+        <button type="button" class="btn-close" (click)="hideNotification()"></button>
+      </div>
+      <div class="toast-body">
+        {{ notificationMessage }}
+      </div>
+    </div>
+  </div>
+
+  <!-- En-tête avec titre et actions -->
+  <div class="page-header mb-4">
+    <div class="d-flex flex-column">
+      <div class="text-center mb-3">
+        <h2 class="page-title">
+          <i class="bi bi-calendar-check me-2 text-primary"></i>
+          Demandes de Congés
+        </h2>
+        <p class="page-subtitle text-muted mb-0">
+          Gestion et validation des demandes de congés de votre entreprise
+        </p>
+      </div>
+      <div class="d-flex gap-2 justify-content-end">
+        <button
+          class="btn btn-outline-primary "
+          (click)="refresh()"
+          [disabled]="isLoadingData">
+          <i class="bi bi-arrow-clockwise me-1"></i>
+          <span *ngIf="!isLoading">Actualiser</span>
+          <span *ngIf="isLoading">Chargement...</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertes d'information -->
+  <div class="row mb-4" *ngIf="!isLoading">
+    <div class="col-12">
+      <div class="alert alert-info d-flex align-items-center" *ngIf="getDemandesUrgentes() > 0">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <div>
+          <strong>Attention !</strong>
+          {{ getDemandesUrgentes() }} demande(s) urgente(s) nécessitent votre attention (début dans moins de 7 jours).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+      <h6 class="card-title mb-0">
+        <i class="bi bi-funnel me-2"></i>
+        Filtres et recherche
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Recherche -->
+        <div class="col-md-3">
+          <label class="form-label fw-medium">
+            <i class="bi bi-search me-1"></i>
+            Rechercher
+          </label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control border-start-0"
+              placeholder="Nom employé, raison, ID..."
+              [(ngModel)]="searchTerm"
+              (input)="applyFilters()"
+            />
+          </div>
+        </div>
+
+        <!-- Filtre statut -->
+        <div class="col-md-2">
+          <label class="form-label fw-medium">
+            <i class="bi bi-info-circle me-1"></i>
+            Statut
+          </label>
+          <select class="form-select" [(ngModel)]="filterStatut" (change)="applyFilters()">
+            <option value="tous">Tous les statuts</option>
+            <option value="EN_ATTENTE"> En attente</option>
+            <option value="APPROUVEE"> Approuvées</option>
+            <option value="REJETEE">Rejetées</option>
+            <option value="ANNULEE"> Annulées</option>
+          </select>
+        </div>
+
+        <!-- Filtre type -->
+        <div class="col-md-2">
+          <label class="form-label fw-medium">
+            <i class="bi bi-tag me-1"></i>
+            Type de congé
+          </label>
+          <select class="form-select" [(ngModel)]="filterType" (change)="applyFilters()">
+            <option value="tous">Tous les types</option>
+            <option *ngFor="let option of getTypeCongeOptions()" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Éléments par page -->
+        <div class="col-md-2">
+          <label class="form-label fw-medium">Affichage</label>
+          <select class="form-select" [(ngModel)]="itemsPerPage" (change)="applyFilters()">
+            <option value="5">5 par page</option>
+            <option value="10">10 par page</option>
+            <option value="25">25 par page</option>
+            <option value="50">50 par page</option>
+          </select>
+        </div>
+
+        <!-- Bouton reset -->
+        <div class="col-md-3 d-flex align-items-end">
+          <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>
+            Réinitialiser les filtres
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ <div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card border-primary stats-card">
+      <div class="card-body text-center bg-primary bg-opacity-10">
+        <h3 class="stats-number text-primary">{{ getDemandesParStatut('EN_ATTENTE') }}</h3>
+        <p class="stats-label text-primary">En Attente</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-success stats-card">
+      <div class="card-body text-center bg-success bg-opacity-10">
+        <h3 class="stats-number text-success">{{ getDemandesParStatut('APPROUVEE') }}</h3>
+        <p class="stats-label text-success">Approuvées</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-danger stats-card">
+      <div class="card-body text-center bg-danger bg-opacity-10">
+        <h3 class="stats-number text-danger">{{ getDemandesParStatut('REJETEE') }}</h3>
+        <p class="stats-label text-danger">Rejetées</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card border-info stats-card">
+      <div class="card-body text-center bg-info bg-opacity-10">
+        <h3 class="stats-number text-info">{{ getPourcentageApprobation() }}%</h3>
+        <p class="stats-label text-info">Taux d'approbation</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Tableau des demandes -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <h6 class="card-title mb-0">
+        <i class="bi bi-table me-2"></i>
+        Liste des demandes ({{ totalItems }} sur {{ totalDemandes }} demande{{ totalDemandes > 1 ? 's' : '' }})
+      </h6>
+      <small class="text-muted" *ngIf="!isLoading">
+        <i class="bi bi-clock me-1"></i>
+        Dernière mise à jour : {{ lastUpdate | date:'dd/MM/yyyy HH:mm' }}
+      </small>
+    </div>
+
+    <div class="card-body p-0">
+      <!-- État de chargement -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="loading-content">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          <p class="mt-3 text-muted">Chargement des demandes de congés...</p>
+          <small class="text-muted">Récupération des données depuis le serveur</small>
+        </div>
+      </div>
+
+      <!-- État d'erreur -->
+      <div *ngIf="error && !isLoading" class="alert alert-danger m-3" role="alert">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+          <div class="flex-grow-1">
+            <h6 class="alert-heading mb-1">Erreur de chargement</h6>
+            <p class="mb-2">{{ error }}</p>
+            <button class="btn btn-outline-danger btn-sm" (click)="refresh()">
+              <i class="bi bi-arrow-clockwise me-1"></i>
+              Réessayer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tableau des données -->
+      <div *ngIf="!isLoading && !error" class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light sticky-top">
+            <tr>
+              <!-- Employé -->
+              <th scope="col" class="border-0 ps-3 sortable" (click)="sort('employeNom')">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-person me-2 text-primary"></i>
+                  Employé
+                  <i class="bi ms-1" [ngClass]="{
+                    'bi-arrow-up': sortBy === 'employeNom' && sortDirection === 'asc',
+                    'bi-arrow-down': sortBy === 'employeNom' && sortDirection === 'desc',
+                    'bi-arrow-up-down': sortBy !== 'employeNom'
+                  }"></i>
+                </div>
+              </th>
+
+              <!-- Type de congé -->
+              <th scope="col" class="border-0 text-center sortable" (click)="sort('typeConge')">
+                <div class="d-flex align-items-center justify-content-center">
+                  <i class="bi bi-tag me-2 text-primary"></i>
+                  Type
+                  <i class="bi ms-1" [ngClass]="{
+                    'bi-arrow-up': sortBy === 'typeConge' && sortDirection === 'asc',
+                    'bi-arrow-down': sortBy === 'typeConge' && sortDirection === 'desc',
+                    'bi-arrow-up-down': sortBy !== 'typeConge'
+                  }"></i>
+                </div>
+              </th>
+
+              <!-- Période -->
+              <th scope="col" class="border-0 text-center sortable" (click)="sort('dateDebut')">
+                <div class="d-flex align-items-center justify-content-center">
+                  <i class="bi bi-calendar-range me-2 text-primary"></i>
+                  Période
+                  <i class="bi ms-1" [ngClass]="{
+                    'bi-arrow-up': sortBy === 'dateDebut' && sortDirection === 'asc',
+                    'bi-arrow-down': sortBy === 'dateDebut' && sortDirection === 'desc',
+                    'bi-arrow-up-down': sortBy !== 'dateDebut'
+                  }"></i>
+                </div>
+              </th>
+
+              <!-- Durée -->
+              <th scope="col" class="border-0 text-center">
+                <div class="d-flex align-items-center justify-content-center">
+                  <i class="bi bi-hourglass me-2 text-primary"></i>
+                  Durée
+                </div>
+              </th>
+
+              <!-- Date de demande -->
+              <th scope="col" class="border-0 text-center sortable" (click)="sort('dateDemande')">
+                <div class="d-flex align-items-center justify-content-center">
+                  <i class="bi bi-calendar-plus me-2 text-primary"></i>
+                  Demandé le
+                  <i class="bi ms-1" [ngClass]="{
+                    'bi-arrow-up': sortBy === 'dateDemande' && sortDirection === 'asc',
+                    'bi-arrow-down': sortBy === 'dateDemande' && sortDirection === 'desc',
+                    'bi-arrow-up-down': sortBy !== 'dateDemande'
+                  }"></i>
+                </div>
+              </th>
+
+              <!-- Statut -->
+              <th scope="col" class="border-0 text-center sortable" (click)="sort('statut')">
+                <div class="d-flex align-items-center justify-content-center">
+                  <i class="bi bi-info-circle me-2 text-primary"></i>
+                  Statut
+                  <i class="bi ms-1" [ngClass]="{
+                    'bi-arrow-up': sortBy === 'statut' && sortDirection === 'asc',
+                    'bi-arrow-down': sortBy === 'statut' && sortDirection === 'desc',
+                    'bi-arrow-up-down': sortBy !== 'statut'
+                  }"></i>
+                </div>
+              </th>
+
+              <!-- Actions -->
+              <th scope="col" class="border-0 text-center pe-3">
+                <i class="bi bi-gear me-1"></i>
+                Actions
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let demande of getPaginatedItems(); let i = index"
+                class="table-row"
+                [ngClass]="getPriorityClass(demande)">
+
+              <!-- Employé avec avatar -->
+              <td class="ps-3">
+                <div class="d-flex align-items-center">
+                  <div class="employee-avatar me-3">
+                    <div class="avatar-circle">
+                      {{ demande.employePrenom.charAt(0) }}{{ demande.employeNom.charAt(0) }}
+                    </div>
+                  </div>
+                  <div class="employee-info">
+                    <div class="employee-name">
+                      {{ demande.employePrenom }} {{ demande.employeNom }}
+                    </div>
+                    <small class="text-muted">
+                      <i class="bi bi-hash me-1"></i>
+                      ID: {{ demande.employeId }}
+                    </small>
+                    <div *ngIf="getPriorityText(demande)" class="priority-indicator">
+                      <small class="text-warning fw-medium">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        {{ getPriorityText(demande) }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Type de congé avec icône -->
+              <td class="text-center">
+                <div class="type-badge">
+                  <span class="badge bg-light text-dark border">
+                    {{ getTypeLabel(demande.typeConge) }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Période -->
+              <td class="text-center">
+                <div class="periode-info">
+                  <div class="fw-medium">{{ formatDateShort(demande.dateDebut) }}</div>
+                  <small class="text-muted">
+                    <i class="bi bi-arrow-right mx-1"></i>
+                    {{ formatDateShort(demande.dateFin) }}
+                  </small>
+                </div>
+              </td>
+
+              <!-- Durée -->
+              <td class="text-center">
+                <span class="badge bg-info text-white">
+                  <i class="bi bi-calendar-day me-1"></i>
+                  {{ calculerDuree(demande.dateDebut, demande.dateFin) }} jour(s)
+                </span>
+              </td>
+
+              <!-- Date de demande -->
+              <td class="text-center">
+                <div class="date-demande">
+                  <div class="fw-medium">{{ formatDateShort(demande.dateDemande) }}</div>
+                  <small class="text-muted">{{ formatDate(demande.dateDemande) }}</small>
+                </div>
+              </td>
+
+              <!-- Statut avec icône -->
+              <td class="text-center">
+                <span class="badge" [ngClass]="getStatutClass(demande.statut)">
+                  <i class="bi me-1" [ngClass]="getStatutIcon(demande.statut)"></i>
+                  {{ getStatutLabel(demande.statut) }}
+                </span>
+              </td>
+
+              <!-- Actions -->
+              <td class="text-center pe-3">
+                <div class="btn-group action-buttons" role="group">
+                  <!-- Bouton détails -->
+                  <button
+                    class="btn btn-outline-info btn-sm"
+                    (click)="voirDetails(demande)"
+                    title="Voir les détails"
+                    data-bs-toggle="tooltip">
+                    <i class="bi bi-eye"></i>Détails
+                  </button>
+
+                  <!-- Actions selon le statut -->
+                  <ng-container *ngIf="canApproveDemande(demande)">
+                    <button
+                      class="btn btn-outline-success btn-sm"
+                      (click)="approuverDemande(demande)"
+                      [disabled]="isProcessing"
+                      title="Approuver la demande"
+                      data-bs-toggle="tooltip">
+                      <i class="bi bi-check-lg"></i>Approuver
+                    </button>
+                    <button
+                      class="btn btn-outline-danger btn-sm"
+                      (click)="ouvrirModalRejet(demande)"
+                      [disabled]="isProcessing"
+                      title="Rejeter la demande"
+                      data-bs-toggle="tooltip">
+                      <i class="bi bi-x-lg"></i>Rejeter
+                    </button>
+                  </ng-container>
+
+                  <!-- Bouton annuler -->
+                  <button
+                    *ngIf="canModifyDemande(demande)"
+                    class="btn btn-outline-warning btn-sm"
+                    (click)="annulerDemande(demande)"
+                    [disabled]="isProcessing"
+                    title="Annuler la demande"
+                    data-bs-toggle="tooltip">
+                    <i class="bi bi-trash"></i> Annuler
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Aucun résultat -->
+            <tr *ngIf="getPaginatedItems().length === 0">
+              <td colspan="7" class="text-center py-5">
+                <div class="empty-state">
+                  <i class="bi bi-inbox empty-icon"></i>
+                  <h6 class="empty-title">Aucune demande trouvée</h6>
+                  <p class="empty-description text-muted" *ngIf="totalDemandes === 0">
+                    Aucune demande de congé n'a encore été soumise.
+                  </p>
+                  <p class="empty-description text-muted" *ngIf="totalDemandes > 0">
+                    Aucune demande ne correspond aux critères de recherche actuels.
+                  </p>
+                  <div class="mt-3">
+                    <button
+                      *ngIf="totalDemandes > 0"
+                      class="btn btn-outline-primary btn-sm me-2"
+                      (click)="resetFilters()">
+                      <i class="bi bi-arrow-counterclockwise me-1"></i>
+                      Réinitialiser les filtres
+                    </button>
+                    <button
+                      class="btn btn-primary btn-sm"
+                      routerLink="/dashboard/conges/nouvelle-demande">
+                      <i class="bi bi-plus-lg me-1"></i>
+                      Créer une demande
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="card-footer bg-white" *ngIf="getTotalPages() > 1">
+        <div class="d-flex justify-content-between align-items-center">
+          <!-- Info pagination -->
+          <div class="text-muted">
+            <small>
+              <i class="bi bi-info-circle me-1"></i>
+              Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} à
+              {{ getMin(currentPage * itemsPerPage, totalItems) }} sur {{ totalItems }} demande(s)
+            </small>
+          </div>
+
+          <!-- Navigation pagination -->
+          <nav aria-label="Navigation des pages">
+            <ul class="pagination pagination-sm mb-0">
+              <!-- Première page -->
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="goToPage(1)" title="Première page">
+                  <i class="bi bi-chevron-double-left"></i>
+                </button>
+              </li>
+
+              <!-- Page précédente -->
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="goToPage(currentPage - 1)" title="Page précédente">
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+              </li>
+
+              <!-- Pages numériques -->
+              <li class="page-item"
+                  *ngFor="let page of [].constructor(getTotalPages()); let i = index"
+                  [class.active]="currentPage === i + 1">
+                <button class="page-link" (click)="goToPage(i + 1)">
+                  {{ i + 1 }}
+                </button>
+              </li>
+
+              <!-- Page suivante -->
+              <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+                <button class="page-link" (click)="goToPage(currentPage + 1)" title="Page suivante">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+              </li>
+
+              <!-- Dernière page -->
+              <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+                <button class="page-link" (click)="goToPage(getTotalPages())" title="Dernière page">
+                  <i class="bi bi-chevron-double-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de rejet -->
+<div class="modal fade" [class.show]="showRejectModal" [style.display]="showRejectModal ? 'block' : 'none'"
+     tabindex="-1" *ngIf="showRejectModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-x-circle me-2"></i>
+          Rejeter la demande de congé
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="fermerModalRejet()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="alert alert-warning" role="alert">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          <strong>Attention :</strong> Cette action ne peut pas être annulée.
+        </div>
+
+        <!-- Informations sur la demande -->
+        <div class="mb-3">
+          <h6>Détails de la demande :</h6>
+          <ul class="list-unstyled">
+            <li><strong>Employé :</strong> {{ selectedDemande?.employePrenom }} {{ selectedDemande?.employeNom }}</li>
+            <li><strong>Type de congé :</strong> {{ getTypeLabel(selectedDemande?.typeConge!) }}</li>
+            <li><strong>Période :</strong>
+              {{ formatDate(selectedDemande?.dateDebut!) }} au {{ formatDate(selectedDemande?.dateFin!) }}
+            </li>
+            <li><strong>Durée :</strong> {{ calculerDuree(selectedDemande?.dateDebut!, selectedDemande?.dateFin!) }} jour(s)</li>
+          </ul>
+        </div>
+
+        <!-- Raison de la demande si disponible -->
+        <div class="mb-3" *ngIf="selectedDemande?.raison">
+          <h6>Raison invoquée :</h6>
+          <p class="text-muted fst-italic">{{ selectedDemande?.raison }}</p>
+        </div>
+
+        <!-- Champ motif de rejet -->
+        <div class="mb-3">
+          <label class="form-label">
+            <strong>Motif du rejet</strong> <span class="text-danger">*</span>
+          </label>
+          <textarea
+            class="form-control"
+            rows="4"
+            [(ngModel)]="motifRejet"
+            placeholder="Veuillez expliquer clairement les raisons du rejet de cette demande..."
+            maxlength="500"></textarea>
+          <div class="form-text">
+            {{ motifRejet.length }}/500 caractères
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="fermerModalRejet()">
+          <i class="bi bi-x-circle me-1"></i>
+          Annuler
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="rejeterDemande()"
+          [disabled]="!motifRejet.trim() || isProcessing">
+          <i class="bi bi-x-circle me-1" *ngIf="!isProcessing"></i>
+          <span class="spinner-border spinner-border-sm me-1" *ngIf="isProcessing"></span>
+          {{ isProcessing ? 'Rejet en cours...' : 'Confirmer le rejet' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de détails -->
+<div class="modal fade" [class.show]="showDetailsModal" [style.display]="showDetailsModal ? 'block' : 'none'"
+     tabindex="-1" *ngIf="showDetailsModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-info-circle me-2 text-primary"></i>
+          Détails de la demande de congé
+        </h5>
+        <button type="button" class="btn-close" (click)="fermerModalDetails()"></button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedDemande">
+        <div class="row">
+          <!-- Informations employé -->
+          <div class="col-md-6">
+            <h6 class="border-bottom pb-2">
+              <i class="bi bi-person me-2"></i>
+              Informations employé
+            </h6>
+            <div class="mb-3">
+              <div class="d-flex align-items-center mb-2">
+                <div class="employee-avatar me-3">
+                  <div class="avatar-circle">
+                    {{ selectedDemande.employePrenom.charAt(0) }}{{ selectedDemande.employeNom.charAt(0) }}
+                  </div>
+                </div>
+                <div>
+                  <div class="fw-medium">{{ selectedDemande.employePrenom }} {{ selectedDemande.employeNom }}</div>
+                  <small class="text-muted">ID: {{ selectedDemande.employeId }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations congé -->
+          <div class="col-md-6">
+            <h6 class="border-bottom pb-2">
+              <i class="bi bi-calendar me-2"></i>
+              Informations congé
+            </h6>
+            <div class="mb-3">
+              <p class="mb-1">
+                <strong>Type :</strong>
+                {{ getTypeLabel(selectedDemande.typeConge) }}
+              </p>
+              <p class="mb-1">
+                <strong>Statut :</strong>
+                <span class="badge ms-1" [ngClass]="getStatutClass(selectedDemande.statut)">
+                  <i class="bi me-1" [ngClass]="getStatutIcon(selectedDemande.statut)"></i>
+                  {{ getStatutLabel(selectedDemande.statut) }}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dates et durée -->
+        <div class="row">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2">
+              <i class="bi bi-calendar-range me-2"></i>
+              Période et durée
+            </h6>
+            <div class="row">
+              <div class="col-md-4">
+                <p class="mb-1"><strong>Date de début :</strong></p>
+                <p class="text-muted">{{ formatDate(selectedDemande.dateDebut) }}</p>
+              </div>
+              <div class="col-md-4">
+                <p class="mb-1"><strong>Date de fin :</strong></p>
+                <p class="text-muted">{{ formatDate(selectedDemande.dateFin) }}</p>
+              </div>
+              <div class="col-md-4">
+                <p class="mb-1"><strong>Durée totale :</strong></p>
+                <p class="text-primary fw-medium">
+                  {{ calculerDuree(selectedDemande.dateDebut, selectedDemande.dateFin) }} jour(s) ouvrables
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historique de la demande -->
+        <div class="row">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2">
+              <i class="bi bi-clock-history me-2"></i>
+              Historique
+            </h6>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-marker bg-primary"></div>
+                <div class="timeline-content">
+                  <h6>Demande créée</h6>
+                  <p class="text-muted mb-0">{{ formatDate(selectedDemande.dateDemande) }}</p>
+                </div>
+              </div>
+
+              <div class="timeline-item" *ngIf="selectedDemande.dateApprobationRejet">
+                <div class="timeline-marker" [ngClass]="{
+                  'bg-success': selectedDemande.statut === 'APPROUVEE',
+                  'bg-danger': selectedDemande.statut === 'REJETEE',
+                  'bg-warning': selectedDemande.statut === 'ANNULEE'
+                }"></div>
+                <div class="timeline-content">
+                  <h6>{{
+                    selectedDemande.statut === 'APPROUVEE' ? 'Demande approuvée' :
+                    selectedDemande.statut === 'REJETEE' ? 'Demande rejetée' : 'Demande annulée'
+                  }}</h6>
+                  <p class="text-muted mb-0">{{ formatDate(selectedDemande.dateApprobationRejet) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Raison de la demande -->
+        <div *ngIf="selectedDemande.raison" class="row">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2">
+              <i class="bi bi-chat-left-text me-2"></i>
+              Raison de la demande
+            </h6>
+            <div class="alert alert-light">
+              <p class="mb-0 fst-italic">{{ selectedDemande.raison }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Motif de rejet si applicable -->
+        <div *ngIf="selectedDemande.motifRejet" class="row">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 text-danger">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              Motif du rejet
+            </h6>
+            <div class="alert alert-danger">
+              <p class="mb-0">{{ selectedDemande.motifRejet }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+       <!-- Sixième section : Documents justificatifs -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2">
+              <i class="bi bi-files me-2"></i>
+              Documents justificatifs
+            </h6>
+
+            <!-- État de chargement -->
+            <div *ngIf="isLoadingDocuments" class="text-center py-3">
+              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Chargement des documents...</span>
+              </div>
+              <p class="text-muted mt-2 mb-0">Chargement des documents...</p>
+            </div>
+
+            <!-- Aucun document -->
+            <div *ngIf="!isLoadingDocuments && documents.length === 0"
+                 class="alert alert-light text-center">
+              <i class="bi bi-file-earmark-x text-muted fs-4 mb-2"></i>
+              <p class="mb-0">Aucun document joint à cette demande</p>
+            </div>
+
+            <!-- Liste des documents -->
+            <div *ngIf="!isLoadingDocuments && documents.length > 0" class="list-group">
+              <a *ngFor="let doc of documents"
+                 [href]="doc.url"
+                 target="_blank"
+                 class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                  <!-- Icône du document -->
+                  <div class="document-icon me-3">
+                    <i [class]="'bi ' + getDocumentIcon(doc.nom)"
+                       style="font-size: 1.5rem;"></i>
+                  </div>
+
+                  <!-- Informations du document -->
+                  <div class="flex-grow-1">
+                    <h6 class="mb-0">{{ doc.nom }}</h6>
+                    <small class="text-muted d-block">
+                      {{ formatFileSize(doc.taille) }} •
+                      Ajouté le {{ doc.dateUpload | date:'dd/MM/yyyy HH:mm' }} par
+                      {{ doc.uploadedBy }}
+                    </small>
+                  </div>
+
+                  <!-- Bouton de visualisation -->
+                 <button class="btn btn-sm btn-outline-primary ms-2"
+                     (click)="$event.preventDefault(); openDocument(doc.url, doc.nom, doc.taille)">
+                     <i class="bi bi-eye me-1"></i>
+                        Voir
+                  </button>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="fermerModalDetails()">
+          <i class="bi bi-x-circle me-1"></i>
+          Fermer
+        </button>
+
+        <!-- Actions selon le statut -->
+        <ng-container *ngIf="selectedDemande && canApproveDemande(selectedDemande)">
+          <button
+            class="btn btn-success"
+            (click)="approuverDemande(selectedDemande); fermerModalDetails()"
+            [disabled]="isProcessing">
+            <i class="bi bi-check-lg me-1"></i>
+            Approuver
+          </button>
+          <button
+            class="btn btn-danger"
+            (click)="ouvrirModalRejet(selectedDemande); fermerModalDetails()"
+            [disabled]="isProcessing">
+            <i class="bi bi-x-lg me-1"></i>
+            Rejeter
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Modal d'approbation -->
+<div class="modal fade" [class.show]="showApprovalModal" [style.display]="showApprovalModal ? 'block' : 'none'"
+     tabindex="-1" *ngIf="showApprovalModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-check-circle me-2"></i>
+          Approuver la demande de congé
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="fermerModalApprobation()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="alert alert-success" role="alert">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong>Confirmation requise :</strong> Vous êtes sur le point d'approuver cette demande de congé.
+        </div>
+
+        <!-- Informations sur la demande -->
+        <div class="mb-4" *ngIf="selectedDemandeForApproval">
+          <h6 class="fw-bold text-success mb-3">
+            <i class="bi bi-clipboard-check me-2"></i>
+            Récapitulatif de la demande
+          </h6>
+
+          <!-- Carte employé -->
+          <div class="card border-success mb-3">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="employee-avatar me-3">
+                      <div class="avatar-circle bg-success">
+                        {{ selectedDemandeForApproval.employePrenom.charAt(0) }}{{ selectedDemandeForApproval.employeNom.charAt(0) }}
+                      </div>
+                    </div>
+                    <div>
+                      <h6 class="mb-1">{{ selectedDemandeForApproval.employePrenom }} {{ selectedDemandeForApproval.employeNom }}</h6>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="text-end">
+                    <span class="badge bg-light text-dark border">
+                      {{ getTypeLabel(selectedDemandeForApproval.typeConge) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Détails de la période -->
+          <div class="row">
+            <div class="col-md-4">
+              <div class="info-item">
+                <label class="text-muted small">Date de début</label>
+                <div class="fw-medium">{{ formatDate(selectedDemandeForApproval.dateDebut) }}</div>
+                <small class="text-muted">{{ formatDateShort(selectedDemandeForApproval.dateDebut) }}</small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="info-item">
+                <label class="text-muted small">Date de fin</label>
+                <div class="fw-medium">{{ formatDate(selectedDemandeForApproval.dateFin) }}</div>
+                <small class="text-muted">{{ formatDateShort(selectedDemandeForApproval.dateFin) }}</small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="info-item">
+                <label class="text-muted small">Durée totale</label>
+                <div class="fw-medium text-success">
+                  <i class="bi bi-calendar-day me-1"></i>
+                  {{ calculerDuree(selectedDemandeForApproval.dateDebut, selectedDemandeForApproval.dateFin) }} jour(s)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Raison si disponible -->
+          <div class="mt-3" *ngIf="selectedDemandeForApproval.raison">
+            <h6 class="text-muted small mb-2">Raison invoquée :</h6>
+            <div class="alert alert-light border-start border-success border-3">
+              <p class="mb-0 fst-italic">{{ selectedDemandeForApproval.raison }}</p>
+            </div>
+          </div>
+
+          <!-- Information sur les impacts -->
+          <div class="mt-3">
+            <div class="alert alert-warning border-warning">
+              <h6 class="alert-heading">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Impacts de l'approbation
+              </h6>
+              <ul class="mb-0">
+                <li>Cette action ne peut pas être annulée</li>
+                <li>L'employé sera notifié automatiquement</li>
+                <li *ngIf="getTypeCongeNeedsSolde(selectedDemandeForApproval.typeConge)">
+                  Les jours seront déduits du solde de congés
+                </li>
+                <li>La demande apparaîtra comme "Approuvée" dans le système</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="fermerModalApprobation()">
+          <i class="bi bi-x-circle me-1"></i>
+          Annuler
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="confirmerApprobation()"
+          [disabled]="isProcessing">
+          <i class="bi bi-check-circle me-1" *ngIf="!isProcessing"></i>
+          <span class="spinner-border spinner-border-sm me-1" *ngIf="isProcessing"></span>
+          {{ isProcessing ? 'Approbation en cours...' : 'Confirmer l\'approbation' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Backdrops pour les modals -->
+<div class="modal-backdrop fade"
+     [class.show]="showRejectModal || showDetailsModal || showApprovalModal"
+     *ngIf="showRejectModal || showDetailsModal || showApprovalModal"
+     (click)="fermerModalRejet(); fermerModalDetails(); fermerModalApprobation()">
+</div>

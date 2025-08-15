@@ -1,0 +1,186 @@
+/* =============================================
+   STYLES POUR LE COMPOSANT DEMANDES DE CONGÉS
+   ============================================= */
+
+.page-title {
+  color: #0d6efd;
+}
+
+h2 {
+  font-size: 2.8rem;
+  font-weight: 700;
+}
+
+.page-subtitle {
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.conges-demandes-container {
+  padding: 1rem;
+}
+
+/* Styles des cartes statistiques */
+.stats-card {
+  
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stats-warning { border-left: 4px solid #ffc107; }
+.stats-success { border-left: 4px solid #198754; }
+.stats-danger { border-left: 4px solid #dc3545; }
+.stats-info { border-left: 4px solid #0dcaf0; }
+
+.stats-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stats-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stats-number {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stats-label {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+/* Styles des badges de priorité */
+.priority-indicator {
+  margin-top: 0.25rem;
+}
+
+/* Styles de l'avatar employé */
+.employee-avatar .avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e9ecef;
+  color: #495057;
+  font-weight: 600;
+}
+
+/* Styles pour la timeline */
+.timeline {
+  position: relative;
+  padding: 1rem 0;
+}
+
+.timeline-item {
+  padding-left: 2rem;
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* Styles des modals */
+.modal-header.bg-success {
+  background-color: #198754 !important;
+}
+
+.modal-header.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-card {
+    margin-bottom: 1rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+  }
+}
+/* Styles communs pour les cartes statistiques */
+.stats-card {
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-3px);
+}
+
+.stats-number {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.stats-label {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Variantes de couleurs */
+.border-stat-primary {
+  border: 1px solid #0d6efd;
+}
+
+.border-stat-success {
+  border: 1px solid #198754;
+}
+
+.border-stat-danger {
+  border: 1px solid #dc3545;
+}
+
+.border-stat-warning {
+  border: 1px solid #ffc107;
+}
+
+.border-stat-info {
+  border: 1px solid #0dcaf0;
+}
+
+/* Backgrounds avec opacité */
+.bg-stat-primary {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+.bg-stat-success {
+  background-color: rgba(25, 135, 84, 0.1);
+}
+
+.bg-stat-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.bg-stat-warning {
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.bg-stat-info {
+  background-color: rgba(13, 202, 240, 0.1);
+}

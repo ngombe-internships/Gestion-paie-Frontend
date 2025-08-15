@@ -64,15 +64,13 @@ export class MesCongesComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
- loadMesDemandesConges(resetPage: boolean = false): void {
+loadMesDemandesConges(resetPage: boolean = false): void {
     if (resetPage) {
         this.currentPage = 0;
     }
 
     this.isLoading = true;
     this.error = null;
-
-
 
     this.congeService.getMesDemandesConges({
         page: this.currentPage,
@@ -84,35 +82,39 @@ export class MesCongesComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
     ).subscribe({
         next: (response) => {
-
-            //  CORRECTION : Vérifier la structure de la réponse
-            if (response && response.content) {
-                this.demandes = response.content;
-                this.totalItems = response.totalElements || 0;
-                this.totalPages = response.totalPages || 0;
-                this.currentPage = response.pageNumber || 0;
-            } else {
-                console.warn('⚠️ Structure de réponse inattendue:', response);
-                this.demandes = [];
-                this.totalItems = 0;
-                this.totalPages = 0;
-            }
+            // ✅ Gestion robuste de la réponse
+            this.demandes = response?.content || [];
+            this.totalItems = response?.totalElements || 0;
+            this.totalPages = response?.totalPages || 0;
+            this.currentPage = response?.pageNumber || 0;
 
             this.calculerStatistiques();
-            this.applyFilters(); // ✅ IMPORTANT : Appliquer les filtres
+            this.applyFilters();
 
+            // ✅ Message approprié pour le cas vide
+            if (this.demandes.length === 0) {
+                this.toastrService.info('Aucune demande de congé trouvée', 'Information');
+            } else {
+                this.toastrService.success(
+                    `${this.demandes.length} demande(s) chargée(s)`,
+                    'Chargement réussi'
+                );
+            }
 
-
-            this.toastrService.success(
-                `${this.demandes.length} demande(s) chargée(s)`,
-                'Chargement réussi'
-            );
             this.isLoading = false;
         },
         error: (error) => {
             console.error('❌ Erreur chargement demandes:', error);
-            this.error = error.message || 'Erreur lors du chargement des demandes.';
-            this.toastrService.error(this.error ?? '', 'Erreur de chargement');
+
+            // ✅ Initialiser avec des valeurs par défaut
+            this.demandes = [];
+            this.demandesFiltrees = [];
+            this.totalItems = 0;
+            this.totalPages = 0;
+            this.calculerStatistiques();
+
+            this.error = 'Impossible de charger vos demandes de congé. Veuillez réessayer.';
+            this.toastrService.error(this.error, 'Erreur de chargement');
             this.isLoading = false;
         }
     });

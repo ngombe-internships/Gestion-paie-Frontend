@@ -124,7 +124,6 @@ export const routes: Routes = [
       { path: 'audit-logs', component: AuditLogsComponent, canActivate: [authGuard] }
     ]
   },
-
   // === REDIRECTIONS ===
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }

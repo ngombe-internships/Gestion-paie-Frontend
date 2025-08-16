@@ -53,6 +53,7 @@ import { NouvelleDemandeComponent } from './conges/components/employe/nouvelle-d
 import { JoursFeriesComponent } from './conges/components/jours-feries/jours-feries.component';
 import { TypeConge } from './conges/models/demande-conge.model';
 import { TypesCongesComponent } from './conges/components/types-conges/types-conges.component';
+import { NotificationsHistoriqueComponent } from './conges/components/notifications-historique/notifications-historique.component';
 
 export const routes: Routes = [
   // === ROUTES PUBLIQUES ===
@@ -114,6 +115,10 @@ export const routes: Routes = [
       {path: 'conges/mes-demandes', component: MesCongesComponent, canActivate: [authGuard] },
       {path:'conges/mon-solde', component: MonSoldeComponent, canActivate: [authGuard] },
       {path:'conges/nouvelle-demande', component: NouvelleDemandeComponent, canActivate: [authGuard] },
+
+      // === NOTIFICATIONS ===
+      { path: 'notifications', component: NotificationsHistoriqueComponent, canActivate: [authGuard] },
+
       // --- Administration ---
       { path: 'employeur', component: EmployeurListComponent, canActivate: [authGuard] },
       { path: 'audit-logs', component: AuditLogsComponent, canActivate: [authGuard] }

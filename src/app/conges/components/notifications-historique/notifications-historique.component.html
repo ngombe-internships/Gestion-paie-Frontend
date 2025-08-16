@@ -1,0 +1,201 @@
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="card-title mb-0">
+            <i class="bi bi-bell me-2"></i>
+            Historique des notifications
+          </h4>
+        </div>
+        <div class="card-body">
+
+          <!-- Loading -->
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Chargement des notifications...</p>
+          </div>
+
+          <!-- Liste des notifications -->
+          <div *ngIf="!loading && notifications.length > 0" class="notifications-list">
+            <div *ngFor="let notification of notifications; trackBy: trackById"
+                 class="notification-card mb-3"
+                 [class.unread]="!notification.lu">
+
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex align-items-start">
+                    <div class="notification-icon me-3">
+                      <div class="icon-wrapper" [class]="'bg-' + getNotificationColor(notification.type || '')">
+                        <i [class]="getNotificationIcon(notification.type || '')"></i>
+                      </div>
+                    </div>
+
+                    <div class="flex-grow-1">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="notification-title mb-1">{{ notification.titre || 'Sans titre' }}</h6>
+                        <span class="badge" [class]="'bg-' + getNotificationColor(notification.type || '')">
+                          {{ getNotificationTypeDisplay(notification.type) }}
+                        </span>
+                      </div>
+
+                      <p class="notification-preview text-muted mb-2">
+                        {{ (notification.message || '').length > 100 ? ((notification.message || '').substring(0, 100) + '...') : (notification.message || 'Aucun message') }}
+                      </p>
+
+                      <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                          <i class="bi bi-clock me-1"></i>
+                          {{ getTimeAgo(notification.dateCreation) }}
+                        </small>
+
+                        <div class="action-buttons">
+                          <!-- Bouton détail -->
+                          <button class="btn btn-outline-primary btn-sm me-2"
+                                  (click)="openDetailModal(notification)">
+                            <i class="bi bi-eye me-1"></i>
+                            Voir détail
+                          </button>
+
+                          <span class="badge bg-success" *ngIf="notification.lu">Lu</span>
+                          <span class="badge bg-primary" *ngIf="!notification.lu">Nouveau</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pagination -->
+            <nav *ngIf="totalPages > 1" class="mt-4">
+              <ul class="pagination justify-content-center">
+                <li class="page-item" [class.disabled]="currentPage === 0">
+                  <button class="page-link" (click)="onPageChange(currentPage - 1)">
+                    <i class="bi bi-chevron-left"></i> Précédent
+                  </button>
+                </li>
+
+                <li *ngFor="let page of [].constructor(totalPages); let i = index"
+                    class="page-item" [class.active]="i === currentPage">
+                  <button class="page-link" (click)="onPageChange(i)">{{ i + 1 }}</button>
+                </li>
+
+                <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+                  <button class="page-link" (click)="onPageChange(currentPage + 1)">
+                    Suivant <i class="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+
+          <!-- Aucune notification -->
+          <div *ngIf="!loading && notifications.length === 0" class="text-center py-5">
+            <i class="bi bi-bell-slash display-1 text-muted"></i>
+            <h5 class="mt-3 text-muted">Aucune notification</h5>
+            <p class="text-muted">Vous n'avez reçu aucune notification pour le moment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour les détails -->
+<div class="modal fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'"
+     *ngIf="showModal && selectedNotification" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" [class]="'bg-' + getNotificationColor(selectedNotification.type || '')">
+        <h5 class="modal-title text-white">
+          <i [class]="getNotificationIcon(selectedNotification.type || '')" class="me-2"></i>
+          Détail de la notification
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="notification-detail">
+          <!-- Titre -->
+          <div class="detail-section mb-4">
+            <h6 class="text-muted mb-2">TITRE</h6>
+            <h4 class="mb-0">{{ selectedNotification.titre || 'Sans titre' }}</h4>
+          </div>
+
+          <!-- Message complet -->
+          <div class="detail-section mb-4">
+            <h6 class="text-muted mb-2">MESSAGE</h6>
+            <div class="message-content p-3 bg-light rounded">
+              {{ selectedNotification.message || 'Aucun message disponible' }}
+            </div>
+          </div>
+
+          <!-- Informations supplémentaires -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="detail-section mb-3">
+                <h6 class="text-muted mb-2">TYPE</h6>
+                <span class="badge fs-6" [class]="'bg-' + getNotificationColor(selectedNotification.type || '')">
+                  {{ getNotificationTypeDisplay(selectedNotification.type) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="detail-section mb-3">
+                <h6 class="text-muted mb-2">DATE DE RÉCEPTION</h6>
+                <p class="mb-0">
+                  <i class="bi bi-calendar me-1"></i>
+                  {{ getTimeAgo(selectedNotification.dateCreation) }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Référence si disponible -->
+          <div class="detail-section mb-3" *ngIf="selectedNotification.referenceType">
+            <h6 class="text-muted mb-2">RÉFÉRENCE</h6>
+            <p class="mb-0">
+              <strong>Type :</strong> {{ selectedNotification.referenceType }} <br>
+              <strong>ID :</strong> {{ selectedNotification.referenceId }}
+            </p>
+          </div>
+
+          <!-- Statut de lecture -->
+          <div class="detail-section">
+            <h6 class="text-muted mb-2">STATUT</h6>
+            <span class="badge bg-success" *ngIf="selectedNotification.lu">
+              <i class="bi bi-check-circle me-1"></i> Lu
+            </span>
+            <span class="badge bg-primary" *ngIf="!selectedNotification.lu">
+              <i class="bi bi-exclamation-circle me-1"></i> Non lu
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          <i class="bi bi-x-circle me-1"></i>
+          Fermer
+        </button>
+
+        <!-- Action selon le type -->
+        <button type="button" class="btn btn-primary"
+                *ngIf="hasActionLink(selectedNotification)"
+                [routerLink]="selectedNotification.lienAction || '/dashboard/conges/demandes/' + selectedNotification.referenceId"
+                (click)="closeModal()">
+          <i class="bi bi-arrow-right-circle me-1"></i>
+          Voir l'élément
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay pour le modal -->
+<div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"
+     (click)="closeModal()"></div>

@@ -1,0 +1,98 @@
+.notification-card {
+  transition: all 0.3s ease;
+}
+
+.notification-card:hover {
+  transform: translateY(-2px);
+}
+
+.notification-card.unread {
+  border-left: 4px solid #007bff !important;
+}
+
+.notification-icon .icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: #212529;
+}
+
+.notification-preview {
+  line-height: 1.5;
+}
+
+.action-buttons .btn {
+  transition: all 0.2s ease;
+}
+
+.action-buttons .btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Modal styles */
+.modal.show {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.detail-section {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.detail-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.message-content {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.6;
+}
+
+.modal-header h5 {
+  font-weight: 600;
+}
+
+/* Animation pour le modal */
+.modal {
+  transition: opacity 0.3s ease;
+}
+
+.modal-dialog {
+  transition: transform 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .notification-card .card-body {
+    padding: 1rem;
+  }
+
+  .notification-icon .icon-wrapper {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .action-buttons {
+    margin-top: 1rem;
+  }
+
+  .modal-dialog {
+    margin: 1rem;
+  }
+}

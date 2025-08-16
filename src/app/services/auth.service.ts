@@ -8,6 +8,7 @@ import { LoginDto } from '../model/loginDto'; // Assuming you create these inter
 import { RegisterDto } from '../model/registerDto'; // Assuming you create these interfaces
 import { environment } from '../../environment';
 import { RegisterEmployeeDto } from '../model/registerEmployeeDto';
+import { NotificationService } from '../conges/services/notification.service';
 
 // Interfaces pour les DTOs front-end (à créer si ce n'est pas déjà fait)
 export interface LoginResponse {
@@ -45,6 +46,8 @@ interface PasswordResetDto {
 export class AuthService {
   private readonly baseUrl = environment.apiUrl + '/api/auth'; // Assurez-vous d'avoir environment.ts configuré
   private readonly http = inject(HttpClient);
+  private readonly notificationService = inject(NotificationService);
+
 
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
   isAuthenticated$ = this.loggedIn.asObservable();
@@ -99,6 +102,11 @@ export class AuthService {
             this.loggedIn.next(true);
             this.userRoleSubject.next(response.data.role);
             this.displayNameSubject.next(response.data.displayName);
+            if (response.data.role === 'EMPLOYE' || response.data.role === 'EMPLOYEUR') {
+                   setTimeout(() => {
+                    this.notificationService.initForUser();
+               }, 1000); // Petit délai pour s'assurer que le token est bien stocké
+            }
           }
         }),
         catchError(this.handleError)
@@ -151,6 +159,7 @@ export class AuthService {
 
 
   logout(): void {
+    this.notificationService.clear();
     localStorage.clear();
     this.loggedIn.next(false);
     this.userRoleSubject.next(null);

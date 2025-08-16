@@ -43,6 +43,12 @@ export class MesCongesComponent implements OnInit, OnDestroy {
     annulees: 0
   };
 
+
+   //Variables pour le modal d'annulation
+  showModalAnnulation = false;
+  demandeAnnuler: DemandeCongeResponseDto | null = null;
+  annulationEnCours = false;
+
   private readonly destroy$ = new Subject<void>();
  public readonly congeService = inject(CongeService);
   private  readonly authService = inject(AuthService);
@@ -223,9 +229,12 @@ applyFilters(): void {
   getTypeCongeLabel(type: TypeConge): string {
     return this.congeService.getTypeCongeLabel(type);
   }
+   peutAnnuler(demande: DemandeCongeResponseDto): boolean {
+    if (!demande) return false;
 
-  peutAnnuler(demande: DemandeCongeResponseDto): boolean {
-    return this.congeService.peutAnnulerDemande(demande);
+    // Seules les demandes en attente peuvent être annulées par l'employé
+    // Votre backend gère déjà cette logique, mais on peut ajouter cette vérification côté client
+    return demande.statut === StatutDemandeConge.EN_ATTENTE;
   }
 
   annulerDemande(demande: DemandeCongeResponseDto): void {
@@ -318,6 +327,77 @@ getPagesArray(): number[] {
 getMin(a: number, b: number): number {
   return Math.min(a, b);
 }
+
+ // ✅ NOUVEAU : Méthodes pour le modal d'annulation
+  ouvrirModalAnnulation(demande: DemandeCongeResponseDto): void {
+    if (!this.peutAnnuler(demande)) {
+      this.toastrService.warning('Cette demande ne peut pas être annulée.', 'Action impossible');
+      return;
+    }
+
+    this.demandeAnnuler = demande;
+    this.showModalAnnulation = true;
+    console.log('📋 Ouverture modal annulation pour demande:', demande.id);
+  }
+
+  fermerModalAnnulation(): void {
+    this.showModalAnnulation = false;
+    this.demandeAnnuler = null;
+    this.annulationEnCours = false;
+  }
+
+  confirmerAnnulation(): void {
+    if (!this.demandeAnnuler) {
+      return;
+    }
+
+    this.annulationEnCours = true;
+    const demandeId = this.demandeAnnuler.id;
+    const demandeInfo = `${this.getTypeCongeLabel(this.demandeAnnuler.typeConge)} du ${this.congeService.formatDateShort(this.demandeAnnuler.dateDebut)} au ${this.congeService.formatDateShort(this.demandeAnnuler.dateFin)}`;
+
+    console.log('🗑️ Début annulation demande:', demandeId);
+
+    this.congeService.annulerDemande(demandeId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          console.log('✅ Annulation réussie:', response);
+
+          if (response.data) {
+            this.toastrService.success(
+              `Demande annulée avec succès : ${demandeInfo}`,
+              'Annulation confirmée'
+            );
+
+            // Fermer le modal
+            this.fermerModalAnnulation();
+
+            // Recharger la liste
+            this.loadMesDemandesConges();
+          } else {
+            this.toastrService.error(
+              response.message || 'Erreur lors de l\'annulation',
+              'Erreur'
+            );
+            this.annulationEnCours = false;
+          }
+        },
+        error: (error) => {
+          console.error('❌ Erreur annulation:', error);
+
+          let errorMessage = 'Erreur lors de l\'annulation de la demande.';
+
+          if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+
+          this.toastrService.error(errorMessage, 'Erreur d\'annulation');
+          this.annulationEnCours = false;
+        }
+      });
+  }
 
 
 

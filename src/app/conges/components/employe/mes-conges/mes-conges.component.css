@@ -309,3 +309,57 @@
     max-width: 150px;
   }
 }
+
+/* ✅ NOUVEAU : Styles pour le modal d'annulation */
+
+.modal.show {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.demande-details {
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa !important;
+}
+
+.demande-details .row {
+  margin-bottom: 0.5rem;
+}
+
+.demande-details .row:last-child {
+  margin-bottom: 0;
+}
+
+.modal-header.bg-danger {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+/* ✅ Animation du modal */
+.modal {
+  transition: opacity 0.3s ease;
+}
+
+.modal-dialog {
+  transition: transform 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+
+/* ✅ Responsive pour la colonne Actions */
+@media (max-width: 768px) {
+  .table td:last-child {
+    text-align: center !important;
+  }
+
+  .btn-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}

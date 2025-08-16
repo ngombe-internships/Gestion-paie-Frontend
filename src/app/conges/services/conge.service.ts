@@ -178,12 +178,12 @@ getMesDemandesConges(params: {
    * PUT /api/conge/{id}/annuler
    */
   annulerDemande(demandeId: number): Observable<ApiResponse<DemandeCongeResponseDto>> {
-    return this.http.put<ApiResponse<DemandeCongeResponseDto>>(
-      `${this.apiUrl}/${demandeId}/annuler`,
-      {},
-      this.getHttpOptions()
-    );
-  }
+  return this.http.put<ApiResponse<DemandeCongeResponseDto>>(
+    `${this.apiUrl}/${demandeId}/annuler`,
+    {},
+    this.getHttpOptions()
+  );
+}
 
   /**
    * Récupérer toutes les demandes de l'entreprise (pour employeur)

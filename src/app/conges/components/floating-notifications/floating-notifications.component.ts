@@ -121,12 +121,30 @@ this.subscriptions.add(
       this.notificationService.marquerCommeLu(notification.id).subscribe();
     }
 
-    // Navigation vers le lien d'action si disponible
-    if (notification.lienAction) {
-      this.router.navigate([notification.lienAction]);
-    } else if (notification.referenceType === 'DEMANDE_CONGE' && notification.referenceId) {
-      this.router.navigate(['/dashboard/conges/demandes', notification.referenceId]);
-    }
+  // NOUVEAU : Toutes les notifications liées aux congés redirigeront vers la liste des demandes
+    if (notification.type.includes('DEMANDE_CONGE') ||
+      notification.type.includes('CONGE_') ||
+      notification.referenceType === 'DEMANDE_CONGE') {
+
+    console.log("Redirection vers la liste des demandes de congés");
+    this.router.navigate(['/dashboard/conges/demandes']);
+    this.notificationService.closeDropdown();
+    return;
+  }
+
+    //  Pour les autres types de notifications, comportement normal
+   if (notification.lienAction) {
+    console.log("Navigation via lienAction:", notification.lienAction);
+    this.router.navigate([notification.lienAction]);
+  } else if (notification.type.includes('BULLETIN_PAIE') ||
+             notification.referenceType === 'BULLETIN_PAIE') {
+    console.log("Navigation vers les bulletins de paie");
+    this.router.navigate(['/dashboard/bulletins']);
+  } else {
+    // Fallback - redirection vers le dashboard
+    console.log("Navigation fallback vers dashboard");
+    this.router.navigate(['/dashboard']);
+  }
 
     this.notificationService.closeDropdown();
   }

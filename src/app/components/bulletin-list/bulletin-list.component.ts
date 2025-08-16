@@ -19,22 +19,23 @@ export class BulletinListComponent implements OnInit {
   error: string | null = null;
   searchText: string = '';
 
-  //variable de pagination
+  // Pagination
   currentPage = 0;
   pageSize = 10;
   totalPages = 0;
-  statutFilter = 'ACTIFS'; // 'ACTIFS', 'ARCHIVÉS', 'ANNULÉS'
+  statutFilter = 'ACTIFS';
+
+  // Mapping options (label, value, backend status list)
   statutOptions = [
-  { label: 'Actifs', value: 'ACTIFS' },
-  { label: 'Archivés', value: 'ARCHIVÉS' },
-  { label: 'Annulés', value: 'ANNULÉS' }
- ];
+    { label: 'Actifs', value: 'ACTIFS', backend: ['GÉNÉRÉ', 'VALIDÉ', 'ENVOYÉ'] },
+    { label: 'Archivés', value: 'ARCHIVÉS', backend: ['ARCHIVÉ'] },
+    { label: 'Annulés', value: 'ANNULÉS', backend: ['ANNULÉ'] }
+  ];
 
   private readonly bulletinService = inject(BulletinService);
   private readonly authService = inject(AuthService);
   private readonly router = inject (Router);
   private readonly toastrService = inject(ToastrService);
-
 
   ngOnInit(): void {
     if (this.authService.hasRole('EMPLOYEUR')){
@@ -47,34 +48,33 @@ export class BulletinListComponent implements OnInit {
   }
 
   getStatutList(): string[] {
-  if (this.statutFilter === 'ARCHIVÉS') return ['ARCHIVÉ'];
-  if (this.statutFilter === 'ANNULÉS') return ['ANNULÉ'];
-    return ['GÉNÉRÉ', 'VALIDÉ', 'ENVOYÉ'];
+    const found = this.statutOptions.find(opt => opt.value === this.statutFilter);
+    return found ? found.backend : ['GÉNÉRÉ', 'VALIDÉ', 'ENVOYÉ'];
   }
 
   fetchEmployeurBulletins(): void {
-  this.isLoading = true;
-  this.error = '';
-  this.bulletinService.getBulletinsForEmployeurPaginated(
-    this.currentPage, this.pageSize, this.searchText, this.getStatutList()
-  ).subscribe({
-    next: (response) => {
-      this.bulletins = response.data.content;
-      this.totalPages = response.data.totalPages;
-      this.isLoading = false;
-    },
-    error: (err) => {
-      this.error = "Erreur lors du chargement des bulletins.";
-      this.isLoading = false;
-    }
-  });
-}
+    this.isLoading = true;
+    this.error = '';
+    this.bulletinService.getBulletinsForEmployeurPaginated(
+      this.currentPage, this.pageSize, this.searchText, this.getStatutList()
+    ).subscribe({
+      next: (response) => {
+        this.bulletins = response.data.content;
+        this.totalPages = response.data.totalPages;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.error = "Erreur lors du chargement des bulletins.";
+        this.isLoading = false;
+      }
+    });
+  }
 
-   searchBulletins() {
-  this.currentPage = 0;
-  this.fetchEmployeurBulletins();
-}
-  // Méthodes d'action existantes (viewBulletin, validerBulletin, etc.)
+  searchBulletins() {
+    this.currentPage = 0;
+    this.fetchEmployeurBulletins();
+  }
+
   viewBulletin(id: number): void {
     this.router.navigate(['/dashboard/bulletins', id]);
   }
@@ -84,15 +84,13 @@ export class BulletinListComponent implements OnInit {
       next: (response) => {
         const index = this.bulletins.findIndex(b => b.id === id);
         if (index !== -1) {
-          this.bulletins[index].statusBulletin = response.data.statusBulletin; // Met à jour le statut du DTO de réponse
+          this.bulletins[index].statusBulletin = response.data.statusBulletin;
         }
-        // Afficher une notification de succès
-       this.toastrService.success('Bulletin validé avec succès.');
-        // Recharger les bulletins pour s'assurer de l'état le plus récent (optionnel, selon le besoin)
-         this.fetchEmployeurBulletins();
+        this.toastrService.success('Bulletin validé avec succès.');
+        this.fetchEmployeurBulletins();
       },
       error: (err) => {
-       this.toastrService.error('Erreur lors de la validation du bulletin: ' + (err.error?.message || err.message));
+        this.toastrService.error('Erreur lors de la validation du bulletin: ' + (err.error?.message || err.message));
         console.error(err);
       }
     });
@@ -104,7 +102,7 @@ export class BulletinListComponent implements OnInit {
         const index = this.bulletins.findIndex(b => b.id === id);
         if (index !== -1) {
           this.bulletins[index].statusBulletin = response.data.statusBulletin;
-           this.fetchEmployeurBulletins();
+          this.fetchEmployeurBulletins();
         }
         this.toastrService.success('Bulletin envoyé avec succès.');
       },
@@ -121,7 +119,7 @@ export class BulletinListComponent implements OnInit {
         const index = this.bulletins.findIndex(b => b.id === id);
         if (index !== -1) {
           this.bulletins[index].statusBulletin= response.data.statusBulletin;
-            this.fetchEmployeurBulletins();
+          this.fetchEmployeurBulletins();
         }
         this.toastrService.success('Bulletin archivé avec succès.');
       },
@@ -139,11 +137,11 @@ export class BulletinListComponent implements OnInit {
         if (index !== -1) {
           this.bulletins[index].statusBulletin = response.data.statusBulletin;
         }
-       this.toastrService.success('Bulletin annulé avec succès.');
-         this.fetchEmployeurBulletins();
+        this.toastrService.success('Bulletin annulé avec succès.');
+        this.fetchEmployeurBulletins();
       },
       error: (err) => {
-       this.toastrService.error('Erreur lors de l\'annulation du bulletin: ' + (err.error?.message || err.message));
+        this.toastrService.error('Erreur lors de l\'annulation du bulletin: ' + (err.error?.message || err.message));
         console.error(err);
       }
     });
@@ -163,34 +161,27 @@ export class BulletinListComponent implements OnInit {
         this.toastrService.success('Téléchargement du PDF réussi.');
       },
       error: (err) => {
-       this.toastrService.error('Erreur lors du téléchargement du PDF: ' + (err.error?.message || err.message || 'Le fichier PDF n\'a pas pu être généré ou trouvé.'));
+        this.toastrService.error('Erreur lors du téléchargement du PDF: ' + (err.error?.message || err.message || 'Le fichier PDF n\'a pas pu être généré ou trouvé.'));
         console.error(err);
       }
     });
   }
 
-  // Fonctions pour gérer la visibilité des boutons selon le statut
   canValidate(bulletin: BulletinPaieEmployeurDto): boolean {
     return bulletin.statusBulletin === 'GÉNÉRÉ';
   }
-
   canSend(bulletin: BulletinPaieEmployeurDto): boolean {
     return bulletin.statusBulletin === 'VALIDÉ';
   }
-
   canArchive(bulletin: BulletinPaieEmployeurDto): boolean {
     return bulletin.statusBulletin === 'ENVOYÉ';
   }
-
   canCancel(bulletin: BulletinPaieEmployeurDto): boolean {
     return bulletin.statusBulletin=== 'GÉNÉRÉ' || bulletin.statusBulletin=== 'VALIDÉ';
   }
-
   canDownload(bulletin: BulletinPaieEmployeurDto): boolean {
     return bulletin.statusBulletin=== 'ENVOYÉ' || bulletin.statusBulletin === 'ARCHIVÉ';
   }
-
-  // Pour supprimer, généralement accessible seulement à l'ADMIN ou avec une logique spécifique
   deleteBulletin(id: number): void {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce bulletin ? Cette action est irréversible.')) {
       this.bulletinService.deleteBulletin(id).subscribe({
@@ -205,25 +196,20 @@ export class BulletinListComponent implements OnInit {
       });
     }
   }
-
- goToPage(page: number): void {
-  if (page >= 0 && page < this.totalPages) {
-    this.currentPage = page;
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.fetchEmployeurBulletins();
+    }
+  }
+  filterByStatut(statut: string) {
+    this.statutFilter = statut;
+    this.currentPage = 0;
     this.fetchEmployeurBulletins();
   }
-}
-
-filterByStatut(statut: string) {
-  this.statutFilter = statut;
-  this.currentPage = 0; // Revient à la première page
-  this.fetchEmployeurBulletins();
-}
-
-
   onPageSizeChange(size: number): void {
-  this.pageSize = size;
-  this.currentPage = 0;
-  this.fetchEmployeurBulletins();
-}
-
+    this.pageSize = size;
+    this.currentPage = 0;
+    this.fetchEmployeurBulletins();
+  }
 }

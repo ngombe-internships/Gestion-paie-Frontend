@@ -12,6 +12,7 @@ import {
   AbsenceJourneeDto,
   EffectifJournalierDto
 } from '../../models/calendrier-conge.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-conges-calendrier',
@@ -53,6 +54,7 @@ export class CongesCalendrierComponent implements OnInit, OnDestroy {
   public readonly authService = inject(AuthService);
   public readonly calendrierService = inject(CalendrierCongeService);
   public readonly jourFerieService = inject(JourFerieService);
+  private readonly router = inject(Router);
 
   // Constantes pour l'affichage
   readonly MOIS_NOMS = [
@@ -622,6 +624,10 @@ export class CongesCalendrierComponent implements OnInit, OnDestroy {
 
   console.log(`✅ Trouvé ${absencesJour.length} absence(s)`);
   return absencesJour;
+}
+
+goToJourFerier(): void {
+  this.router.navigate(['/dashboard/conges/jours-feries']);
 }
 
 }

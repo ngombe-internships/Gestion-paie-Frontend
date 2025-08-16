@@ -9,16 +9,15 @@
         </h1>
         <!-- <p class="page-subtitle">Planification et suivi des effectifs</p> -->
       </div>
-      <!-- <div class="header-actions">
-        <button class="btn btn-outline-primary btn-sm" (click)="refresh()" [disabled]="isLoading">
-          <i class="bi bi-arrow-clockwise"></i>
-          <span class="d-none d-md-inline">Actualiser</span>
+      <div class="header-actions">
+        <button class="btn btn-outline-primary btn-sm-2" (click)="goToJourFerier()" [disabled]="isLoading">
+                    <span class="d-none d-md-inline">Ajouter un Jour Férie</span>
         </button>
-        <button class="btn btn-success btn-sm" (click)="exporterCalendrier()" [disabled]="isLoading">
+        <!-- <button class="btn btn-success btn-sm" (click)="exporterCalendrier()" [disabled]="isLoading">
           <i class="bi bi-download"></i>
           <span class="d-none d-md-inline">Exporter</span>
-        </button>
-      </div> -->
+        </button> -->
+      </div>
     </div>
   </div>
 
@@ -35,6 +34,8 @@
         Aujourd'hui
       </button>
     </div>
+
+
 
     <button class="nav-btn next" (click)="changerMois('next')" [disabled]="isLoading">
       <i class="bi bi-chevron-right"></i>Suivant

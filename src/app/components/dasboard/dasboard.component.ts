@@ -129,6 +129,7 @@ export class DasboardComponent implements OnInit {
           { title: 'Mon Profil', route: '/dashboard/entrepriseDetail' },
           { title: 'Créer un Employé', route: '/dashboard/register/employer' },
           { title: 'Mes Employés', route: '/dashboard/employes' },
+          { title: 'Bulletins des Employés', route: '/dashboard/bulletins/employeur' },
           { title: 'Config Employés', route: '/dashboard/employe-paie-config' }
         ]
       },
@@ -140,7 +141,6 @@ export class DasboardComponent implements OnInit {
         items: [
           { title: 'Éléments de paie', route: '/dashboard/element' },
           { title: 'Template Bulletin', route: '/dashboard/template' },
-          { title: 'Bulletins Émis', route: '/dashboard/bulletins/employeur' },
           { title: 'Paramètres des taux', route: '/dashboard/parametres' }
         ]
       },
@@ -152,9 +152,10 @@ export class DasboardComponent implements OnInit {
         items: [
           { title: 'Demandes de congés', route: '/dashboard/conges/demandes' },
           { title: 'Calendrier', route: '/dashboard/conges/calendrier' },
-          { title: 'Types de congés', route: '/dashboard/conges/types' },
           { title: 'Soldes employés', route: '/dashboard/conges/soldes' },
-          { title: 'Jours fériés', route: '/dashboard/conges/jours-feries' }
+          { title: 'Jours fériés', route: '/dashboard/conges/jours-feries' },
+          { title: 'Types de congés', route: '/dashboard/conges/types' },
+
         ]
       }
     ];

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ToastComponent } from "./toast/toast.component";
+import { ToastComponent } from "./shared/components/toast/toast.component";
 import { DocumentViewerModalComponent } from "./shared/components/document-viewer-modal/document-viewer-modal.component";
 import { HeaderComponent } from "./components/header/header.component";
 import { FloatingNotificationsComponent } from "./conges/components/floating-notifications/floating-notifications.component";

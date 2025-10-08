@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
 import {
   CalendrierMoisDto,
   AbsenceJourneeDto,
   EffectifJournalierDto
-} from '../models/calendrier-conge.model';
+} from '../../features/leave/models/calendrier-conge.model';
 import { environment } from '../../../environment';
 import { ApiResponse } from '../../model/ApiResponse';
+import { AuthService } from '../../core/services/auth.service';
 
 
 @Injectable({

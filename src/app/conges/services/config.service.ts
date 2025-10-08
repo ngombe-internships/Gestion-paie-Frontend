@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../../model/ApiResponse';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environment';
-import { JourFerieUpdateDto } from '../models/jour-ferie.model';
+import { JourFerieUpdateDto } from '../../features/leave/models/jour-ferie.model';
 
 // =============================================
 // INTERFACES

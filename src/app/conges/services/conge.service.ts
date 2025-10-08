@@ -7,8 +7,8 @@ import {
   TypeConge,
   StatutDemandeConge,
   DocumentDto
-} from '../models/demande-conge.model';
-import { SoldeCongeDto, HistoriqueCongeDto } from '../models/solde-conge.model';
+} from '../../features/leave/models/demande-conge.model';
+import { SoldeCongeDto, HistoriqueCongeDto } from '../../features/leave/models/solde-conge.model';
 import { ApiResponse } from '../../model/ApiResponse';
 import { AuthService } from '../../services/auth.service';
 import { EmployeService } from '../../services/employe.service';

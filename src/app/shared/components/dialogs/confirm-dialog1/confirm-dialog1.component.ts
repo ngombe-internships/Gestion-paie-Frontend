@@ -21,6 +21,11 @@ constructor(
     this.data.buttonType = this.data.buttonType || 'primary'; // Type de bouton par défaut
   }
 
+  // baseDialog : ConfirmDialogData = {
+  //   title: "Confirmation",
+  //   message:
+  // }
+
   onCancel(): void {
     this.dialogRef.close(false);
   }

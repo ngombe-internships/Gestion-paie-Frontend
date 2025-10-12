@@ -4,15 +4,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastComponent } from "./shared/components/toast/toast.component";
 import { DocumentViewerModalComponent } from "./shared/components/document-viewer-modal/document-viewer-modal.component";
-import { HeaderComponent } from "./components/header/header.component";
-import { FloatingNotificationsComponent } from "./conges/components/floating-notifications/floating-notifications.component";
+import { HeaderComponent } from "./shared/components/layout/header/header.component";
+import { FloatingNotificationsComponent } from "./shared/components/notifications/floating-notifications/floating-notifications.component";
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, CommonModule, FormsModule, ToastComponent, DocumentViewerModalComponent, FloatingNotificationsComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
-  template:'<router-outlet></router-outlet>'
 })
 export class AppComponent {
   title = 'maalipo';

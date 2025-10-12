@@ -1,14 +1,14 @@
-import { ApiResponse } from './../model/ApiResponse';
+import { ApiResponse } from '../../shared/models/ApiResponse';
 // src/app/services/auth.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { LoginDto } from '../model/loginDto'; // Assuming you create these interfaces
-import { RegisterDto } from '../model/registerDto'; // Assuming you create these interfaces
-import { environment } from '../../environment';
-import { RegisterEmployeeDto } from '../model/registerEmployeeDto';
-import { NotificationService } from '../conges/services/notification.service';
+
+import { environment } from '../../../environments/environment';
+import { LoginDto } from '../../features/auth/models/loginDto';
+import { RegisterEmployeeDto } from '../../features/auth/models/registerEmployeeDto';
+import { NotificationService } from '../../features/leave/services/notification.service';
 
 // Interfaces pour les DTOs front-end (à créer si ce n'est pas déjà fait)
 export interface LoginResponse {

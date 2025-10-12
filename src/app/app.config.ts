@@ -4,9 +4,9 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
-import { authInterceptor} from './interceptors/auth.interceptor';
 import { provideAnimations } from '@angular/platform-browser/animations'; // <-- Importez ceci
 import { provideToastr } from 'ngx-toastr'; // <-- Importez ceci
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }),

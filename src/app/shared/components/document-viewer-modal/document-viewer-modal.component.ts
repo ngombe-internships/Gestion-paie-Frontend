@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
-import { DocumentViewerService, DocumentViewerData } from '../../services/document-viewer.service';
+import { DocumentViewerService, DocumentViewerData } from './services/document-viewer.service';
 
 @Component({
   selector: 'app-document-viewer-modal',

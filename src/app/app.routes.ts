@@ -1,59 +1,43 @@
 import { Component } from '@angular/core';
 import { Routes } from '@angular/router';
+import { LoginComponent } from './features/auth/components/login/login.component';
+import { noAuthGuard } from './core/guard/noAuth.guard';
+import { PasswordResetComponent } from './features/auth/components/password-reset/password-reset.component';
+import { PasswordForgotComponent } from './features/auth/components/password-forgot/password-forgot.component';
+import { DasboardComponent } from './features/dashboard/components/dasboard/dasboard.component';
+import { authGuard } from './core/guard/auth.guard';
+import { DasboardOveriewComponent } from './features/dashboard/components/dasboard-overiew/dasboard-overiew.component';
+import { EmployeurDasboardComponent } from './features/employees/components/employeur-dasboard/employeur-dasboard.component';
+import { RegisterEmployerComponent } from './features/auth/components/register-employeur/register-employer.component';
+import { RegisterComponent } from './features/auth/components/register/register.component';
+import { EmployeDetailsComponent } from './features/employees/components/employe-detail/employe-details.component';
+import { ChangePasswordComponent } from './features/auth/components/change-password/change-password.component';
+import { EmployeListComponent } from './features/employees/components/employe-list/employe-list.component';
+import { EmployeFormComponent } from './features/employees/components/employe-form/employe-form.component';
+import { BulletinFormComponent } from './features/payroll/components/bulletin-form/bulletin-form.component';
+import { BulletinListComponent } from './features/payroll/components/bulletin-list/bulletin-list.component';
+import { EmployeeBulletinListComponent } from './features/employees/components/employee-bulletin-list/employee-bulletin-list.component';
+import { BulletinDetailComponent } from './features/payroll/components/bulletin-detail/bulletin-detail.component';
+import { BulletinTemplateComponent } from './features/payroll/components/bulletin-template/bulletin-template.component';
+import { EntrepriseDetailsComponent } from './features/company/components/entreprise-details/entreprise-details.component';
+import { EntrepriseFormComponent } from './features/company/components/entreprise-form/entreprise-form.component';
+import { EntrepriseParametreRhListComponent } from './features/company/components/entreprise-parametre-rh-list/entreprise-parametre-rh-list.component';
+import { ElementPaieListComponent } from './features/payroll/components/element-paie-list/element-paie-list.component';
+import { EmployeConfigListComponent } from './features/employees/components/employe-config-list/employe-config-list.component';
+import { EmployeConfigComponent } from './features/employees/components/employe-config/employe-config.component';
+import { CongesDemandesComponent } from './features/leave/components/conges-demandes/conges-demandes.component';
+import { CongesCalendrierComponent } from './features/leave/components/conges-calendrier/conges-calendrier.component';
+import { TypesCongesComponent } from './features/leave/components/types-conges/types-conges.component';
+import { CongesSoldesComponent } from './features/leave/components/conges-soldes/conges-soldes.component';
+import { JoursFeriesComponent } from './features/leave/components/jours-feries/jours-feries.component';
+import { MesCongesComponent } from './features/leave/components/mes-conges/mes-conges.component';
+import { MonSoldeComponent } from './features/leave/components/mon-solde/mon-solde.component';
+import { NouvelleDemandeComponent } from './features/leave/components/nouvelle-demande/nouvelle-demande.component';
+import { NotificationsHistoriqueComponent } from './shared/components/notifications/notifications-historique/notifications-historique.component';
+import { EmployeurListComponent } from './features/employees/components/employeur-list/employeur-list.component';
+import { AuditLogsComponent } from './features/auditing/components/audit-logs/audit-logs.component';
 
-// Components imports - Authentication
-import { LoginComponent } from './components/login/login.component';
-import { RegisterComponent } from './components/register/register.component';
-import { RegisterEmployerComponent } from './components/register-employeur/register-employer.component';
-import { PasswordResetComponent } from './features/auth/password-reset/password-reset.component';
-import { PasswordForgotComponent } from './features/auth/password-forgot/password-forgot.component';
-import { ChangePasswordComponent } from './features/auth/change-password/change-password.component';
 
-// Components imports - Dashboard
-import { DasboardComponent } from './components/dasboard/dasboard.component';
-import { DasboardOveriewComponent } from './features/dashboard/dasboard-overiew/dasboard-overiew.component';
-import { EmployeurDasboardComponent } from './features/employees/employeur-dasboard/employeur-dasboard.component';
-
-// Components imports - Employés
-import { EmployeListComponent } from './features/employees/employe-list/employe-list.component';
-import { EmployeFormComponent } from './features/employees/employe-form/employe-form.component';
-import { EmployeDetailsComponent } from './features/employees/employe-detail/employe-detail.component';
-
-// Components imports - Bulletins
-import { BulletinFormComponent } from './components/bulletin-form/bulletin-form.component';
-import { BulletinListComponent } from './components/bulletin-list/bulletin-list.component';
-import { BulletinDetailComponent } from './components/bulletin-detail/bulletin-detail.component';
-import { EmployeeBulletinListComponent } from './features/employees/employee-bulletin-list/employee-bulletin-list.component';
-import { BulletinTemplateComponent } from './components/bulletin-template/bulletin-template.component';
-
-// Components imports - Entreprise
-import { EntrepriseDetailsComponent } from './components/entreprise-details/entreprise-details.component';
-import { EntrepriseFormComponent } from './features/company/entreprise-form/entreprise-form.component';
-import { EntrepriseParametreRhListComponent } from './features/company/entreprise-parametre-rh-list/entreprise-parametre-rh-list.component';
-
-// Components imports - Configuration & Paie
-import { ElementPaieListComponent } from './components/element-paie-list/element-paie-list.component';
-import { EmployeConfigListComponent } from './features/employees/employe-config-list/employe-config-list.component';
-import { EmployeConfigComponent } from './features/employees/employe-config/employe-config.component';
-
-// Components imports - Administration
-import { EmployeurListComponent } from './features/employees/employeur-list/employeur-list.component';
-import { AuditLogsComponent } from './features/auditing/audit-logs/audit-logs.component';
-
-// Guards
-import { authGuard } from './guard/auth.guard';
-import { adminGuard } from './guard/admin.guard';
-import { noAuthGuard } from './guard/noAuth.guard';
-import { CongesSoldesComponent } from './features/leave/conges-soldes/conges-soldes.component';
-import { CongesDemandesComponent } from './features/leave/conges-demandes/conges-demandes.component';
-import { CongesCalendrierComponent } from './features/leave/conges-calendrier/conges-calendrier.component';
-import { MesCongesComponent } from './features/leave/mes-conges/mes-conges.component';
-import { MonSoldeComponent } from './features/leave/mon-solde/mon-solde.component';
-import { NouvelleDemandeComponent } from './features/leave/nouvelle-demande/nouvelle-demande.component';
-import { JoursFeriesComponent } from './features/leave/jours-feries/jours-feries.component';
-import { TypeConge } from './features/leave/models/demande-conge.model';
-import { TypesCongesComponent } from './features/leave/types-conges/types-conges.component';
-import { NotificationsHistoriqueComponent } from './conges/components/notifications-historique/notifications-historique.component';
 
 export const routes: Routes = [
   // === ROUTES PUBLIQUES ===

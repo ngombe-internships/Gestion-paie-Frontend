@@ -103,15 +103,15 @@ getMesDemandesConges(params: {
     searchTerm?: string
 }): Observable<any> {
     console.log('🔍 CongeService:  getMesDemandesConges appelé avec:', params);
-    
+
     return this.employeService.getMyEmployeProfile().pipe(
         switchMap(employe => {
             console.log('👤 Profil employé récupéré:', employe);
-            
+
             if (!employe || !employe.id) {
                 console.error('❌ Profil employé non disponible');
                 return of({
-                    content:  [],
+                    content: [],
                     totalElements: 0,
                     totalPages: 0,
                     pageNumber:  0
@@ -120,24 +120,29 @@ getMesDemandesConges(params: {
 
             let httpParams = new HttpParams()
                 .set('page', params.page?. toString() || '0')
-                .set('size', params. size?.toString() || '10');
+                .set('size', params.size?. toString() || '10');
 
+            // ✅ CORRIGÉ : N'ajouter le statut que s'il est défini et différent de 'TOUS'
             if (params.statut && params.statut !== 'TOUS') {
                 httpParams = httpParams.set('statut', params.statut);
             }
-            if (params. year) {
+
+            // ✅ CORRIGÉ : N'ajouter l'année que si elle est définie ET > 0
+            if (params.year && params.year > 0) {
                 httpParams = httpParams.set('year', params.year.toString());
             }
-            if (params. searchTerm) {
-                httpParams = httpParams.set('searchTerm', params.searchTerm);
+
+            // ✅ N'ajouter searchTerm que s'il est défini et non vide
+            if (params.searchTerm && params.searchTerm.trim() !== '') {
+                httpParams = httpParams.set('searchTerm', params.searchTerm. trim());
             }
 
-            const url = `${this.apiUrl}/employe/${employe.id}`;
-            console.log('🌐 Appel API:', url, 'avec params:', httpParams.toString());
+            const url = `${this.apiUrl}/employe/${employe. id}`;
+            console.log('🌐 Appel API:', url, 'avec params:', httpParams. toString());
 
             return this.http.get<any>(url, { params: httpParams }).pipe(
-                tap(response => console.log('📥 Réponse API:', response)),
-                catchError(error => {
+                tap((response: any) => console.log('📥 Réponse API:', response)),
+                catchError((error: any) => {
                     console.error('❌ Erreur API:', error);
                     return of({
                         content:  [],
@@ -148,7 +153,7 @@ getMesDemandesConges(params: {
                 })
             );
         }),
-        catchError(error => {
+        catchError((error: any) => {
             console.error('❌ Erreur getMyEmployeProfile:', error);
             return of({
                 content: [],

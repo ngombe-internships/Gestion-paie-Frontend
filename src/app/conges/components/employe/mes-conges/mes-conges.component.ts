@@ -73,91 +73,103 @@ export class MesCongesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * ✅ Charger les statistiques globales (toutes les demandes de l'année)
-   */
-  loadStatistiquesGlobales(): void {
-    this.congeService.getMesDemandesConges({
-      page: 0,
-      size: 1000, // Récupérer toutes les demandes pour les stats
-      statut:  'TOUS',
-      year: this. filtreAnnee > 0 ? this.filtreAnnee : undefined
-    }).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (response) => {
-        const allDemandes = this.extractContent(response);
-        this.calculerStatistiques(allDemandes);
-      },
-      error: (err:  any) => {
-        console.error('Erreur chargement stats:', err);
-      }
-    });
-  }
+ * ✅ Charger les statistiques globales
+ */
+loadStatistiquesGlobales(): void {
+    const params:  any = {
+        page: 0,
+        size: 1000,
+        statut: 'TOUS'
+    };
 
-  /**
-   * ✅ Charger les demandes avec filtres
-   */
-  loadMesDemandesConges(resetPage:  boolean = false): void {
+    // ✅ N'ajouter year que si > 0
+    if (this. filtreAnnee > 0) {
+        params.year = this.filtreAnnee;
+    }
+
+    this.congeService.getMesDemandesConges(params)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+            next: (response) => {
+                const allDemandes = this.extractContent(response);
+                this.calculerStatistiques(allDemandes);
+            },
+            error: (err:  any) => {
+                console.error('Erreur chargement stats:', err);
+            }
+        });
+}
+
+/**
+ * ✅ Charger les demandes avec filtres
+ */
+loadMesDemandesConges(resetPage: boolean = false): void {
     if (resetPage) {
-      this.currentPage = 0;
+        this.currentPage = 0;
     }
 
     this.isLoading = true;
     this.error = null;
 
-    console.log('🔄 Chargement des demandes de congés...');
+    console.log('🔄 Chargement des demandes de congés.. .');
 
-    const params:  any = {
-      page: this.currentPage,
-      size: this.itemsPerPage,
-      searchTerm: this. searchText
+    const params: any = {
+        page: this.currentPage,
+        size: this. itemsPerPage
     };
 
-    // Ajouter le statut seulement si ce n'est pas "TOUS"
+    // ✅ Ajouter le statut seulement si ce n'est pas "TOUS"
     if (this.filtreStatut && this.filtreStatut !== 'TOUS') {
-      params.statut = this.filtreStatut;
+        params.statut = this.filtreStatut;
     }
 
-    // Ajouter l'année seulement si > 0
-    if (this.filtreAnnee && this.filtreAnnee > 0) {
-      params.year = this. filtreAnnee;
+    // ✅ Ajouter l'année seulement si > 0
+    if (this.filtreAnnee > 0) {
+        params.year = this.filtreAnnee;
+    }
+
+    // ✅ Ajouter searchTerm seulement si non vide
+    if (this. searchText && this.searchText.trim() !== '') {
+        params. searchTerm = this.searchText. trim();
     }
 
     console.log('📤 Paramètres envoyés:', params);
 
     this.congeService.getMesDemandesConges(params).pipe(
-      takeUntil(this.destroy$)
+        takeUntil(this.destroy$)
     ).subscribe({
-      next: (response) => {
-        console.log('✅ Réponse brute reçue:', response);
+        next: (response) => {
+            console.log('✅ Réponse brute reçue:', response);
 
-        const content = this.extractContent(response);
-        console.log('📋 Demandes extraites:', content.length, content);
+            const content = this.extractContent(response);
+            console.log('📋 Demandes extraites:', content.length, content);
 
-        this.demandes = content;
-        this. demandesFiltrees = [... content]; // ✅ Copie directe, pas de re-filtrage ! 
-        
-        this.totalItems = response?. totalElements || response?.data?.totalElements || content.length;
-        this.totalPages = response?.totalPages || response?.data?.totalPages || 1;
-        this.currentPage = response?.pageNumber || response?.data?.number || 0;
+            this. demandes = content;
+            this.demandesFiltrees = [... content];
 
-        // Trier par date de demande (plus récent en premier)
-        this.demandesFiltrees.sort((a, b) =>
-          new Date(b.dateDemande).getTime() - new Date(a.dateDemande).getTime()
-        );
+            this.totalItems = response?. totalElements || response?.data?.totalElements || content.length;
+            this.totalPages = response?.totalPages || response?.data?.totalPages || 1;
+            this.currentPage = response?.pageNumber || response?.data?.number || 0;
 
-        this.isLoading = false;
-      },
-      error: (error:  any) => {
-        console.error('❌ Erreur chargement demandes:', error);
-        this.demandes = [];
-        this.demandesFiltrees = [];
-        this.totalItems = 0;
-        this.totalPages = 0;
-        this.error = 'Impossible de charger vos demandes de congé. ';
-        this. toastrService.error(this.error, 'Erreur');
-        this.isLoading = false;
-      }
+            // Trier par date de demande (plus récent en premier)
+            this.demandesFiltrees.sort((a, b) =>
+                new Date(b.dateDemande).getTime() - new Date(a.dateDemande).getTime()
+            );
+
+            this.isLoading = false;
+        },
+        error: (error:  any) => {
+            console.error('❌ Erreur chargement demandes:', error);
+            this.demandes = [];
+            this.demandesFiltrees = [];
+            this.totalItems = 0;
+            this.totalPages = 0;
+            this.error = 'Impossible de charger vos demandes de congé. ';
+            this. toastrService.error(this.error, 'Erreur');
+            this.isLoading = false;
+        }
     });
-  }
+}
 
   /**
    * ✅ Extraire le contenu de la réponse API

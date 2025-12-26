@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface NotificationDto {
-  id: number;
+  id:  number;
   titre: string;
   message: string;
   type: string;
@@ -30,7 +30,7 @@ export interface CongeAlertDto {
   jourActuel?: number;
   joursRestants?: number;
   icon:  string;
-  colorClass:  string;
+  colorClass: string;
 }
 
 export interface PageResponse<T> {
@@ -38,8 +38,11 @@ export interface PageResponse<T> {
   totalElements: number;
   totalPages: number;
   size: number;
-  number:  number;
+  number: number;
 }
+
+// ✅ Clé localStorage pour les alertes fermées
+const DISMISSED_ALERTS_KEY = 'maalipo_dismissed_conge_alerts';
 
 @Injectable({
   providedIn: 'root'
@@ -54,7 +57,7 @@ export class NotificationService implements OnDestroy {
   private congeAlertsSubject = new BehaviorSubject<CongeAlertDto[]>([]);
   private showDropdownSubject = new BehaviorSubject<boolean>(false);
   
-  private pollingSubscription: Subscription | null = null;
+  private pollingSubscription:  Subscription | null = null;
   private isInitialized = false;
   private cachedEmployeId: number | null = null;
 
@@ -66,13 +69,13 @@ export class NotificationService implements OnDestroy {
   constructor(private http: HttpClient) {}
 
   initForUser(): void {
-    if (this.isInitialized || ! this.canReceiveNotifications()) {
+    if (this.isInitialized || !this.canReceiveNotifications()) {
       return;
     }
 
-    this. isInitialized = true;
+    this.isInitialized = true;
     
-    // ✅ Nettoyer les anciennes alertes fermées au démarrage
+    // Nettoyer les anciennes alertes fermées au démarrage
     this.cleanupOldDismissedAlerts();
     
     // Polling toutes les 30 secondes
@@ -90,12 +93,12 @@ export class NotificationService implements OnDestroy {
   }
 
   private refreshCount(): void {
-    this.http.get<any>(`${this.apiUrl}/count-non-lues`)
+    this.http. get<any>(`${this.apiUrl}/count-non-lues`)
       .pipe(retry(1))
       .subscribe({
         next: (response:  any) => {
           const count = typeof response === 'number' ? response : (response. data ??  0);
-          this.countSubject. next(count);
+          this.countSubject.next(count);
         },
         error: () => {}
       });
@@ -106,7 +109,7 @@ export class NotificationService implements OnDestroy {
       .pipe(retry(1))
       .subscribe({
         next: (response: any) => {
-          const list = response.data?. content ?? response.data ??  response. content ??  [];
+          const list = response.data?. content ??  response.data ??  response.content ??  [];
           this. notificationsSubject.next(list);
         },
         error: () => {}
@@ -117,12 +120,12 @@ export class NotificationService implements OnDestroy {
     const role = localStorage.getItem('user_role') || '';
     
     if (role !== 'EMPLOYE') {
-      this. congeAlertsSubject.next([]);
+      this.congeAlertsSubject.next([]);
       return;
     }
 
     if (this.cachedEmployeId) {
-      this.fetchCongesForEmploye(this.cachedEmployeId);
+      this. fetchCongesForEmploye(this.cachedEmployeId);
       return;
     }
 
@@ -137,7 +140,7 @@ export class NotificationService implements OnDestroy {
       map((response: any) => response.data || response),
       catchError(() => of(null))
     ).subscribe({
-      next: (employe: any) => {
+      next:  (employe: any) => {
         if (employe?. id) {
           this.cachedEmployeId = employe.id;
           localStorage.setItem('employe_id', employe.id.toString());
@@ -151,7 +154,7 @@ export class NotificationService implements OnDestroy {
 
   private fetchCongesForEmploye(employeId: number): void {
     this.http.get<any>(`${this.congeApiUrl}/employe/${employeId}`, {
-      params:  { statut: 'APPROUVEE', size: '50' }
+      params: { statut: 'APPROUVEE', size: '50' }
     }).pipe(
       catchError(() => of({ content: [] }))
     ).subscribe({
@@ -163,12 +166,13 @@ export class NotificationService implements OnDestroy {
     });
   }
 
-  private generateCongeAlerts(demandes:  any[]): CongeAlertDto[] {
-    const alerts:  CongeAlertDto[] = [];
+  private generateCongeAlerts(demandes: any[]): CongeAlertDto[] {
+    const alerts: CongeAlertDto[] = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const dismissedAlerts = this.getDismissedAlerts();
+    // ✅ Récupérer les alertes fermées
+    const dismissedAlerts = this.getDismissedAlertIds();
 
     demandes.forEach((demande: any) => {
       if (! demande.dateDebut || !demande.dateFin) return;
@@ -178,84 +182,53 @@ export class NotificationService implements OnDestroy {
       dateDebut.setHours(0, 0, 0, 0);
       dateFin.setHours(0, 0, 0, 0);
 
-      const diffDebut = Math.ceil((dateDebut. getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      const diffFin = Math. ceil((dateFin.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const diffDebut = Math.ceil((dateDebut.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const diffFin = Math.ceil((dateFin.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
       let alert: CongeAlertDto | null = null;
 
       if (diffDebut === 1) {
-        alert = {
-          id: `CONGE_COMMENCE_DEMAIN-${demande.id}`,
-          type: 'CONGE_COMMENCE_DEMAIN',
-          titre: '🔔 Votre congé commence demain ! ',
-          message:  'Préparez-vous, votre congé débute demain.',
-          dateDebut:  demande.dateDebut,
-          dateFin: demande.dateFin,
-          typeConge: demande.typeConge,
-          demandeId: demande.id,
-          icon: 'bi-bell-fill',
-          colorClass: 'alert-warning'
-        };
+        alert = this.createAlert('CONGE_COMMENCE_DEMAIN', demande, 
+          '🔔 Votre congé commence demain ! ',
+          'Préparez-vous, votre congé débute demain.',
+          'bi-bell-fill', 'alert-warning');
       } else if (diffDebut === 0 && diffFin > 0) {
-        alert = {
-          id: `CONGE_COMMENCE_AUJOURD_HUI-${demande.id}`,
-          type: 'CONGE_COMMENCE_AUJOURD_HUI',
-          titre: '🚀 Votre congé commence aujourd\'hui !',
-          message: 'C\'est le début de votre congé.  Bon repos !',
-          dateDebut: demande.dateDebut,
-          dateFin: demande.dateFin,
-          typeConge: demande.typeConge,
-          demandeId: demande.id,
-          icon: 'bi-rocket-takeoff-fill',
-          colorClass: 'alert-info'
-        };
+        alert = this. createAlert('CONGE_COMMENCE_AUJOURD_HUI', demande,
+          '🚀 Votre congé commence aujourd\'hui !',
+          'C\'est le début de votre congé.  Bon repos !',
+          'bi-rocket-takeoff-fill', 'alert-info');
       } else if (diffDebut < 0 && diffFin > 0) {
-        const dureeTotal = Math. ceil((dateFin. getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const dureeTotal = Math.ceil((dateFin. getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         const jourActuel = Math.abs(diffDebut) + 1;
         alert = {
           id: `CONGE_EN_COURS-${demande.id}`,
           type: 'CONGE_EN_COURS',
-          titre:  '🏖️ Vous êtes en congé',
+          titre: '🏖️ Vous êtes en congé',
           message: `Jour ${jourActuel} sur ${dureeTotal}.  Il vous reste ${diffFin} jour(s).`,
-          dateDebut: demande. dateDebut,
-          dateFin:  demande.dateFin,
-          typeConge: demande.typeConge,
-          demandeId: demande. id,
-          jourActuel,
-          dureeTotal,
-          joursRestants: diffFin,
-          icon: 'bi-umbrella-fill',
-          colorClass: 'alert-success'
-        };
-      } else if (diffFin === 0 && diffDebut <= 0) {
-        alert = {
-          id: `CONGE_SE_TERMINE_AUJOURD_HUI-${demande. id}`,
-          type: 'CONGE_SE_TERMINE_AUJOURD_HUI',
-          titre: '🎉 Dernier jour de congé ! ',
-          message:  'Votre congé se termine aujourd\'hui.  Bon retour demain !',
           dateDebut: demande.dateDebut,
           dateFin: demande. dateFin,
           typeConge:  demande.typeConge,
           demandeId: demande.id,
-          icon: 'bi-calendar-check-fill',
-          colorClass: 'alert-primary'
-        };
-      } else if (diffFin === -1) {
-        alert = {
-          id: `CONGE_RETOUR-${demande. id}`,
-          type: 'CONGE_RETOUR',
-          titre: '👋 Bon retour parmi nous !',
-          message: 'Votre congé s\'est terminé hier. Bienvenue ! ',
-          dateDebut: demande. dateDebut,
-          dateFin:  demande.dateFin,
-          typeConge: demande.typeConge,
-          demandeId: demande. id,
-          icon: 'bi-emoji-smile-fill',
+          jourActuel,
+          dureeTotal,
+          joursRestants:  diffFin,
+          icon: 'bi-umbrella-fill',
           colorClass: 'alert-success'
         };
+      } else if (diffFin === 0 && diffDebut <= 0) {
+        alert = this. createAlert('CONGE_SE_TERMINE_AUJOURD_HUI', demande,
+          '🎉 Dernier jour de congé ! ',
+          'Votre congé se termine aujourd\'hui.  Bon retour demain ! ',
+          'bi-calendar-check-fill', 'alert-primary');
+      } else if (diffFin === -1) {
+        alert = this.createAlert('CONGE_RETOUR', demande,
+          '👋 Bon retour parmi nous !',
+          'Votre congé s\'est terminé hier. Bienvenue ! ',
+          'bi-emoji-smile-fill', 'alert-success');
       }
 
-      if (alert && ! dismissedAlerts. includes(alert.id)) {
+      // ✅ Vérifier si l'alerte n'a pas été fermée
+      if (alert && !dismissedAlerts.includes(alert. id)) {
         alerts.push(alert);
       }
     });
@@ -263,56 +236,85 @@ export class NotificationService implements OnDestroy {
     return alerts;
   }
 
+  private createAlert(
+    type: CongeAlertDto['type'], 
+    demande: any, 
+    titre: string, 
+    message: string, 
+    icon:  string, 
+    colorClass: string
+  ): CongeAlertDto {
+    return {
+      id: `${type}-${demande.id}`,
+      type,
+      titre,
+      message,
+      dateDebut: demande. dateDebut,
+      dateFin:  demande.dateFin,
+      typeConge: demande.typeConge,
+      demandeId: demande. id,
+      icon,
+      colorClass
+    };
+  }
+
   /**
    * ✅ Fermer une alerte de congé
    */
   dismissCongeAlert(alertId: string): void {
-    const dismissed = this.getDismissedAlerts();
-    if (! dismissed.includes(alertId)) {
-      // ✅ Sauvegarder avec la date pour nettoyage futur
-      const dismissedWithDate = this.getDismissedAlertsWithDate();
-      dismissedWithDate[alertId] = new Date().toISOString();
-      localStorage.setItem('dismissedCongeAlerts', JSON. stringify(dismissedWithDate));
-    }
+    // Récupérer les alertes actuellement fermées
+    const dismissed = this.getDismissedAlertsData();
     
+    // Ajouter la nouvelle alerte fermée avec la date
+    dismissed[alertId] = new Date().toISOString();
+    
+    // Sauvegarder dans localStorage
+    this.saveDismissedAlerts(dismissed);
+    
+    // Mettre à jour l'affichage
     const currentAlerts = this. congeAlertsSubject.value;
-    this.congeAlertsSubject.next(currentAlerts. filter(a => a.id !== alertId));
+    this. congeAlertsSubject.next(currentAlerts.filter(a => a. id !== alertId));
   }
 
   /**
-   * ✅ Récupérer les alertes fermées (liste simple)
+   * ✅ Sauvegarder les alertes fermées
    */
-  private getDismissedAlerts(): string[] {
-    const stored = localStorage.getItem('dismissedCongeAlerts');
-    if (!stored) return [];
+  private saveDismissedAlerts(data: Record<string, string>): void {
     try {
-      const parsed = JSON.parse(stored);
-      // Support ancien format (array) et nouveau format (object)
-      if (Array.isArray(parsed)) {
-        return parsed;
-      }
-      return Object.keys(parsed);
-    } catch {
-      return [];
+      localStorage. setItem(DISMISSED_ALERTS_KEY, JSON.stringify(data));
+    } catch (e) {
+      // Silencieux en cas d'erreur
     }
   }
 
   /**
-   * ✅ Récupérer les alertes fermées avec date
+   * ✅ Récupérer les IDs des alertes fermées
    */
-  private getDismissedAlertsWithDate(): Record<string, string> {
-    const stored = localStorage.getItem('dismissedCongeAlerts');
-    if (!stored) return {};
+  private getDismissedAlertIds(): string[] {
+    const data = this.getDismissedAlertsData();
+    return Object. keys(data);
+  }
+
+  /**
+   * ✅ Récupérer les données complètes des alertes fermées
+   */
+  private getDismissedAlertsData(): Record<string, string> {
     try {
+      const stored = localStorage.getItem(DISMISSED_ALERTS_KEY);
+      if (!stored) return {};
+      
       const parsed = JSON.parse(stored);
-      // Convertir ancien format si nécessaire
+      
+      // Si c'est un tableau (ancien format), convertir en objet
       if (Array.isArray(parsed)) {
         const converted: Record<string, string> = {};
-        parsed.forEach(id => {
+        parsed.forEach((id:  string) => {
           converted[id] = new Date().toISOString();
         });
+        this.saveDismissedAlerts(converted);
         return converted;
       }
+      
       return parsed;
     } catch {
       return {};
@@ -323,31 +325,30 @@ export class NotificationService implements OnDestroy {
    * ✅ Nettoyer les anciennes alertes fermées (plus de 30 jours)
    */
   private cleanupOldDismissedAlerts(): void {
-    const dismissed = this.getDismissedAlertsWithDate();
-    const now = new Date();
-    const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 jours en millisecondes
+    const dismissed = this.getDismissedAlertsData();
+    const now = new Date().getTime();
+    const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 jours
     
     const cleaned: Record<string, string> = {};
     
     Object.entries(dismissed).forEach(([alertId, dateStr]) => {
-      const dismissedDate = new Date(dateStr);
-      const age = now.getTime() - dismissedDate.getTime();
+      const dismissedDate = new Date(dateStr).getTime();
+      const age = now - dismissedDate;
       
-      // Garder seulement les alertes fermées depuis moins de 30 jours
       if (age < maxAge) {
         cleaned[alertId] = dateStr;
       }
     });
     
-    localStorage.setItem('dismissedCongeAlerts', JSON.stringify(cleaned));
+    this.saveDismissedAlerts(cleaned);
   }
 
   loadAllNotifications(page: number = 0, size: number = 20): Observable<PageResponse<NotificationDto>> {
-    return this.http.get<any>(`${this.apiUrl}? page=${page}&size=${size}`).pipe(
+    return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${size}`).pipe(
       map((response: any) => {
         const data = response. data || response;
         return {
-          content:  data.content ?? [],
+          content:  data.content ??  [],
           totalElements:  data.totalElements ??  0,
           totalPages: data. totalPages ?? 0,
           size:  data.size ?? size,
@@ -357,15 +358,15 @@ export class NotificationService implements OnDestroy {
     );
   }
 
-  marquerCommeLu(id:  number): Observable<any> {
-    const currentNotifs = this.notificationsSubject. value;
-    const updatedNotifs = currentNotifs.map(n => n. id === id ?  { ...n, lu: true } : n);
-    this.notificationsSubject. next(updatedNotifs);
-    this.countSubject. next(Math.max(0, this. countSubject.value - 1));
+  marquerCommeLu(id: number): Observable<any> {
+    const currentNotifs = this.notificationsSubject.value;
+    const updatedNotifs = currentNotifs.map(n => n.id === id ?  { ...n, lu: true } : n);
+    this.notificationsSubject.next(updatedNotifs);
+    this.countSubject.next(Math.max(0, this.countSubject. value - 1));
 
     return this.http.put(`${this.apiUrl}/${id}/marquer-lu`, {}).pipe(
       catchError(() => {
-        this.notificationsSubject.next(currentNotifs);
+        this.notificationsSubject. next(currentNotifs);
         this.countSubject. next(this.countSubject. value + 1);
         return of(null);
       })
@@ -374,7 +375,7 @@ export class NotificationService implements OnDestroy {
 
   marquerToutesCommeLues(): Observable<any> {
     const currentNotifs = this. notificationsSubject.value;
-    this.notificationsSubject.next(currentNotifs.map(n => ({ ... n, lu: true })));
+    this.notificationsSubject.next(currentNotifs.map(n => ({ ...n, lu: true })));
     this.countSubject. next(0);
 
     return this.http.put(`${this.apiUrl}/marquer-toutes-lues`, {}).pipe(
@@ -386,15 +387,15 @@ export class NotificationService implements OnDestroy {
   }
 
   toggleDropdown(): void {
-    this.showDropdownSubject.next(! this.showDropdownSubject.value);
+    this. showDropdownSubject.next(!this. showDropdownSubject.value);
   }
 
   closeDropdown(): void {
-    this. showDropdownSubject.next(false);
+    this.showDropdownSubject. next(false);
   }
 
   /**
-   * ✅ Clear - Ne supprime PAS les alertes fermées
+   * ✅ Clear - NE supprime PAS les alertes fermées du localStorage
    */
   clear(): void {
     this.isInitialized = false;
@@ -403,18 +404,18 @@ export class NotificationService implements OnDestroy {
       this.pollingSubscription.unsubscribe();
       this.pollingSubscription = null;
     }
-    this.countSubject. next(0);
+    this.countSubject.next(0);
     this.notificationsSubject.next([]);
     this.congeAlertsSubject.next([]);
-    // ✅ On ne supprime PAS dismissedCongeAlerts du localStorage
+    // ✅ On NE supprime PAS DISMISSED_ALERTS_KEY du localStorage ! 
   }
 
   private canReceiveNotifications(): boolean {
-    const role = localStorage. getItem('user_role') || '';
+    const role = localStorage.getItem('user_role') || '';
     return role === 'EMPLOYE' || role === 'EMPLOYEUR';
   }
 
   ngOnDestroy(): void {
-    this. clear();
+    this.clear();
   }
 }

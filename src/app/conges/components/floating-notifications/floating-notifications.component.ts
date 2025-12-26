@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { CongeAlertDto, NotificationDto, NotificationService } from '../../services/notification.service';
+import { NotificationDto, CongeAlertDto, NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-floating-notifications',
@@ -15,7 +15,7 @@ import { CongeAlertDto, NotificationDto, NotificationService } from '../../servi
 export class FloatingNotificationsComponent implements OnInit, OnDestroy {
   count = 0;
   notifications: NotificationDto[] = [];
-  congeAlerts: CongeAlertDto[] = []; // ✅ NOUVEAU
+  congeAlerts: CongeAlertDto[] = [];
   showDropdown = false;
   loading = false;
   isVisible = false;
@@ -26,24 +26,19 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
   constructor(
     public notificationService: NotificationService,
     private authService: AuthService,
-    private router:  Router
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    // S'abonner aux changements d'authentification
     this.subscriptions.add(
       this.authService.isAuthenticated$.subscribe(isAuth => {
         console.log('FloatingNotifications: Authentification:', isAuth);
 
-        if (! isAuth) {
-          this.notificationService.clear();
-          this.count = 0;
-          this.notifications = [];
-          this. congeAlerts = []; // ✅ NOUVEAU
-          this.showDropdown = false;
-          this.isVisible = false;
-          this.isSubscribedToNotifications = false;
+        if (!isAuth) {
+          this.resetState();
         } else {
-          this. checkVisibility();
+          this.checkVisibility();
           if (this.isVisible && !this.isSubscribedToNotifications) {
             this.subscribeToNotifications();
           }
@@ -53,9 +48,25 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this. subscriptions.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 
+  /**
+   * Réinitialise l'état du composant
+   */
+  private resetState(): void {
+    this.notificationService.clear();
+    this.count = 0;
+    this.notifications = [];
+    this.congeAlerts = [];
+    this.showDropdown = false;
+    this.isVisible = false;
+    this.isSubscribedToNotifications = false;
+  }
+
+  /**
+   * Vérifie si le composant doit être visible selon le rôle
+   */
   private checkVisibility(): void {
     const role = this.authService.getUserRole();
     const isAuthenticated = this.authService.isLoggedIn();
@@ -63,6 +74,9 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
     console.log('FloatingNotifications: isVisible =', this.isVisible, ', role =', role);
   }
 
+  /**
+   * S'abonne aux observables du service de notifications
+   */
   private subscribeToNotifications(): void {
     if (this.isSubscribedToNotifications) {
       console.log('FloatingNotifications: Déjà abonné, skip');
@@ -73,71 +87,82 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
     console.log('FloatingNotifications: Abonnement aux notifications');
 
     // Abonnement au compteur
-    this. subscriptions.add(
-      this.notificationService.count$. subscribe(count => {
+    this.subscriptions.add(
+      this.notificationService.count$.subscribe(count => {
         console.log('FloatingNotifications: Count reçu:', count);
         this.count = count;
       })
     );
 
     // Abonnement à la liste des notifications
-    this.subscriptions. add(
-      this.notificationService. notifications$.subscribe(notifications => {
+    this.subscriptions.add(
+      this.notificationService.notifications$.subscribe(notifications => {
         console.log('FloatingNotifications: Notifications reçues:', notifications.length);
         this.notifications = notifications;
       })
     );
 
-    // ✅ NOUVEAU : Abonnement aux alertes de congés
+    // Abonnement aux alertes de congés
     this.subscriptions.add(
-      this. notificationService.congeAlerts$.subscribe(alerts => {
+      this.notificationService.congeAlerts$.subscribe(alerts => {
         console.log('FloatingNotifications: Alertes congés reçues:', alerts.length);
         this.congeAlerts = alerts;
       })
     );
 
     // Abonnement à l'état du dropdown
-    this. subscriptions.add(
+    this.subscriptions.add(
       this.notificationService.showDropdown$.subscribe(show => {
         this.showDropdown = show;
       })
     );
 
-    console.log('FloatingNotifications: Initialisation du service.. .');
+    // Initialiser le service (le polling démarre ici)
+    console.log('FloatingNotifications: Initialisation du service...');
     this.notificationService.initForUser();
   }
 
-  // ✅ NOUVEAU : Compteur total (notifications + alertes)
+  /**
+   * Compteur total (notifications + alertes)
+   */
   get totalCount(): number {
-    return this. count + this.congeAlerts.length;
+    return this.count + this.congeAlerts.length;
   }
 
+  /**
+   * Toggle du dropdown
+   */
   toggleDropdown(): void {
     this.notificationService.toggleDropdown();
   }
 
-  onNotificationClick(notification:  NotificationDto): void {
-    if (! notification.lu) {
-      this.notificationService. marquerCommeLu(notification.id).subscribe();
+  /**
+   * Gestion du clic sur une notification
+   */
+  onNotificationClick(notification: NotificationDto): void {
+    // Marquer comme lue si nécessaire
+    if (!notification.lu) {
+      this.notificationService.marquerCommeLu(notification.id).subscribe();
     }
 
-    if (notification.type. includes('DEMANDE_CONGE') ||
+    // Redirection selon le type et le rôle
+    if (notification.type.includes('DEMANDE_CONGE') ||
         notification.type.includes('CONGE_') ||
-        notification. referenceType === 'DEMANDE_CONGE') {
+        notification.referenceType === 'DEMANDE_CONGE') {
       
       const role = this.authService.getUserRole();
-      if (role === 'EMPLOYE') {
-        this.router.navigate(['/dashboard/conges/mes-demandes']);
-      } else {
-        this.router.navigate(['/dashboard/conges/demandes']);
-      }
-      this.notificationService. closeDropdown();
+      const route = role === 'EMPLOYE' 
+        ? '/dashboard/conges/mes-demandes'
+        : '/dashboard/conges/demandes';
+      
+      this.router.navigate([route]);
+      this.notificationService.closeDropdown();
       return;
     }
 
     if (notification.lienAction) {
-      this.router. navigate([notification.lienAction]);
-    } else if (notification.type. includes('BULLETIN_PAIE') ||
+      this.router.navigate([notification.lienAction]);
+    } else if (notification.type.includes('BULLETIN_PAIE') ||
                notification.referenceType === 'BULLETIN_PAIE') {
       this.router.navigate(['/dashboard/bulletins']);
     } else {
@@ -147,18 +172,25 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
     this.notificationService.closeDropdown();
   }
 
-  // ✅ NOUVEAU : Clic sur une alerte de congé
-  onCongeAlertClick(alert:  CongeAlertDto): void {
+  /**
+   * Gestion du clic sur une alerte de congé
+   */
+  onCongeAlertClick(alert: CongeAlertDto): void {
     this.router.navigate(['/dashboard/conges/mes-demandes']);
     this.notificationService.closeDropdown();
   }
 
-  // ✅ NOUVEAU : Fermer une alerte de congé
+  /**
+   * Fermer une alerte de congé
+   */
   dismissCongeAlert(event: Event, alert: CongeAlertDto): void {
     event.stopPropagation();
     this.notificationService.dismissCongeAlert(alert.id);
   }
 
+  /**
+   * Marque toutes les notifications comme lues
+   */
   marquerToutesLues(): void {
     if (this.count > 0) {
       this.loading = true;
@@ -169,35 +201,38 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Ferme le dropdown si on clique en dehors
+   */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement;
-    if (! target.closest('.floating-notification-container')) {
-      this.notificationService. closeDropdown();
+    if (!target.closest('.floating-notification-container')) {
+      this.notificationService.closeDropdown();
     }
   }
 
+  /**
+   * Retourne l'icône appropriée selon le type de notification
+   */
   getNotificationIcon(type: string): string {
-    switch (type) {
-      case 'DEMANDE_CONGE_SOUMISE':
-        return 'bi-calendar-plus text-warning';
-      case 'DEMANDE_CONGE_APPROUVEE':
-        return 'bi-calendar-check text-success';
-      case 'DEMANDE_CONGE_REJETEE':
-        return 'bi-calendar-x text-danger';
-      case 'BULLETIN_PAIE_DISPONIBLE':
-        return 'bi-file-earmark-text text-info';
-      default:
-        return 'bi-bell text-primary';
-    }
+    const icons: Record<string, string> = {
+      'DEMANDE_CONGE_SOUMISE': 'bi-calendar-plus text-warning',
+      'DEMANDE_CONGE_APPROUVEE': 'bi-calendar-check text-success',
+      'DEMANDE_CONGE_REJETEE': 'bi-calendar-x text-danger',
+      'BULLETIN_PAIE_DISPONIBLE': 'bi-file-earmark-text text-info'
+    };
+    return icons[type] || 'bi-bell text-primary';
   }
 
+  /**
+   * Formate le temps écoulé depuis la création
+   */
   getTimeAgo(dateString: string): string {
     if (!dateString) return '';
     
-    let date:  Date;
-    
-    if (! dateString.includes('Z') && ! dateString.includes('+')) {
+    let date: Date;
+    if (!dateString.includes('Z') && !dateString.includes('+')) {
       date = new Date(dateString + 'Z');
     } else {
       date = new Date(dateString);
@@ -218,16 +253,20 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
     return date.toLocaleDateString('fr-FR');
   }
 
-  // ✅ NOUVEAU :  Formater une date courte
+  /**
+   * Formate une date courte
+   */
   formatDateShort(dateString: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
   }
 
-  // ✅ NOUVEAU : Label du type de congé
+  /**
+   * Label du type de congé
+   */
   getTypeCongeLabel(type: string): string {
-    const labels:  { [key: string]: string } = {
+    const labels: Record<string, string> = {
       'CONGE_PAYE': 'Congé payé',
       'CONGE_MALADIE': 'Congé maladie',
       'CONGE_MATERNITE': 'Congé maternité',
@@ -238,15 +277,23 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
     return labels[type] || type;
   }
 
-  trackByNotificationId(index: number, notification: NotificationDto): number {
+  /**
+   * TrackBy pour optimiser le rendu de la liste des notifications
+   */
+  trackByNotificationId(_index: number, notification: NotificationDto): number {
     return notification.id;
   }
 
-  // ✅ NOUVEAU
-  trackByAlertId(index:  number, alert: CongeAlertDto): string {
+  /**
+   * TrackBy pour optimiser le rendu de la liste des alertes
+   */
+  trackByAlertId(_index: number, alert: CongeAlertDto): string {
     return alert.id;
   }
 
+  /**
+   * Ferme le dropdown
+   */
   closeDropdown(): void {
     this.notificationService.closeDropdown();
   }

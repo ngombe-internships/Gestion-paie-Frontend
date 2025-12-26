@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build: staging",
+  "buildCommand": "npm run build:staging",
   "outputDirectory": "dist/maalipo/browser",
   "framework": "angular",
   "rewrites": [

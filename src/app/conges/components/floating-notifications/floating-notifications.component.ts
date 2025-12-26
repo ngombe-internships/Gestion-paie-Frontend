@@ -1,173 +1,232 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs';
-import { retry } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../../../services/auth.service';
+import { NotificationDto, NotificationService } from '../../services/notification.service';
 
-export interface NotificationDto {
-  id:  number;
-  titre: string;
-  message: string;
-  type: string;
-  lu:  boolean;
-  dateCreation: string;
-  referenceId?: number;
-  referenceType?: string;
-  lienAction?: string;
-}
-
-@Injectable({
-  providedIn: 'root'
+@Component({
+  selector: 'app-floating-notifications',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './floating-notifications.component.html',
+  styleUrls: ['./floating-notifications.component.css']
 })
-export class NotificationService implements OnDestroy {
-  private apiUrl = `${environment.apiUrl}/api/notifications`;
+export class FloatingNotificationsComponent implements OnInit, OnDestroy {
+  count = 0;
+  notifications: NotificationDto[] = [];
+  showDropdown = false;
+  loading = false;
+  isVisible = false;
 
-  // Sources de données
-  private countSubject = new BehaviorSubject<number>(0);
-  private notificationsSubject = new BehaviorSubject<NotificationDto[]>([]);
-  private showDropdownSubject = new BehaviorSubject<boolean>(false);
-  
-  // Gestion du cycle de vie
-  private pollingSubscription:  Subscription | null = null;
-  private isInitialized = false;
+  private subscriptions = new Subscription();
+  private isSubscribedToNotifications = false;
 
-  // Observables publics pour les composants
-  public count$ = this.countSubject.asObservable();
-  public notifications$ = this.notificationsSubject.asObservable();
-  public showDropdown$ = this.showDropdownSubject.asObservable();
+  constructor(
+    public notificationService: NotificationService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  constructor(private http: HttpClient) {}
+  ngOnInit(): void {
+    // S'abonner aux changements d'authentification
+    this. subscriptions.add(
+      this.authService.isAuthenticated$.subscribe(isAuth => {
+        console.log('FloatingNotifications: Authentification:', isAuth);
+
+        if (! isAuth) {
+          // Déconnecté:  nettoyer tout
+          this.notificationService.clear();
+          this.count = 0;
+          this.notifications = [];
+          this. showDropdown = false;
+          this. isVisible = false;
+          this.isSubscribedToNotifications = false;
+        } else {
+          this.checkVisibility();
+          if (this.isVisible && !this.isSubscribedToNotifications) {
+            this.subscribeToNotifications();
+          }
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this. subscriptions.unsubscribe();
+    // Ne pas appeler clear() ici car le service est partagé globalement
+  }
 
   /**
-   * Appelé par le composant quand l'utilisateur est connecté
+   * Vérifie si le composant doit être visible selon le rôle
    */
-  initForUser(): void {
-    if (this.isInitialized) {
-      console.log('NotificationService: Déjà initialisé, skip');
+  private checkVisibility(): void {
+    const role = this.authService.getUserRole();
+    const isAuthenticated = this.authService.isLoggedIn();
+    this.isVisible = isAuthenticated && (role === 'EMPLOYE' || role === 'EMPLOYEUR');
+    console.log('FloatingNotifications: isVisible =', this. isVisible, ', role =', role);
+  }
+
+  /**
+   * S'abonne aux observables du service de notifications
+   */
+  private subscribeToNotifications(): void {
+    // Protection contre les doubles abonnements
+    if (this.isSubscribedToNotifications) {
+      console.log('FloatingNotifications: Déjà abonné, skip');
       return;
     }
 
-    if (!this.canReceiveNotifications()) {
-      console.log('NotificationService:  Utilisateur non autorisé');
-      return;
-    }
+    this.isSubscribedToNotifications = true;
+    console.log('FloatingNotifications:  Abonnement aux notifications');
 
-    this.isInitialized = true;
-    console.log('NotificationService: Initialisation.. .');
-    
-    // Lance le polling : Appel immédiat (0ms) puis toutes les 30s
-    this.pollingSubscription = timer(0, 30000).subscribe(() => {
-      if (this.canReceiveNotifications()) {
-        this. refreshAll();
-      }
-    });
-  }
+    // Abonnement au compteur
+    this. subscriptions.add(
+      this.notificationService.count$.subscribe(count => {
+        console.log('FloatingNotifications: Count reçu:', count);
+        this.count = count;
+      })
+    );
 
-  /**
-   * Rafraîchit toutes les données
-   */
-  private refreshAll(): void {
-    this.refreshCount();
-    this.loadRecentNotifications();
-  }
+    // Abonnement à la liste des notifications
+    this.subscriptions.add(
+      this.notificationService.notifications$.subscribe(notifications => {
+        console.log('FloatingNotifications:  Notifications reçues:', notifications.length);
+        this.notifications = notifications;
+      })
+    );
 
-  /**
-   * Rafraîchit le compteur de notifications non lues
-   */
-  private refreshCount(): void {
-    this.http.get<any>(`${this.apiUrl}/count-non-lues`)
-      .pipe(retry(1))
-      .subscribe({
-        next:  (response) => {
-          // Gestion flexible si le backend renvoie un objet ou un nombre
-          const count = typeof response === 'number' ? response : (response.data ?? 0);
-          console.log('NotificationService: Count =', count);
-          this.countSubject.next(count);
-        },
-        error: (err) => console.error('NotificationService: Erreur count:', err)
-      });
-  }
+    // Abonnement à l'état du dropdown
+    this. subscriptions.add(
+      this.notificationService.showDropdown$.subscribe(show => {
+        this.showDropdown = show;
+      })
+    );
 
-  /**
-   * Charge les notifications récentes
-   */
-  private loadRecentNotifications(): void {
-    this.http.get<any>(`${this.apiUrl}?page=0&size=10`)
-      .pipe(retry(1))
-      .subscribe({
-        next: (response) => {
-          const list = response. data?.content ?? response.data ?? response.content ?? [];
-          console.log('NotificationService: Notifications chargées:', list.length);
-          this.notificationsSubject.next(list);
-        },
-        error:  (err) => console.error('NotificationService: Erreur notifications:', err)
-      });
-  }
-
-  /**
-   * Marque une notification comme lue (Optimistic UI update)
-   */
-  marquerCommeLu(id: number): Observable<any> {
-    // Optimistic UI update :  on met à jour l'interface AVANT la réponse serveur
-    const currentNotifs = this.notificationsSubject. value;
-    const updatedNotifs = currentNotifs.map(n => n. id === id ? { ...n, lu: true } : n);
-    this.notificationsSubject. next(updatedNotifs);
-    this.countSubject. next(Math.max(0, this. countSubject.value - 1));
-
-    return this.http.put(`${this.apiUrl}/${id}/marquer-lu`, {});
-  }
-
-  /**
-   * Marque toutes les notifications comme lues (Optimistic UI update)
-   */
-  marquerToutesCommeLues(): Observable<any> {
-    const currentNotifs = this.notificationsSubject. value;
-    this.notificationsSubject.next(currentNotifs.map(n => ({ ...n, lu: true })));
-    this.countSubject.next(0);
-
-    return this.http.put(`${this.apiUrl}/marquer-toutes-lues`, {});
+    // Initialiser le service (le polling démarre ici)
+    console.log('FloatingNotifications: Initialisation du service.. .');
+    this.notificationService.initForUser();
   }
 
   /**
    * Toggle du dropdown
    */
   toggleDropdown(): void {
-    this.showDropdownSubject. next(!this.showDropdownSubject. value);
+    this.notificationService.toggleDropdown();
+  }
+
+  /**
+   * Gestion du clic sur une notification
+   */
+  onNotificationClick(notification: NotificationDto): void {
+    // Marquer comme lue si nécessaire
+    if (! notification.lu) {
+      this.notificationService. marquerCommeLu(notification.id).subscribe();
+    }
+
+    // Redirection selon le type et le rôle
+    if (notification.type. includes('DEMANDE_CONGE') ||
+        notification.type.includes('CONGE_') ||
+        notification. referenceType === 'DEMANDE_CONGE') {
+      
+      const role = this.authService.getUserRole();
+      if (role === 'EMPLOYE') {
+        console.log('Redirection vers mes demandes de congés (employé)');
+        this.router.navigate(['/dashboard/conges/mes-demandes']);
+      } else {
+        console.log('Redirection vers la liste des demandes (employeur)');
+        this.router. navigate(['/dashboard/conges/demandes']);
+      }
+      this.notificationService.closeDropdown();
+      return;
+    }
+
+    if (notification.lienAction) {
+      console.log('Navigation via lienAction:', notification.lienAction);
+      this.router.navigate([notification.lienAction]);
+    } else if (notification.type. includes('BULLETIN_PAIE') ||
+               notification. referenceType === 'BULLETIN_PAIE') {
+      console.log('Navigation vers les bulletins de paie');
+      this.router.navigate(['/dashboard/bulletins']);
+    } else {
+      console.log('Navigation fallback vers dashboard');
+      this.router.navigate(['/dashboard']);
+    }
+
+    this.notificationService.closeDropdown();
+  }
+
+  /**
+   * Marque toutes les notifications comme lues
+   */
+  marquerToutesLues(): void {
+    if (this.count > 0) {
+      this.loading = true;
+      this.notificationService.marquerToutesCommeLues().subscribe({
+        next: () => this.loading = false,
+        error: () => this.loading = false
+      });
+    }
+  }
+
+  /**
+   * Ferme le dropdown si on clique en dehors
+   */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.floating-notification-container')) {
+      this.notificationService. closeDropdown();
+    }
+  }
+
+  /**
+   * Retourne l'icône appropriée selon le type de notification
+   */
+  getNotificationIcon(type: string): string {
+    switch (type) {
+      case 'DEMANDE_CONGE_SOUMISE':
+        return 'bi-calendar-plus text-warning';
+      case 'DEMANDE_CONGE_APPROUVEE':
+        return 'bi-calendar-check text-success';
+      case 'DEMANDE_CONGE_REJETEE':
+        return 'bi-calendar-x text-danger';
+      case 'BULLETIN_PAIE_DISPONIBLE':
+        return 'bi-file-earmark-text text-info';
+      default:
+        return 'bi-bell text-primary';
+    }
+  }
+
+  /**
+   * Formate le temps écoulé depuis la création
+   */
+  getTimeAgo(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math. floor(diffInHours / 24);
+
+    if (diffInMinutes < 1) return 'À l\'instant';
+    if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`;
+    if (diffInHours < 24) return `Il y a ${diffInHours}h`;
+    if (diffInDays < 7) return `Il y a ${diffInDays}j`;
+    return date.toLocaleDateString('fr-FR');
+  }
+
+  /**
+   * TrackBy pour optimiser le rendu de la liste
+   */
+  trackByNotificationId(index: number, notification: NotificationDto): number {
+    return notification.id;
   }
 
   /**
    * Ferme le dropdown
    */
   closeDropdown(): void {
-    this.showDropdownSubject.next(false);
-  }
-
-  /**
-   * Nettoie tout proprement (appelé à la déconnexion)
-   */
-  clear(): void {
-    console.log('NotificationService: Nettoyage');
-    this.isInitialized = false;
-    
-    if (this.pollingSubscription) {
-      this.pollingSubscription.unsubscribe();
-      this.pollingSubscription = null;
-    }
-    
-    this.countSubject.next(0);
-    this.notificationsSubject.next([]);
-    this.closeDropdown();
-  }
-
-  /**
-   * Vérifie si l'utilisateur peut recevoir des notifications
-   */
-  private canReceiveNotifications(): boolean {
-    const role = localStorage. getItem('user_role') || '';
-    return role === 'EMPLOYE' || role === 'EMPLOYEUR';
-  }
-
-  ngOnDestroy(): void {
-    this. clear();
+    this.notificationService.closeDropdown();
   }
 }

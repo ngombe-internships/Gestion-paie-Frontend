@@ -1,16 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { NotificationService, NotificationDto } from '../../services/notification.service';
-import { ApiResponse } from '../../../model/ApiResponse';
-
-interface PaginatedNotifications {
-  content: NotificationDto[];
-  totalPages: number;
-  totalElements: number;
-  number: number;
-  size: number;
-}
+import { NotificationDto, NotificationService, PageResponse } from '../../services/notification.service';
 
 @Component({
   selector: 'app-notifications-historique',
@@ -32,23 +23,21 @@ export class NotificationsHistoriqueComponent implements OnInit {
 
   constructor(private notificationService: NotificationService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadNotifications();
   }
 
-  loadNotifications(page = 0) {
+  loadNotifications(page: number = 0): void {
     this.loading = true;
     console.log('Chargement des notifications, page:', page);
 
     this.notificationService.loadAllNotifications(page, this.pageSize).subscribe({
-      next: (response: ApiResponse<PaginatedNotifications>) => {
+      next: (response: PageResponse<NotificationDto>) => {
         console.log('Réponse reçue:', response);
 
-        // ✅ Vérifications de sécurité pour éviter les erreurs null
-        if (response && response.data) {
-          const data = response.data;
-          this.notifications = data.content || [];
-          this.totalPages = data.totalPages || 0;
+        if (response) {
+          this. notifications = response.content || [];
+          this. totalPages = response. totalPages || 0;
           this.currentPage = page;
 
           console.log(`Notifications chargées: ${this.notifications.length}`);
@@ -59,7 +48,7 @@ export class NotificationsHistoriqueComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: (error) => {
+      error: (error:  any) => {
         console.error('Erreur lors du chargement des notifications:', error);
         this.notifications = [];
         this.totalPages = 0;
@@ -68,50 +57,44 @@ export class NotificationsHistoriqueComponent implements OnInit {
     });
   }
 
-  onPageChange(page: number) {
+  onPageChange(page: number): void {
     if (page >= 0 && page < this.totalPages) {
       this.loadNotifications(page);
     }
   }
 
-  marquerCommeLu(notification: NotificationDto) {
-    if (!notification.lu) {
+  marquerCommeLu(notification: NotificationDto): void {
+    if (! notification. lu) {
       this.notificationService.marquerCommeLu(notification.id).subscribe({
         next: () => {
-          // Mettre à jour localement
           notification.lu = true;
           console.log(`Notification ${notification.id} marquée comme lue`);
         },
-        error: (error) => {
+        error:  (error:  any) => {
           console.error('Erreur lors du marquage comme lu:', error);
         }
       });
     }
   }
 
-  // Ouvrir le modal avec les détails
-  openDetailModal(notification: NotificationDto) {
+  openDetailModal(notification: NotificationDto): void {
     this.selectedNotification = notification;
     this.showModal = true;
-
-    // Marquer comme lu si ce n'est pas encore fait
     this.marquerCommeLu(notification);
   }
 
-  // Fermer le modal
-  closeModal() {
+  closeModal(): void {
     this.showModal = false;
-    this.selectedNotification = null;
+    this. selectedNotification = null;
   }
 
-  // ✅ TrackBy function pour éviter les erreurs
   trackById(index: number, notification: NotificationDto): number {
     return notification.id;
   }
 
   getNotificationIcon(type: string): string {
     switch (type) {
-      case 'DEMANDE_CONGE_SOUMISE': return 'bi-calendar-plus text-warning';
+      case 'DEMANDE_CONGE_SOUMISE':  return 'bi-calendar-plus text-warning';
       case 'DEMANDE_CONGE_APPROUVEE': return 'bi-calendar-check text-success';
       case 'DEMANDE_CONGE_REJETEE': return 'bi-calendar-x text-danger';
       case 'BULLETIN_PAIE_DISPONIBLE': return 'bi-file-earmark-text text-info';
@@ -134,14 +117,12 @@ export class NotificationsHistoriqueComponent implements OnInit {
     return date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR');
   }
 
-  // ✅ Méthode pour gérer les valeurs null dans le template
   getNotificationTypeDisplay(type: string | null | undefined): string {
     if (!type) return 'INFORMATION';
     return type.replace('_', ' ');
   }
 
-  // ✅ Méthode pour gérer les liens d'action null
   hasActionLink(notification: NotificationDto): boolean {
-    return !!(notification.lienAction || (notification.referenceType === 'DEMANDE_CONGE' && notification.referenceId));
+    return ! !(notification.lienAction || (notification.referenceType === 'DEMANDE_CONGE' && notification.referenceId));
   }
 }

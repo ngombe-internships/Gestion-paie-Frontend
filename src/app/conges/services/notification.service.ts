@@ -1,12 +1,12 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs';
-import { retry } from 'rxjs/operators';
+import { retry, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface NotificationDto {
-  id:  number;
-  titre: string;
+  id: number;
+  titre:  string;
   message: string;
   type: string;
   lu:  boolean;
@@ -14,6 +14,15 @@ export interface NotificationDto {
   referenceId?: number;
   referenceType?: string;
   lienAction?: string;
+}
+
+// Interface pour la pagination
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages:  number;
+  size: number;
+  number: number;
 }
 
 @Injectable({
@@ -43,83 +52,90 @@ export class NotificationService implements OnDestroy {
    */
   initForUser(): void {
     if (this.isInitialized) {
-      console.log('NotificationService: Déjà initialisé, skip');
       return;
     }
 
     if (!this.canReceiveNotifications()) {
-      console.log('NotificationService:  Utilisateur non autorisé');
       return;
     }
 
     this.isInitialized = true;
     console.log('NotificationService: Initialisation.. .');
     
-    // Lance le polling : Appel immédiat (0ms) puis toutes les 30s
+    // Lance le polling :  Appel immédiat (0ms) puis toutes les 30s
     this.pollingSubscription = timer(0, 30000).subscribe(() => {
       if (this.canReceiveNotifications()) {
-        this. refreshAll();
+        this.refreshAll();
       }
     });
   }
 
-  /**
-   * Rafraîchit toutes les données
-   */
   private refreshAll(): void {
     this.refreshCount();
     this.loadRecentNotifications();
   }
 
-  /**
-   * Rafraîchit le compteur de notifications non lues
-   */
   private refreshCount(): void {
     this.http.get<any>(`${this.apiUrl}/count-non-lues`)
       .pipe(retry(1))
       .subscribe({
-        next:  (response) => {
-          // Gestion flexible si le backend renvoie un objet ou un nombre
-          const count = typeof response === 'number' ? response : (response.data ?? 0);
-          console.log('NotificationService: Count =', count);
+        next: (response:  any) => {
+          const count = typeof response === 'number' ? response : (response. data ?? 0);
           this.countSubject.next(count);
         },
-        error: (err) => console.error('NotificationService: Erreur count:', err)
+        error: (err: any) => console.error('Erreur count:', err)
       });
   }
 
-  /**
-   * Charge les notifications récentes
-   */
   private loadRecentNotifications(): void {
-    this.http.get<any>(`${this.apiUrl}?page=0&size=10`)
+    this.http.get<any>(`${this.apiUrl}? page=0&size=10`)
       .pipe(retry(1))
       .subscribe({
-        next: (response) => {
-          const list = response. data?.content ?? response.data ?? response.content ?? [];
-          console.log('NotificationService: Notifications chargées:', list.length);
+        next: (response: any) => {
+          const list = response. data?.content ?? response.data ?? response. content ?? [];
           this.notificationsSubject.next(list);
         },
-        error:  (err) => console.error('NotificationService: Erreur notifications:', err)
+        error: (err: any) => console.error('Erreur notifications:', err)
       });
   }
 
   /**
-   * Marque une notification comme lue (Optimistic UI update)
+   * Charge toutes les notifications avec pagination (pour l'historique)
    */
+  loadAllNotifications(page: number = 0, size:  number = 20): Observable<PageResponse<NotificationDto>> {
+    return this. http.get<any>(`${this.apiUrl}?page=${page}&size=${size}`).pipe(
+      map((response: any) => {
+        // Gérer différentes structures de réponse
+        if (response. data) {
+          return {
+            content: response.data. content ?? response.data ??  [],
+            totalElements: response.data. totalElements ?? 0,
+            totalPages: response.data. totalPages ?? 0,
+            size:  response.data.size ?? size,
+            number: response.data.number ?? page
+          };
+        }
+        return {
+          content: response. content ?? [],
+          totalElements: response. totalElements ?? 0,
+          totalPages: response.totalPages ?? 0,
+          size: response. size ?? size,
+          number: response. number ?? page
+        };
+      })
+    );
+  }
+
   marquerCommeLu(id: number): Observable<any> {
-    // Optimistic UI update :  on met à jour l'interface AVANT la réponse serveur
-    const currentNotifs = this.notificationsSubject. value;
-    const updatedNotifs = currentNotifs.map(n => n. id === id ? { ...n, lu: true } : n);
-    this.notificationsSubject. next(updatedNotifs);
-    this.countSubject. next(Math.max(0, this. countSubject.value - 1));
+    // Optimistic UI update
+    const currentNotifs = this.notificationsSubject.value;
+    const updatedNotifs = currentNotifs.map(n => n.id === id ? { ...n, lu: true } :  n);
+    this.notificationsSubject.next(updatedNotifs);
+    this.countSubject.next(Math.max(0, this.countSubject.value - 1));
 
     return this.http.put(`${this.apiUrl}/${id}/marquer-lu`, {});
   }
 
-  /**
-   * Marque toutes les notifications comme lues (Optimistic UI update)
-   */
   marquerToutesCommeLues(): Observable<any> {
     const currentNotifs = this.notificationsSubject. value;
     this.notificationsSubject.next(currentNotifs.map(n => ({ ...n, lu: true })));
@@ -128,40 +144,25 @@ export class NotificationService implements OnDestroy {
     return this.http.put(`${this.apiUrl}/marquer-toutes-lues`, {});
   }
 
-  /**
-   * Toggle du dropdown
-   */
   toggleDropdown(): void {
     this.showDropdownSubject. next(!this.showDropdownSubject. value);
   }
 
-  /**
-   * Ferme le dropdown
-   */
   closeDropdown(): void {
     this.showDropdownSubject.next(false);
   }
 
-  /**
-   * Nettoie tout proprement (appelé à la déconnexion)
-   */
   clear(): void {
-    console.log('NotificationService: Nettoyage');
+    console. log('NotificationService: Nettoyage');
     this.isInitialized = false;
-    
     if (this.pollingSubscription) {
       this.pollingSubscription.unsubscribe();
       this.pollingSubscription = null;
     }
-    
     this.countSubject.next(0);
-    this.notificationsSubject.next([]);
-    this.closeDropdown();
+    this.notificationsSubject. next([]);
   }
 
-  /**
-   * Vérifie si l'utilisateur peut recevoir des notifications
-   */
   private canReceiveNotifications(): boolean {
     const role = localStorage. getItem('user_role') || '';
     return role === 'EMPLOYE' || role === 'EMPLOYEUR';

@@ -1,16 +1,16 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs';
-import { retry, map, catchError, switchMap } from 'rxjs/operators';
+import { retry, map, catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface NotificationDto {
-  id: number;
+  id:  number;
   titre: string;
   message: string;
   type: string;
-  lu: boolean;
+  lu:  boolean;
   dateCreation: string;
   referenceId?: number;
   referenceType?: string;
@@ -25,7 +25,7 @@ export interface CongeAlertDto {
   dateDebut: string;
   dateFin: string;
   typeConge: string;
-  demandeId: number;
+  demandeId:  number;
   dureeTotal?:  number;
   jourActuel?: number;
   joursRestants?: number;
@@ -49,21 +49,21 @@ export class NotificationService implements OnDestroy {
   private congeApiUrl = `${environment.apiUrl}/api/conge`;
   private employeApiUrl = `${environment.apiUrl}/api/employes`;
 
-  // Sources de données
   private countSubject = new BehaviorSubject<number>(0);
   private notificationsSubject = new BehaviorSubject<NotificationDto[]>([]);
   private congeAlertsSubject = new BehaviorSubject<CongeAlertDto[]>([]);
   private showDropdownSubject = new BehaviorSubject<boolean>(false);
   
-  // Gestion du cycle de vie
-  private pollingSubscription: Subscription | null = null;
+  private pollingSubscription:  Subscription | null = null;
   private isInitialized = false;
+  
+  // ✅ Cache de l'ID employé pour éviter les appels répétés
+  private cachedEmployeId:  number | null = null;
 
-  // Observables publics
   public count$ = this.countSubject.asObservable();
-  public notifications$ = this. notificationsSubject.asObservable();
-  public congeAlerts$ = this.congeAlertsSubject. asObservable();
-  public showDropdown$ = this. showDropdownSubject.asObservable();
+  public notifications$ = this.notificationsSubject.asObservable();
+  public congeAlerts$ = this.congeAlertsSubject.asObservable();
+  public showDropdown$ = this.showDropdownSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -75,7 +75,7 @@ export class NotificationService implements OnDestroy {
     this.isInitialized = true;
     console.log('NotificationService: Initialisation.. .');
     
-    this.pollingSubscription = timer(0, 30000).subscribe(() => {
+    this. pollingSubscription = timer(0, 30000).subscribe(() => {
       if (this.canReceiveNotifications()) {
         this.refreshAll();
       }
@@ -93,7 +93,7 @@ export class NotificationService implements OnDestroy {
       .pipe(retry(1))
       .subscribe({
         next: (response:  any) => {
-          const count = typeof response === 'number' ? response : (response. data ??  0);
+          const count = typeof response === 'number' ? response : (response.data ??  0);
           this.countSubject.next(count);
         },
         error: (err:  any) => console.error('Erreur count:', err)
@@ -101,90 +101,92 @@ export class NotificationService implements OnDestroy {
   }
 
   private loadRecentNotifications(): void {
-    this.http.get<any>(`${this.apiUrl}?page=0&size=10`)
+    this.http.get<any>(`${this.apiUrl}? page=0&size=10`)
       .pipe(retry(1))
       .subscribe({
         next: (response: any) => {
-          const list = response.data?. content ??  response.data ??  response.content ??  [];
+          const list = response.data?. content ??  response.data ??  response. content ??  [];
           this. notificationsSubject.next(list);
         },
         error: (err:  any) => console.error('Erreur notifications:', err)
       });
   }
 
- /**
- * ✅ Charge les demandes de congés approuvées pour générer les alertes
- */
-private loadCongeAlerts(): void {
-  const role = localStorage.getItem('user_role') || '';
-  
-  // Seulement pour les employés
-  if (role !== 'EMPLOYE') {
-    this.congeAlertsSubject.next([]);
-    return;
-  }
+  /**
+   * ✅ Charge les demandes de congés approuvées pour générer les alertes
+   * Utilise le même endpoint que le reste de l'app:  /api/employes/my-profile
+   */
+  private loadCongeAlerts(): void {
+    const role = localStorage.getItem('user_role') || '';
+    
+    // Seulement pour les employés
+    if (role !== 'EMPLOYE') {
+      this.congeAlertsSubject. next([]);
+      return;
+    }
 
-  // Récupérer l'ID de l'employé depuis le localStorage ou le token
-  const userId = localStorage.getItem('user_id');
-  const employeId = localStorage.getItem('employe_id');
-  
-  // Si on a l'employe_id directement, l'utiliser
-  if (employeId) {
-    this.fetchCongesForEmploye(parseInt(employeId, 10));
-    return;
-  }
+    // Si on a déjà l'ID en cache, l'utiliser directement
+    if (this.cachedEmployeId) {
+      this. fetchCongesForEmploye(this.cachedEmployeId);
+      return;
+    }
 
-  // Sinon, essayer de récupérer via l'endpoint /api/employes/profile
-  this.http.get<any>(`${this.employeApiUrl}/profile`).pipe(
-    catchError(() => {
-      // Fallback :  essayer /api/employes/me
-      return this.http.get<any>(`${this.employeApiUrl}/me`).pipe(
-        catchError(() => of(null))
-      );
-    })
-  ).subscribe({
-    next: (employe:  any) => {
-      if (employe && employe.id) {
-        // Sauvegarder pour la prochaine fois
-        localStorage.setItem('employe_id', employe.id. toString());
-        this.fetchCongesForEmploye(employe.id);
-      } else {
-        console.warn('Impossible de récupérer le profil employé pour les alertes');
-        this.congeAlertsSubject.next([]);
+    // Vérifier dans localStorage
+    const storedEmployeId = localStorage.getItem('employe_id');
+    if (storedEmployeId) {
+      this.cachedEmployeId = parseInt(storedEmployeId, 10);
+      this.fetchCongesForEmploye(this.cachedEmployeId);
+      return;
+    }
+
+    // ✅ Utiliser le bon endpoint:  /api/employes/my-profile
+    this.http.get<any>(`${this.employeApiUrl}/my-profile`).pipe(
+      map((response: any) => response.data || response),
+      catchError((err) => {
+        console.error('Erreur récupération profil employé:', err);
+        return of(null);
+      })
+    ).subscribe({
+      next: (employe:  any) => {
+        if (employe && employe.id) {
+          // Sauvegarder pour la prochaine fois
+          this.cachedEmployeId = employe.id;
+          localStorage.setItem('employe_id', employe. id.toString());
+          console.log('✅ Profil employé récupéré pour alertes, ID:', employe. id);
+          this.fetchCongesForEmploye(employe.id);
+        } else {
+          console.warn('Profil employé non disponible pour les alertes');
+          this.congeAlertsSubject. next([]);
+        }
       }
-    },
-    error: () => {
-      console.warn('Erreur récupération profil employé');
-      this.congeAlertsSubject.next([]);
-    }
-  });
-}
+    });
+  }
 
-/**
- * ✅ Récupère les congés pour un employé donné
- */
-private fetchCongesForEmploye(employeId: number): void {
-  this. http.get<any>(`${this.congeApiUrl}/employe/${employeId}`, {
-    params: { 
-      statut: 'APPROUVEE', 
-      size: '50' 
-    }
-  }).pipe(
-    catchError((err) => {
-      console.error('Erreur chargement congés:', err);
-      return of({ content: [] });
-    })
-  ).subscribe({
-    next: (response:  any) => {
-      const demandes = response?. content || response?.data?. content || response?.data || [];
-      console.log('📋 Demandes pour alertes:', demandes. length, demandes);
-      
-      const alerts = this.generateCongeAlerts(demandes);
-      this.congeAlertsSubject.next(alerts);
-      console.log('🔔 Alertes congés générées:', alerts.length, alerts);
-    }
-  });
-}
+  /**
+   * ✅ Récupère les congés pour un employé donné
+   */
+  private fetchCongesForEmploye(employeId: number): void {
+    this.http.get<any>(`${this.congeApiUrl}/employe/${employeId}`, {
+      params:  { 
+        statut: 'APPROUVEE', 
+        size: '50' 
+      }
+    }).pipe(
+      catchError((err) => {
+        console. error('Erreur chargement congés:', err);
+        return of({ content: [] });
+      })
+    ).subscribe({
+      next: (response: any) => {
+        const demandes = response?. content || response?.data?.content || response?.data || [];
+        console.log('📋 Demandes pour alertes:', demandes. length);
+        
+        const alerts = this.generateCongeAlerts(demandes);
+        this.congeAlertsSubject. next(alerts);
+        console.log('🔔 Alertes congés générées:', alerts.length, alerts);
+      }
+    });
+  }
 
   /**
    * ✅ Génère les alertes à partir des demandes de congés
@@ -194,7 +196,6 @@ private fetchCongesForEmploye(employeId: number): void {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // Récupérer les alertes déjà fermées
     const dismissedAlerts = this.getDismissedAlerts();
 
     demandes.forEach((demande: any) => {
@@ -220,41 +221,39 @@ private fetchCongesForEmploye(employeId: number): void {
           dateDebut: demande.dateDebut,
           dateFin: demande.dateFin,
           typeConge: demande.typeConge,
-          demandeId:  demande.id,
+          demandeId: demande.id,
           icon: 'bi-bell-fill',
           colorClass: 'alert-warning'
         };
       }
-
       // 🚀 Congé qui commence AUJOURD'HUI
       else if (diffDebut === 0 && diffFin > 0) {
         alert = {
           id: `CONGE_COMMENCE_AUJOURD_HUI-${demande.id}`,
           type: 'CONGE_COMMENCE_AUJOURD_HUI',
           titre: '🚀 Votre congé commence aujourd\'hui !',
-          message: 'C\'est le début de votre congé.  Bon repos ! ',
-          dateDebut: demande. dateDebut,
-          dateFin:  demande.dateFin,
+          message: 'C\'est le début de votre congé.  Bon repos !',
+          dateDebut: demande.dateDebut,
+          dateFin: demande.dateFin,
           typeConge: demande.typeConge,
-          demandeId: demande. id,
+          demandeId: demande.id,
           icon: 'bi-rocket-takeoff-fill',
           colorClass: 'alert-info'
         };
       }
-
       // 🏖️ Congé EN COURS
       else if (diffDebut < 0 && diffFin > 0) {
         const dureeTotal = Math.ceil((dateFin. getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         const jourActuel = Math.abs(diffDebut) + 1;
         alert = {
-          id: `CONGE_EN_COURS-${demande.id}`,
+          id: `CONGE_EN_COURS-${demande. id}`,
           type: 'CONGE_EN_COURS',
-          titre:  '🏖️ Vous êtes en congé',
-          message: `Jour ${jourActuel} sur ${dureeTotal}. Il vous reste ${diffFin} jour(s).`,
-          dateDebut: demande.dateDebut,
-          dateFin: demande. dateFin,
-          typeConge:  demande.typeConge,
-          demandeId: demande.id,
+          titre: '🏖️ Vous êtes en congé',
+          message: `Jour ${jourActuel} sur ${dureeTotal}.  Il vous reste ${diffFin} jour(s).`,
+          dateDebut: demande. dateDebut,
+          dateFin:  demande.dateFin,
+          typeConge: demande.typeConge,
+          demandeId: demande. id,
           jourActuel,
           dureeTotal,
           joursRestants: diffFin,
@@ -262,7 +261,6 @@ private fetchCongesForEmploye(employeId: number): void {
           colorClass: 'alert-success'
         };
       }
-
       // 🎉 Congé qui SE TERMINE AUJOURD'HUI
       else if (diffFin === 0 && diffDebut <= 0) {
         alert = {
@@ -278,8 +276,7 @@ private fetchCongesForEmploye(employeId: number): void {
           colorClass: 'alert-primary'
         };
       }
-
-      // 👋 Congé TERMINÉ HIER (message de retour)
+      // 👋 Congé TERMINÉ HIER
       else if (diffFin === -1) {
         alert = {
           id:  `CONGE_RETOUR-${demande.id}`,
@@ -295,8 +292,7 @@ private fetchCongesForEmploye(employeId: number): void {
         };
       }
 
-      // Ajouter l'alerte si elle n'a pas été fermée
-      if (alert && !dismissedAlerts.includes(alert.id)) {
+      if (alert && ! dismissedAlerts.includes(alert.id)) {
         alerts.push(alert);
       }
     });
@@ -317,8 +313,7 @@ private fetchCongesForEmploye(employeId: number): void {
 
   private getDismissedAlerts(): string[] {
     const stored = localStorage.getItem('dismissedCongeAlerts');
-    if (! stored) return [];
-    
+    if (!stored) return [];
     try {
       return JSON.parse(stored);
     } catch {
@@ -328,6 +323,7 @@ private fetchCongesForEmploye(employeId: number): void {
 
   resetDismissedAlerts(): void {
     localStorage.removeItem('dismissedCongeAlerts');
+    this.cachedEmployeId = null;
     this.loadCongeAlerts();
   }
 
@@ -339,7 +335,7 @@ private fetchCongesForEmploye(employeId: number): void {
             content: response.data.content ??  response.data ??  [],
             totalElements:  response.data.totalElements ?? 0,
             totalPages:  response.data.totalPages ?? 0,
-            size: response.data.size ??  size,
+            size: response.data. size ?? size,
             number:  response.data.number ?? page
           };
         }
@@ -359,20 +355,18 @@ private fetchCongesForEmploye(employeId: number): void {
     const updatedNotifs = currentNotifs.map(n => n.id === id ?  { ...n, lu: true } : n);
     this.notificationsSubject.next(updatedNotifs);
     this.countSubject.next(Math.max(0, this.countSubject.value - 1));
-
     return this.http.put(`${this.apiUrl}/${id}/marquer-lu`, {});
   }
 
   marquerToutesCommeLues(): Observable<any> {
     const currentNotifs = this.notificationsSubject. value;
     this.notificationsSubject.next(currentNotifs.map(n => ({ ...n, lu: true })));
-    this.countSubject. next(0);
-
+    this.countSubject.next(0);
     return this.http.put(`${this.apiUrl}/marquer-toutes-lues`, {});
   }
 
   toggleDropdown(): void {
-    this.showDropdownSubject.next(!this.showDropdownSubject.value);
+    this.showDropdownSubject.next(! this.showDropdownSubject.value);
   }
 
   closeDropdown(): void {
@@ -382,17 +376,18 @@ private fetchCongesForEmploye(employeId: number): void {
   clear(): void {
     console.log('NotificationService: Nettoyage');
     this.isInitialized = false;
+    this. cachedEmployeId = null;
     if (this.pollingSubscription) {
       this.pollingSubscription.unsubscribe();
       this.pollingSubscription = null;
     }
-    this.countSubject. next(0);
+    this.countSubject.next(0);
     this.notificationsSubject.next([]);
     this.congeAlertsSubject.next([]);
   }
 
   private canReceiveNotifications(): boolean {
-    const role = localStorage.getItem('user_role') || '';
+    const role = localStorage. getItem('user_role') || '';
     return role === 'EMPLOYE' || role === 'EMPLOYEUR';
   }
 

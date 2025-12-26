@@ -201,21 +201,33 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
   /**
    * Formate le temps écoulé depuis la création
    */
-  getTimeAgo(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
-    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    const diffInDays = Math. floor(diffInHours / 24);
-
-    if (diffInMinutes < 1) return 'À l\'instant';
-    if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`;
-    if (diffInHours < 24) return `Il y a ${diffInHours}h`;
-    if (diffInDays < 7) return `Il y a ${diffInDays}j`;
-    return date.toLocaleDateString('fr-FR');
+getTimeAgo(dateString: string): string {
+  if (!dateString) return '';
+  
+  // Parser la date en UTC
+  let date:  Date;
+  
+  // Si la date ne contient pas de timezone, on suppose qu'elle est en UTC
+  if (! dateString.includes('Z') && !dateString. includes('+')) {
+    date = new Date(dateString + 'Z'); // Ajouter Z pour indiquer UTC
+  } else {
+    date = new Date(dateString);
   }
+  
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInSeconds = Math.floor(diffInMs / 1000);
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
 
+  if (diffInSeconds < 60) return 'À l\'instant';
+  if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`;
+  if (diffInHours < 24) return `Il y a ${diffInHours}h`;
+  if (diffInDays < 7) return `Il y a ${diffInDays}j`;
+  
+  return date.toLocaleDateString('fr-FR');
+}
   /**
    * TrackBy pour optimiser le rendu de la liste
    */

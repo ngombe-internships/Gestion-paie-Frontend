@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, map, switchMap, of, forkJoin, catchError } from 'rxjs';
+import { Observable, map, switchMap, of, forkJoin, catchError, tap } from 'rxjs';
 import {
   DemandeCongeCreateDto,
   DemandeCongeResponseDto,
@@ -102,28 +102,60 @@ getMesDemandesConges(params: {
     year?: number,
     searchTerm?: string
 }): Observable<any> {
+    console.log('🔍 CongeService:  getMesDemandesConges appelé avec:', params);
+    
     return this.employeService.getMyEmployeProfile().pipe(
         switchMap(employe => {
+            console.log('👤 Profil employé récupéré:', employe);
+            
             if (!employe || !employe.id) {
-                throw new Error('Profil employé non disponible');
+                console.error('❌ Profil employé non disponible');
+                return of({
+                    content:  [],
+                    totalElements: 0,
+                    totalPages: 0,
+                    pageNumber:  0
+                });
             }
 
             let httpParams = new HttpParams()
-                .set('page', params.page?.toString() || '0')
-                .set('size', params.size?.toString() || '10');
+                .set('page', params.page?. toString() || '0')
+                .set('size', params. size?.toString() || '10');
 
             if (params.statut && params.statut !== 'TOUS') {
                 httpParams = httpParams.set('statut', params.statut);
             }
-            if (params.year) {
+            if (params. year) {
                 httpParams = httpParams.set('year', params.year.toString());
             }
-            if (params.searchTerm) {
+            if (params. searchTerm) {
                 httpParams = httpParams.set('searchTerm', params.searchTerm);
             }
 
-            return this.http.get<any>(`${this.apiUrl}/employe/${employe.id}`,
-                { params: httpParams });
+            const url = `${this.apiUrl}/employe/${employe.id}`;
+            console.log('🌐 Appel API:', url, 'avec params:', httpParams.toString());
+
+            return this.http.get<any>(url, { params: httpParams }).pipe(
+                tap(response => console.log('📥 Réponse API:', response)),
+                catchError(error => {
+                    console.error('❌ Erreur API:', error);
+                    return of({
+                        content:  [],
+                        totalElements: 0,
+                        totalPages: 0,
+                        pageNumber:  0
+                    });
+                })
+            );
+        }),
+        catchError(error => {
+            console.error('❌ Erreur getMyEmployeProfile:', error);
+            return of({
+                content: [],
+                totalElements: 0,
+                totalPages:  0,
+                pageNumber: 0
+            });
         })
     );
 }

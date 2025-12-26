@@ -78,54 +78,67 @@ loadMesDemandesConges(resetPage: boolean = false): void {
     this.isLoading = true;
     this.error = null;
 
+    console.log('🔄 Chargement des demandes de congés.. .');
+
     this.congeService.getMesDemandesConges({
         page: this.currentPage,
         size: this.itemsPerPage,
         statut: this.filtreStatut,
         year: this.filtreAnnee,
-        searchTerm: this.searchText
+        searchTerm: this. searchText
     }).pipe(
         takeUntil(this.destroy$)
     ).subscribe({
         next: (response) => {
-            // ✅ Gestion robuste de la réponse
-            this.demandes = response?.content || [];
-            this.totalItems = response?.totalElements || 0;
-            this.totalPages = response?.totalPages || 0;
-            this.currentPage = response?.pageNumber || 0;
+            console.log('✅ Réponse brute reçue:', response);
+            
+            // Gérer différentes structures de réponse
+            let content: any[] = [];
+            
+            if (response?. content) {
+                content = response.content;
+            } else if (response?.data?. content) {
+                content = response.data.content;
+            } else if (Array.isArray(response?. data)) {
+                content = response.data;
+            } else if (Array.isArray(response)) {
+                content = response;
+            }
+            
+            console.log('📋 Demandes extraites:', content.length, content);
+            
+            this.demandes = content;
+            this.totalItems = response?.totalElements || response?.data?.totalElements || content. length;
+            this.totalPages = response?.totalPages || response?.data?.totalPages || 1;
+            this.currentPage = response?.pageNumber || response?.data?.number || 0;
 
             this.calculerStatistiques();
             this.applyFilters();
 
-            // ✅ Message approprié pour le cas vide
             if (this.demandes.length === 0) {
                 this.toastrService.info('Aucune demande de congé trouvée', 'Information');
             } else {
                 this.toastrService.success(
-                    `${this.demandes.length} demande(s) chargée(s)`,
+                    `${this.demandes. length} demande(s) chargée(s)`,
                     'Chargement réussi'
                 );
             }
 
             this.isLoading = false;
         },
-        error: (error) => {
+        error: (error:  any) => {
             console.error('❌ Erreur chargement demandes:', error);
-
-            // ✅ Initialiser avec des valeurs par défaut
             this.demandes = [];
             this.demandesFiltrees = [];
             this.totalItems = 0;
             this.totalPages = 0;
             this.calculerStatistiques();
-
-            this.error = 'Impossible de charger vos demandes de congé. Veuillez réessayer.';
-            this.toastrService.error(this.error, 'Erreur de chargement');
+            this.error = 'Impossible de charger vos demandes de congé. ';
+            this. toastrService.error(this.error, 'Erreur');
             this.isLoading = false;
         }
     });
 }
-
 applyFilters(): void {
 
 

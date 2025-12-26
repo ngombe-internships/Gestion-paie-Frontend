@@ -127,7 +127,7 @@ export class DasboardComponent implements OnInit {
         isExpanded: false,
         items: [
           { title: 'Mon Profil', route: '/dashboard/entrepriseDetail' },
-          { title: 'Créer un Employé', route: '/dashboard/register/employer' },
+          { title: 'Créer Compte d\'un Employé', route: '/dashboard/register/employer' },
           { title: 'Mes Employés', route: '/dashboard/employes' },
           { title: 'Bulletins des Employés', route: '/dashboard/bulletins/employeur' },
           { title: 'Config Employés', route: '/dashboard/employe-paie-config' }

@@ -4,7 +4,9 @@
     <div class="floating-notification-bell" 
          (click)="toggleDropdown()"
          [class.has-notifications]="totalCount > 0">
-      <i class="bi bi-bell-fill"></i>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+      </svg>
       
       @if (totalCount > 0) {
         <span class="floating-notification-badge">
@@ -58,9 +60,7 @@
                    (click)="onCongeAlertClick(alert)">
                 
                 <div class="conge-alert-content">
-                  <div class="conge-alert-icon">
-                    <i class="bi" [ngClass]="alert.icon"></i>
-                  </div>
+                  <div class="conge-alert-icon" [innerHTML]="getCongeAlertIconSvg(alert.type)"></div>
                   
                   <div class="conge-alert-body">
                     <div class="conge-alert-title">{{ alert.titre }}</div>
@@ -126,6 +126,9 @@
                  (click)="onNotificationClick(notification)">
 
               <div class="notification-content">
+                <!-- Icône de notification SVG -->
+                <div class="notification-icon" [innerHTML]="getNotificationIconSvg(notification.type)"></div>
+
                 <div class="notification-body">
                   <h6 class="notification-item-title">{{ notification.titre }}</h6>
                   <p class="notification-message">{{ notification.message }}</p>

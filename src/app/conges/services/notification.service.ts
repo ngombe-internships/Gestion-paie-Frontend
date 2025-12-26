@@ -1,18 +1,18 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs';
-import { retry, map, catchError } from 'rxjs/operators';
+import { retry, map, catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface NotificationDto {
-  id:  number;
+  id: number;
   titre: string;
   message: string;
   type: string;
-  lu:  boolean;
+  lu: boolean;
   dateCreation: string;
-  referenceId?:  number;
+  referenceId?: number;
   referenceType?: string;
   lienAction?: string;
 }
@@ -47,6 +47,7 @@ export interface PageResponse<T> {
 export class NotificationService implements OnDestroy {
   private apiUrl = `${environment.apiUrl}/api/notifications`;
   private congeApiUrl = `${environment.apiUrl}/api/conge`;
+  private employeApiUrl = `${environment.apiUrl}/api/employes`;
 
   // Sources de données
   private countSubject = new BehaviorSubject<number>(0);
@@ -55,14 +56,14 @@ export class NotificationService implements OnDestroy {
   private showDropdownSubject = new BehaviorSubject<boolean>(false);
   
   // Gestion du cycle de vie
-  private pollingSubscription:  Subscription | null = null;
+  private pollingSubscription: Subscription | null = null;
   private isInitialized = false;
 
   // Observables publics
   public count$ = this.countSubject.asObservable();
-  public notifications$ = this.notificationsSubject.asObservable();
-  public congeAlerts$ = this.congeAlertsSubject.asObservable();
-  public showDropdown$ = this.showDropdownSubject.asObservable();
+  public notifications$ = this. notificationsSubject.asObservable();
+  public congeAlerts$ = this.congeAlertsSubject. asObservable();
+  public showDropdown$ = this. showDropdownSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -74,7 +75,6 @@ export class NotificationService implements OnDestroy {
     this.isInitialized = true;
     console.log('NotificationService: Initialisation.. .');
     
-    // Lance le polling :  appel immédiat (0ms) puis toutes les 30s
     this.pollingSubscription = timer(0, 30000).subscribe(() => {
       if (this.canReceiveNotifications()) {
         this.refreshAll();
@@ -85,7 +85,7 @@ export class NotificationService implements OnDestroy {
   private refreshAll(): void {
     this.refreshCount();
     this.loadRecentNotifications();
-    this.loadCongeAlerts(); // ✅ Calcul local des alertes
+    this.loadCongeAlerts();
   }
 
   private refreshCount(): void {
@@ -93,7 +93,7 @@ export class NotificationService implements OnDestroy {
       .pipe(retry(1))
       .subscribe({
         next: (response:  any) => {
-          const count = typeof response === 'number' ? response : (response.data ??  0);
+          const count = typeof response === 'number' ? response : (response. data ??  0);
           this.countSubject.next(count);
         },
         error: (err:  any) => console.error('Erreur count:', err)
@@ -105,7 +105,7 @@ export class NotificationService implements OnDestroy {
       .pipe(retry(1))
       .subscribe({
         next: (response: any) => {
-          const list = response.data?. content ?? response.data ??  response.content ??  [];
+          const list = response.data?. content ??  response.data ??  response.content ??  [];
           this. notificationsSubject.next(list);
         },
         error: (err:  any) => console.error('Erreur notifications:', err)
@@ -113,7 +113,7 @@ export class NotificationService implements OnDestroy {
   }
 
   /**
-   * ✅ Charge les demandes de congés approuvées et génère les alertes localement
+   * ✅ Charge les demandes de congés approuvées via l'endpoint qui fonctionne
    */
   private loadCongeAlerts(): void {
     const role = localStorage.getItem('user_role') || '';
@@ -124,20 +124,33 @@ export class NotificationService implements OnDestroy {
       return;
     }
 
-    // Récupérer les congés approuvés via l'API existante
-    this. http.get<any>(`${this.congeApiUrl}/mes-demandes`, {
-      params: { statut: 'APPROUVEE', size: '50' }
-    }).pipe(
-      retry(1),
+    // D'abord récupérer le profil employé pour avoir l'ID
+    this.http.get<any>(`${this.employeApiUrl}/me`).pipe(
+      switchMap((employe: any) => {
+        if (! employe || !employe.id) {
+          console.error('Profil employé non trouvé');
+          return of({ content: [] });
+        }
+        
+        // ✅ Utiliser l'endpoint qui fonctionne :  /api/conge/employe/{id}
+        return this.http.get<any>(`${this.congeApiUrl}/employe/${employe.id}`, {
+          params: { 
+            statut: 'APPROUVEE', 
+            size:  '50' 
+          }
+        });
+      }),
       catchError((err) => {
-        console. error('Erreur chargement congés pour alertes:', err);
+        console.error('Erreur chargement congés pour alertes:', err);
         return of({ content: [] });
       })
     ).subscribe({
       next: (response: any) => {
         const demandes = response?. content || response?.data?.content || response?.data || [];
+        console.log('📋 Demandes pour alertes:', demandes. length, demandes);
+        
         const alerts = this.generateCongeAlerts(demandes);
-        this.congeAlertsSubject.next(alerts);
+        this.congeAlertsSubject. next(alerts);
         console.log('🔔 Alertes congés générées:', alerts.length, alerts);
       }
     });
@@ -175,9 +188,9 @@ export class NotificationService implements OnDestroy {
           titre: '🔔 Votre congé commence demain ! ',
           message:  'Préparez-vous, votre congé débute demain.',
           dateDebut: demande.dateDebut,
-          dateFin: demande. dateFin,
-          typeConge:  demande.typeConge,
-          demandeId: demande.id,
+          dateFin: demande.dateFin,
+          typeConge: demande.typeConge,
+          demandeId:  demande.id,
           icon: 'bi-bell-fill',
           colorClass: 'alert-warning'
         };
@@ -189,11 +202,11 @@ export class NotificationService implements OnDestroy {
           id: `CONGE_COMMENCE_AUJOURD_HUI-${demande.id}`,
           type: 'CONGE_COMMENCE_AUJOURD_HUI',
           titre: '🚀 Votre congé commence aujourd\'hui !',
-          message: 'C\'est le début de votre congé.  Bon repos !',
-          dateDebut: demande.dateDebut,
-          dateFin: demande.dateFin,
+          message: 'C\'est le début de votre congé.  Bon repos ! ',
+          dateDebut: demande. dateDebut,
+          dateFin:  demande.dateFin,
           typeConge: demande.typeConge,
-          demandeId: demande.id,
+          demandeId: demande. id,
           icon: 'bi-rocket-takeoff-fill',
           colorClass: 'alert-info'
         };
@@ -201,13 +214,13 @@ export class NotificationService implements OnDestroy {
 
       // 🏖️ Congé EN COURS
       else if (diffDebut < 0 && diffFin > 0) {
-        const dureeTotal = Math. ceil((dateFin. getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const dureeTotal = Math.ceil((dateFin. getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         const jourActuel = Math.abs(diffDebut) + 1;
         alert = {
-          id: `CONGE_EN_COURS-${demande. id}`,
+          id: `CONGE_EN_COURS-${demande.id}`,
           type: 'CONGE_EN_COURS',
-          titre: '🏖️ Vous êtes en congé',
-          message: `Jour ${jourActuel} sur ${dureeTotal}.  Il vous reste ${diffFin} jour(s).`,
+          titre:  '🏖️ Vous êtes en congé',
+          message: `Jour ${jourActuel} sur ${dureeTotal}. Il vous reste ${diffFin} jour(s).`,
           dateDebut: demande.dateDebut,
           dateFin: demande. dateFin,
           typeConge:  demande.typeConge,
@@ -225,12 +238,12 @@ export class NotificationService implements OnDestroy {
         alert = {
           id: `CONGE_SE_TERMINE_AUJOURD_HUI-${demande.id}`,
           type: 'CONGE_SE_TERMINE_AUJOURD_HUI',
-          titre: '🎉 Dernier jour de congé ! ',
-          message:  'Votre congé se termine aujourd\'hui. Bon retour demain ! ',
-          dateDebut: demande. dateDebut,
-          dateFin:  demande.dateFin,
-          typeConge: demande.typeConge,
-          demandeId: demande. id,
+          titre: '🎉 Dernier jour de congé !',
+          message: 'Votre congé se termine aujourd\'hui.  Bon retour demain !',
+          dateDebut: demande.dateDebut,
+          dateFin: demande. dateFin,
+          typeConge:  demande.typeConge,
+          demandeId: demande.id,
           icon: 'bi-calendar-check-fill',
           colorClass: 'alert-primary'
         };
@@ -261,25 +274,17 @@ export class NotificationService implements OnDestroy {
     return alerts;
   }
 
-  /**
-   * ✅ Fermer une alerte de congé (sauvegardé dans localStorage)
-   */
   dismissCongeAlert(alertId: string): void {
-    // Sauvegarder dans localStorage
     const dismissed = this.getDismissedAlerts();
-    if (!dismissed.includes(alertId)) {
+    if (! dismissed.includes(alertId)) {
       dismissed.push(alertId);
-      localStorage. setItem('dismissedCongeAlerts', JSON. stringify(dismissed));
+      localStorage.setItem('dismissedCongeAlerts', JSON. stringify(dismissed));
     }
     
-    // Mettre à jour l'affichage
     const currentAlerts = this.congeAlertsSubject.value;
     this.congeAlertsSubject.next(currentAlerts. filter(a => a.id !== alertId));
   }
 
-  /**
-   * ✅ Récupérer les alertes fermées depuis localStorage
-   */
   private getDismissedAlerts(): string[] {
     const stored = localStorage.getItem('dismissedCongeAlerts');
     if (! stored) return [];
@@ -291,9 +296,6 @@ export class NotificationService implements OnDestroy {
     }
   }
 
-  /**
-   * ✅ Réinitialiser les alertes fermées (pour les tests)
-   */
   resetDismissedAlerts(): void {
     localStorage.removeItem('dismissedCongeAlerts');
     this.loadCongeAlerts();
@@ -302,19 +304,19 @@ export class NotificationService implements OnDestroy {
   loadAllNotifications(page: number = 0, size: number = 20): Observable<PageResponse<NotificationDto>> {
     return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${size}`).pipe(
       map((response: any) => {
-        if (response.data) {
+        if (response. data) {
           return {
             content: response.data.content ??  response.data ??  [],
-            totalElements:  response.data.totalElements ??  0,
-            totalPages: response. data.totalPages ??  0,
-            size: response.data.size ?? size,
+            totalElements:  response.data.totalElements ?? 0,
+            totalPages:  response.data.totalPages ?? 0,
+            size: response.data.size ??  size,
             number:  response.data.number ?? page
           };
         }
         return {
           content: response.content ?? [],
           totalElements: response.totalElements ?? 0,
-          totalPages:  response.totalPages ??  0,
+          totalPages: response.totalPages ?? 0,
           size: response.size ?? size,
           number: response.number ?? page
         };
@@ -323,32 +325,32 @@ export class NotificationService implements OnDestroy {
   }
 
   marquerCommeLu(id: number): Observable<any> {
-    const currentNotifs = this. notificationsSubject.value;
+    const currentNotifs = this.notificationsSubject.value;
     const updatedNotifs = currentNotifs.map(n => n.id === id ?  { ...n, lu: true } : n);
     this.notificationsSubject.next(updatedNotifs);
-    this.countSubject. next(Math.max(0, this.countSubject. value - 1));
+    this.countSubject.next(Math.max(0, this.countSubject.value - 1));
 
-    return this. http.put(`${this.apiUrl}/${id}/marquer-lu`, {});
+    return this.http.put(`${this.apiUrl}/${id}/marquer-lu`, {});
   }
 
   marquerToutesCommeLues(): Observable<any> {
-    const currentNotifs = this. notificationsSubject.value;
+    const currentNotifs = this.notificationsSubject. value;
     this.notificationsSubject.next(currentNotifs.map(n => ({ ...n, lu: true })));
-    this.countSubject.next(0);
+    this.countSubject. next(0);
 
     return this.http.put(`${this.apiUrl}/marquer-toutes-lues`, {});
   }
 
   toggleDropdown(): void {
-    this.showDropdownSubject. next(!this.showDropdownSubject. value);
+    this.showDropdownSubject.next(!this.showDropdownSubject.value);
   }
 
   closeDropdown(): void {
-    this.showDropdownSubject.next(false);
+    this.showDropdownSubject. next(false);
   }
 
   clear(): void {
-    console. log('NotificationService: Nettoyage');
+    console.log('NotificationService: Nettoyage');
     this.isInitialized = false;
     if (this.pollingSubscription) {
       this.pollingSubscription.unsubscribe();
@@ -365,6 +367,6 @@ export class NotificationService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.clear();
+    this. clear();
   }
 }

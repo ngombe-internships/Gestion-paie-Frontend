@@ -4,9 +4,9 @@ import { RouterLink, RouterModule, RouterLinkActive, Router } from '@angular/rou
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import { DemandeCongeResponseDto, StatutDemandeConge, TypeConge } from '../../../models/demande-conge.model';
 import { CongeService } from '../../../services/conge.service';
 import { AuthService } from '../../../../services/auth.service';
-import { DemandeCongeResponseDto, StatutDemandeConge, TypeConge } from '../../../models/demande-conge.model';
 
 @Component({
   selector: 'app-mes-conges',
@@ -30,13 +30,13 @@ export class MesCongesComponent implements OnInit, OnDestroy {
 
   // Filtres
   filtreStatut: string = 'TOUS';
-  filtreAnnee: number = new Date().getFullYear(); // Année actuelle par défaut
-  searchText: string = '';
+  filtreAnnee: number = new Date().getFullYear();
+  searchText:  string = '';
 
-  // ✅ NOUVEAU :  Pour gérer l'affichage
+  // Pour l'affichage
   readonly anneeActuelle:  number = new Date().getFullYear();
 
-  // Statistiques
+  // Statistiques (calculées sur TOUTES les demandes, pas les filtrées)
   stats = {
     total: 0,
     enAttente: 0,
@@ -58,6 +58,8 @@ export class MesCongesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.authService.hasRole('EMPLOYE')) {
+      // Charger d'abord les stats globales, puis les demandes filtrées
+      this.loadStatistiquesGlobales();
       this.loadMesDemandesConges();
     } else {
       this.error = 'Accès non autorisé.  Vous devez être employé pour voir cette page.';
@@ -70,6 +72,29 @@ export class MesCongesComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  /**
+   * ✅ Charger les statistiques globales (toutes les demandes de l'année)
+   */
+  loadStatistiquesGlobales(): void {
+    this.congeService.getMesDemandesConges({
+      page: 0,
+      size: 1000, // Récupérer toutes les demandes pour les stats
+      statut:  'TOUS',
+      year: this. filtreAnnee > 0 ? this.filtreAnnee : undefined
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        const allDemandes = this.extractContent(response);
+        this.calculerStatistiques(allDemandes);
+      },
+      error: (err:  any) => {
+        console.error('Erreur chargement stats:', err);
+      }
+    });
+  }
+
+  /**
+   * ✅ Charger les demandes avec filtres
+   */
   loadMesDemandesConges(resetPage:  boolean = false): void {
     if (resetPage) {
       this.currentPage = 0;
@@ -83,13 +108,17 @@ export class MesCongesComponent implements OnInit, OnDestroy {
     const params:  any = {
       page: this.currentPage,
       size: this.itemsPerPage,
-      statut: this. filtreStatut,
-      searchTerm: this.searchText
+      searchTerm: this. searchText
     };
 
-    // ✅ Ajouter l'année seulement si ce n'est pas "Toutes" (0)
+    // Ajouter le statut seulement si ce n'est pas "TOUS"
+    if (this.filtreStatut && this.filtreStatut !== 'TOUS') {
+      params.statut = this.filtreStatut;
+    }
+
+    // Ajouter l'année seulement si > 0
     if (this.filtreAnnee && this.filtreAnnee > 0) {
-      params.year = this.filtreAnnee;
+      params.year = this. filtreAnnee;
     }
 
     console.log('📤 Paramètres envoyés:', params);
@@ -100,27 +129,21 @@ export class MesCongesComponent implements OnInit, OnDestroy {
       next: (response) => {
         console.log('✅ Réponse brute reçue:', response);
 
-        let content:  any[] = [];
-
-        if (response?. content) {
-          content = response.content;
-        } else if (response?. data?.content) {
-          content = response.data.content;
-        } else if (Array.isArray(response?. data)) {
-          content = response.data;
-        } else if (Array.isArray(response)) {
-          content = response;
-        }
-
+        const content = this.extractContent(response);
         console.log('📋 Demandes extraites:', content.length, content);
 
         this.demandes = content;
-        this.totalItems = response?.totalElements || response?.data?.totalElements || content.length;
+        this. demandesFiltrees = [... content]; // ✅ Copie directe, pas de re-filtrage ! 
+        
+        this.totalItems = response?. totalElements || response?.data?.totalElements || content.length;
         this.totalPages = response?.totalPages || response?.data?.totalPages || 1;
         this.currentPage = response?.pageNumber || response?.data?.number || 0;
 
-        this. calculerStatistiques();
-        this.applyFilters();
+        // Trier par date de demande (plus récent en premier)
+        this.demandesFiltrees.sort((a, b) =>
+          new Date(b.dateDemande).getTime() - new Date(a.dateDemande).getTime()
+        );
+
         this.isLoading = false;
       },
       error: (error:  any) => {
@@ -129,7 +152,6 @@ export class MesCongesComponent implements OnInit, OnDestroy {
         this.demandesFiltrees = [];
         this.totalItems = 0;
         this.totalPages = 0;
-        this.calculerStatistiques();
         this.error = 'Impossible de charger vos demandes de congé. ';
         this. toastrService.error(this.error, 'Erreur');
         this.isLoading = false;
@@ -137,47 +159,74 @@ export class MesCongesComponent implements OnInit, OnDestroy {
     });
   }
 
-  applyFilters(): void {
-    this. demandesFiltrees = [... this.demandes];
-    this.demandesFiltrees. sort((a, b) =>
-      new Date(b.dateDemande).getTime() - new Date(a. dateDemande).getTime()
-    );
+  /**
+   * ✅ Extraire le contenu de la réponse API
+   */
+  private extractContent(response: any): DemandeCongeResponseDto[] {
+    if (response?.content) {
+      return response.content;
+    } else if (response?. data?.content) {
+      return response. data.content;
+    } else if (Array.isArray(response?. data)) {
+      return response.data;
+    } else if (Array.isArray(response)) {
+      return response;
+    }
+    return [];
   }
 
-  // Méthodes de filtrage
+  /**
+   * ✅ Calculer les statistiques sur un ensemble de demandes
+   */
+  calculerStatistiques(demandes: DemandeCongeResponseDto[]): void {
+    this.stats. total = demandes. length;
+    this.stats.enAttente = demandes. filter(d => d.statut === StatutDemandeConge.EN_ATTENTE).length;
+    this.stats.approuvees = demandes. filter(d => d.statut === StatutDemandeConge.APPROUVEE).length;
+    this.stats. refusees = demandes.filter(d => d.statut === StatutDemandeConge. REJETEE).length;
+    this.stats. annulees = demandes.filter(d => d.statut === StatutDemandeConge. ANNULEE).length;
+  }
+
+  // ===== MÉTHODES DE FILTRAGE =====
+
   changerFiltreStatut(statut: string): void {
     this. filtreStatut = statut;
     this.loadMesDemandesConges(true);
   }
 
   changerFiltreAnnee(annee: number): void {
-    this.filtreAnnee = annee;
-    this. loadMesDemandesConges(true);
-  }
-
-  // ✅ NOUVEAU : Revenir à l'année actuelle
-  revenirAnneeActuelle(): void {
-    this.filtreAnnee = this.anneeActuelle;
-    this. loadMesDemandesConges(true);
-  }
-
-  // ✅ NOUVEAU :  Afficher toutes les années
-  afficherToutesLesAnnees(): void {
-    this. filtreAnnee = 0;
+    this. filtreAnnee = annee;
+    this.loadStatistiquesGlobales(); // Recharger les stats pour la nouvelle année
     this.loadMesDemandesConges(true);
   }
 
-  // ✅ NOUVEAU : Vérifier si on est sur l'année actuelle
+  revenirAnneeActuelle(): void {
+    this.filtreAnnee = this.anneeActuelle;
+    this. loadStatistiquesGlobales();
+    this.loadMesDemandesConges(true);
+  }
+
+  afficherToutesLesAnnees(): void {
+    this.filtreAnnee = 0;
+    this. loadStatistiquesGlobales();
+    this.loadMesDemandesConges(true);
+  }
+
+  reinitialiserFiltres(): void {
+    this. filtreStatut = 'TOUS';
+    this.filtreAnnee = this.anneeActuelle;
+    this. searchText = '';
+    this.loadStatistiquesGlobales();
+    this.loadMesDemandesConges(true);
+  }
+
   estAnneeActuelle(): boolean {
-    return this.filtreAnnee === this.anneeActuelle;
+    return this. filtreAnnee === this.anneeActuelle;
   }
 
-  // ✅ NOUVEAU :  Vérifier si on affiche toutes les années
   afficheToutesAnnees(): boolean {
-    return this. filtreAnnee === 0;
+    return this.filtreAnnee === 0;
   }
 
-  // ✅ NOUVEAU : Obtenir le libellé de l'année sélectionnée
   getAnneeLabel(): string {
     if (this.filtreAnnee === 0) {
       return 'Toutes les années';
@@ -201,37 +250,35 @@ export class MesCongesComponent implements OnInit, OnDestroy {
     }
   }
 
-  calculerStatistiques(): void {
-    this.stats.total = this.demandes. length;
-    this.stats.enAttente = this.demandes.filter(d => d.statut === StatutDemandeConge.EN_ATTENTE).length;
-    this.stats.approuvees = this.demandes.filter(d => d.statut === StatutDemandeConge. APPROUVEE).length;
-    this. stats.refusees = this.demandes.filter(d => d.statut === StatutDemandeConge.REJETEE).length;
-    this.stats. annulees = this.demandes.filter(d => d. statut === StatutDemandeConge.ANNULEE).length;
-  }
+  // ===== MÉTHODES UTILITAIRES =====
 
-  // ✅ MODIFIÉ : Liste des années avec "Toutes"
-  getAnneesDisponibles(): { value: number; label: string }[] {
+  getAnneesDisponibles(): { value: number; label:  string }[] {
     const annees:  { value: number; label: string }[] = [];
     const anneeActuelle = new Date().getFullYear();
 
-    // Option "Toutes les années"
     annees.push({ value: 0, label: 'Toutes les années' });
 
-    // Années récentes (3 dernières années + actuelle)
     for (let i = 0; i <= 3; i++) {
       const annee = anneeActuelle - i;
-      annees.push({ value: annee, label:  annee.toString() });
+      annees.push({ value: annee, label: annee.toString() });
     }
 
     return annees;
   }
 
-  getStatutClass(statut: StatutDemandeConge): string {
-    return this.congeService.getStatutClass(statut);
+  getStatutClass(statut: StatutDemandeConge | string): string {
+    return this.congeService.getStatutClass(statut as StatutDemandeConge);
   }
 
-  getStatutLabel(statut: StatutDemandeConge): string {
-    return this.congeService. getStatutLabel(statut);
+  getStatutLabel(statut: StatutDemandeConge | string): string {
+    return this.congeService. getStatutLabel(statut as StatutDemandeConge);
+  }
+
+  getStatutFiltreLabel(): string {
+    if (this.filtreStatut === 'TOUS') {
+      return 'Tous les statuts';
+    }
+    return this.getStatutLabel(this.filtreStatut as StatutDemandeConge);
   }
 
   getTypeCongeLabel(type: TypeConge): string {
@@ -245,7 +292,7 @@ export class MesCongesComponent implements OnInit, OnDestroy {
 
   annulerDemande(demande: DemandeCongeResponseDto): void {
     if (!this.peutAnnuler(demande)) {
-      this.toastrService.warning('Cette demande ne peut pas être annulée.', 'Action impossible');
+      this.toastrService.warning('Cette demande ne peut pas être annulée. ', 'Action impossible');
       return;
     }
 
@@ -254,12 +301,13 @@ export class MesCongesComponent implements OnInit, OnDestroy {
     );
 
     if (confirmation) {
-      this.congeService.annulerDemande(demande.id)
+      this.congeService. annulerDemande(demande. id)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
-            if (response.data) {
+            if (response. data) {
               this. toastrService. success('Demande annulée avec succès', 'Succès');
+              this. loadStatistiquesGlobales();
               this.loadMesDemandesConges();
             } else {
               this.toastrService.error(response.message || 'Erreur lors de l\'annulation', 'Erreur');
@@ -277,6 +325,7 @@ export class MesCongesComponent implements OnInit, OnDestroy {
   }
 
   refresh(): void {
+    this.loadStatistiquesGlobales();
     this.loadMesDemandesConges();
   }
 
@@ -285,7 +334,7 @@ export class MesCongesComponent implements OnInit, OnDestroy {
   }
 
   calculerJoursOuvrables(dateDebut: string, dateFin: string): number {
-    return this.congeService.calculerJoursOuvrables(dateDebut, dateFin);
+    return this.congeService. calculerJoursOuvrables(dateDebut, dateFin);
   }
 
   truncateText(text: string, maxLength: number): string {
@@ -299,16 +348,16 @@ export class MesCongesComponent implements OnInit, OnDestroy {
   }
 
   naviguerVersNouvelleDemandeAbsolue(): void {
-    this.router.navigate(['/dashboard/conges/nouvelle-demande']);
+    this.router. navigate(['/dashboard/conges/nouvelle-demande']);
   }
 
   getPagesArray(): number[] {
     const pageCount = this.totalPages;
-    const currentPage = this.currentPage;
+    const currentPage = this. currentPage;
     const maxVisiblePages = 5;
 
     if (pageCount <= maxVisiblePages) {
-      return Array. from({ length: pageCount }, (_, i) => i);
+      return Array.from({ length: pageCount }, (_, i) => i);
     }
 
     let startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 0);
@@ -320,17 +369,19 @@ export class MesCongesComponent implements OnInit, OnDestroy {
     }
 
     return Array.from(
-      { length:  endPage - startPage + 1 },
+      { length: endPage - startPage + 1 },
       (_, i) => startPage + i
     );
   }
 
-  getMin(a: number, b: number): number {
+  getMin(a: number, b:  number): number {
     return Math.min(a, b);
   }
 
+  // ===== MODAL D'ANNULATION =====
+
   ouvrirModalAnnulation(demande: DemandeCongeResponseDto): void {
-    if (!this.peutAnnuler(demande)) {
+    if (! this.peutAnnuler(demande)) {
       this.toastrService.warning('Cette demande ne peut pas être annulée.', 'Action impossible');
       return;
     }
@@ -342,37 +393,38 @@ export class MesCongesComponent implements OnInit, OnDestroy {
 
   fermerModalAnnulation(): void {
     this.showModalAnnulation = false;
-    this. demandeAnnuler = null;
+    this.demandeAnnuler = null;
     this.annulationEnCours = false;
   }
 
   confirmerAnnulation(): void {
-    if (!this.demandeAnnuler) {
+    if (! this.demandeAnnuler) {
       return;
     }
 
     this.annulationEnCours = true;
-    const demandeId = this.demandeAnnuler. id;
-    const demandeInfo = `${this.getTypeCongeLabel(this.demandeAnnuler. typeConge)} du ${this.congeService.formatDateShort(this. demandeAnnuler.dateDebut)} au ${this.congeService. formatDateShort(this.demandeAnnuler. dateFin)}`;
+    const demandeId = this.demandeAnnuler.id;
+    const demandeInfo = `${this.getTypeCongeLabel(this.demandeAnnuler. typeConge)} du ${this.congeService.formatDateShort(this.demandeAnnuler.dateDebut)} au ${this.congeService.formatDateShort(this.demandeAnnuler.dateFin)}`;
 
     console.log('🗑️ Début annulation demande:', demandeId);
 
-    this.congeService. annulerDemande(demandeId)
+    this.congeService.annulerDemande(demandeId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console. log('✅ Annulation réussie:', response);
+          console.log('✅ Annulation réussie:', response);
 
           if (response. data) {
             this.toastrService.success(
-              `Demande annulée avec succès : ${demandeInfo}`,
+              `Demande annulée avec succès :  ${demandeInfo}`,
               'Annulation confirmée'
             );
 
             this.fermerModalAnnulation();
+            this.loadStatistiquesGlobales();
             this.loadMesDemandesConges();
           } else {
-            this. toastrService. error(
+            this.toastrService.error(
               response.message || 'Erreur lors de l\'annulation',
               'Erreur'
             );
@@ -384,7 +436,7 @@ export class MesCongesComponent implements OnInit, OnDestroy {
 
           let errorMessage = 'Erreur lors de l\'annulation de la demande.';
 
-          if (error.error?. message) {
+          if (error. error?. message) {
             errorMessage = error. error.message;
           } else if (error.message) {
             errorMessage = error.message;
@@ -395,12 +447,4 @@ export class MesCongesComponent implements OnInit, OnDestroy {
         }
       });
   }
-
-  reinitialiserFiltres(): void {
-  this.filtreStatut = 'TOUS';
-  this.filtreAnnee = this.anneeActuelle;
-  this.searchText = '';
-  this.loadMesDemandesConges(true);
-}
-
 }

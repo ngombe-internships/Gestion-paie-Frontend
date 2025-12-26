@@ -1,76 +1,130 @@
 <div class="floating-notification-container" *ngIf="isVisible">
   <!-- Bouton bell flottant -->
-  <div class="floating-notification-bell" (click)="toggleDropdown()"
-       [class.has-notifications]="count > 0">
-       Notif
-    <span class="floating-notification-badge" *ngIf="count > 0">
-      {{ count > 99 ? '99+' : count }}
+  <div class="floating-notification-bell" 
+       (click)="toggleDropdown()"
+       [class.has-notifications]="totalCount > 0">
+    <i class="bi bi-bell-fill"></i>
+    <span class="floating-notification-badge" *ngIf="totalCount > 0">
+      {{ totalCount > 99 ? '99+' : totalCount }}
     </span>
-
-    <!-- Indicateur de pulsation pour nouvelles notifications -->
-    <div class="notification-pulse" *ngIf="count > 0"></div>
+    <div class="notification-pulse" *ngIf="totalCount > 0"></div>
   </div>
 
   <!-- Dropdown des notifications -->
-  <div class="floating-notification-dropdown" [class.show]="showDropdown" *ngIf="showDropdown">
-    <!-- Header du dropdown -->
+  <div class="floating-notification-dropdown" 
+       [class.show]="showDropdown" 
+       *ngIf="showDropdown">
+    
+    <!-- Header -->
     <div class="notification-header">
       <div class="d-flex justify-content-between align-items-center">
         <div class="notification-title">
           <i class="bi bi-bell me-2 text-primary"></i>
           <strong>Notifications</strong>
-          <span class="badge bg-primary ms-2" *ngIf="count > 0">{{ count }}</span>
+          <span class="badge bg-primary ms-2" *ngIf="totalCount > 0">{{ totalCount }}</span>
         </div>
-        <button
-          class="btn btn-sm btn-outline-primary rounded-pill"
-          (click)="marquerToutesLues()"
-          *ngIf="count > 0"
-          [disabled]="loading"
-          title="Marquer toutes comme lues">
-          <i class="bi bi-check-all" *ngIf="!loading"></i>
-          <i class="bi bi-arrow-clockwise spin" *ngIf="loading"></i>Marquer toutes comme lues
+        <button class="btn btn-sm btn-outline-primary rounded-pill"
+                (click)="marquerToutesLues()"
+                *ngIf="count > 0"
+                [disabled]="loading">
+          <i class="bi bi-check-all" *ngIf="! loading"></i>
+          <i class="bi bi-arrow-clockwise spin" *ngIf="loading"></i>
         </button>
       </div>
     </div>
 
-    <!-- Liste des notifications -->
+    <!-- ✅ NOUVEAU : Alertes de congés en premier -->
+    <div class="conge-alerts-section" *ngIf="congeAlerts.length > 0">
+      <div class="section-title">
+        <i class="bi bi-calendar-event me-1"></i>
+        Alertes congés
+      </div>
+      
+      <div *ngFor="let alert of congeAlerts; trackBy: trackByAlertId"
+           class="conge-alert-item"
+           [ngClass]="alert.colorClass"
+           (click)="onCongeAlertClick(alert)">
+        
+        <div class="conge-alert-content">
+          <div class="conge-alert-icon">
+            <i class="bi" [ngClass]="alert.icon"></i>
+          </div>
+          
+          <div class="conge-alert-body">
+            <div class="conge-alert-title">{{ alert.titre }}</div>
+            <div class="conge-alert-message">{{ alert.message }}</div>
+            <div class="conge-alert-dates">
+              <span class="badge bg-light text-dark">
+                <i class="bi bi-calendar3 me-1"></i>
+                {{ formatDateShort(alert.dateDebut) }} → {{ formatDateShort(alert.dateFin) }}
+              </span>
+              <span class="badge bg-light text-dark ms-1">
+                {{ getTypeCongeLabel(alert.typeConge) }}
+              </span>
+            </div>
+            
+            <!-- Barre de progression pour congé en cours -->
+            <div class="progress-mini" *ngIf="alert.type === 'CONGE_EN_COURS' && alert.dureeTotal">
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-success" 
+                     [style.width.%]="((alert. jourActuel || 0) / alert.dureeTotal) * 100">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-close-alert" 
+                  (click)="dismissCongeAlert($event, alert)"
+                  title="Fermer">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Séparateur si les deux sections ont du contenu -->
+    <div class="section-divider" *ngIf="congeAlerts.length > 0 && notifications.length > 0"></div>
+
+    <!-- Liste des notifications normales -->
     <div class="notification-list">
-      <div *ngIf="notifications.length === 0" class="notification-empty">
+      <div class="section-title" *ngIf="congeAlerts.length > 0 && notifications.length > 0">
+        <i class="bi bi-bell me-1"></i>
+        Notifications
+      </div>
+
+      <div *ngIf="notifications.length === 0 && congeAlerts.length === 0" class="notification-empty">
         <i class="bi bi-bell-slash text-muted display-6"></i>
         <p class="text-muted mb-0 mt-2">Aucune notification</p>
         <small class="text-muted">Vous serez notifié ici des nouveautés</small>
       </div>
 
-      <div
-        *ngFor="let notification of notifications; trackBy: trackByNotificationId"
-        class="notification-item"
-        [class.unread]="!notification.lu"
-        (click)="onNotificationClick(notification)">
+      <div *ngFor="let notification of notifications; trackBy: trackByNotificationId"
+           class="notification-item"
+           [class.unread]="! notification.lu"
+           (click)="onNotificationClick(notification)">
 
         <div class="notification-content">
-         
-
           <div class="notification-body">
-            <h6 class="notification-title">{{ notification.titre }}</h6>
+            <h6 class="notification-item-title">{{ notification.titre }}</h6>
             <p class="notification-message">{{ notification.message }}</p>
             <div class="d-flex justify-content-between align-items-center">
               <small class="notification-time text-muted">
                 {{ getTimeAgo(notification.dateCreation) }}
               </small>
               <span class="notification-type-badge badge bg-light text-dark">
-                {{ notification.type.replace('_', ' ') }}
+                {{ notification.type. replace('_', ' ') }}
               </span>
             </div>
           </div>
 
-          <div class="notification-status" *ngIf="!notification.lu">
+          <div class="notification-status" *ngIf="! notification.lu">
             <span class="unread-indicator"></span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Footer du dropdown -->
+    <!-- Footer -->
     <div class="notification-footer" *ngIf="notifications.length > 0">
       <a routerLink="/dashboard/notifications"
          class="btn btn-sm btn-outline-primary w-100 rounded-pill"

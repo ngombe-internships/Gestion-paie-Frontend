@@ -4,16 +4,16 @@ import { RouterLink, RouterModule, RouterLinkActive, Router } from '@angular/rou
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { DemandeCongeResponseDto, StatutDemandeConge, TypeConge } from '../../../models/demande-conge. model';
 import { CongeService } from '../../../services/conge.service';
 import { AuthService } from '../../../../services/auth.service';
+import { DemandeCongeResponseDto, StatutDemandeConge, TypeConge } from '../../../models/demande-conge.model';
 
 @Component({
   selector: 'app-mes-conges',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl:  './mes-conges.component.html',
-  styleUrls: ['./mes-conges.component. css']
+  styleUrls: ['./mes-conges.component.css']
 })
 export class MesCongesComponent implements OnInit, OnDestroy {
   demandes: DemandeCongeResponseDto[] = [];

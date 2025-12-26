@@ -392,4 +392,8 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
   closeDropdown(): void {
     this.notificationService.closeDropdown();
   }
+
+
+  
+
 }

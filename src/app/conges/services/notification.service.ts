@@ -350,13 +350,6 @@ export class NotificationService implements OnDestroy {
     );
   }
 
-  marquerCommeLu(id: number): Observable<any> {
-    const currentNotifs = this.notificationsSubject.value;
-    const updatedNotifs = currentNotifs.map(n => n.id === id ?  { ...n, lu: true } : n);
-    this.notificationsSubject.next(updatedNotifs);
-    this.countSubject.next(Math.max(0, this.countSubject.value - 1));
-    return this.http.put(`${this.apiUrl}/${id}/marquer-lu`, {});
-  }
 
   marquerToutesCommeLues(): Observable<any> {
     const currentNotifs = this.notificationsSubject. value;
@@ -394,4 +387,33 @@ export class NotificationService implements OnDestroy {
   ngOnDestroy(): void {
     this. clear();
   }
+
+
+  marquerCommeLu(id: number): Observable<any> {
+  console.log('📌 Marquage notification comme lue, ID:', id);
+  
+  // Optimistic UI update
+  const currentNotifs = this.notificationsSubject.value;
+  const updatedNotifs = currentNotifs.map(n => 
+    n.id === id ? { ... n, lu: true } : n
+  );
+  this.notificationsSubject.next(updatedNotifs);
+  
+  // Décrémenter le compteur
+  const newCount = Math.max(0, this.countSubject.value - 1);
+  this.countSubject. next(newCount);
+  console.log('📊 Nouveau compteur:', newCount);
+
+  return this.http.put(`${this.apiUrl}/${id}/marquer-lu`, {}).pipe(
+    tap(() => console.log('✅ Notification marquée comme lue côté serveur')),
+    catchError((err) => {
+      console.error('❌ Erreur marquage notification:', err);
+      // Rollback en cas d'erreur
+      this.notificationsSubject. next(currentNotifs);
+      this.countSubject. next(this.countSubject. value + 1);
+      return of(null);
+    })
+  );
+}
+
 }

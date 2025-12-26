@@ -5,7 +5,7 @@
          (click)="toggleDropdown()"
          [class.has-notifications]="totalCount > 0">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm. 995-14.901a1 1 0 1 0-1.99 0A5. 002 5.002 0 0 0 3 6c0 1.098-. 5 6-2 7h14c-1.5-1-2-5. 902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
       </svg>
       
       @if (totalCount > 0) {
@@ -20,12 +20,11 @@
     @if (showDropdown) {
       <div class="floating-notification-dropdown" [class.show]="showDropdown">
         
-        <!-- Header -->
+        <!-- Header fixe -->
         <div class="notification-header">
           <div class="d-flex justify-content-between align-items-center">
             <div class="notification-title">
-              <i class="bi bi-bell me-2 text-primary"></i>
-              <strong>Notifications</strong>
+              <strong>🔔 Notifications</strong>
               @if (totalCount > 0) {
                 <span class="badge bg-primary ms-2">{{ totalCount }}</span>
               }
@@ -35,8 +34,8 @@
               <button class="btn btn-sm btn-outline-primary rounded-pill"
                       (click)="marquerToutesLues()"
                       [disabled]="loading"
-                      title="Marquer toutes comme lues">
-                @if (!loading) {
+                      title="Tout marquer comme lu">
+                @if (! loading) {
                   <i class="bi bi-check-all"></i>
                 } @else {
                   <i class="bi bi-arrow-clockwise spin"></i>
@@ -46,123 +45,119 @@
           </div>
         </div>
 
-        <!-- Alertes de congés -->
-        @if (congeAlerts.length > 0) {
-          <div class="conge-alerts-section">
-            <div class="section-title">
-              <i class="bi bi-calendar-event me-1"></i>
-              Alertes congés
-            </div>
-            
-            @for (alert of congeAlerts; track trackByAlertId($index, alert)) {
-              <div class="conge-alert-item"
-                   [ngClass]="alert.colorClass"
-                   (click)="onCongeAlertClick(alert)">
-                
-                <div class="conge-alert-content">
-                  <div class="conge-alert-icon" [innerHTML]="getCongeAlertIconSvg(alert.type)"></div>
+        <!-- Contenu scrollable -->
+        <div class="notification-scroll-container">
+          
+          <!-- Alertes de congés -->
+          @if (congeAlerts.length > 0) {
+            <div class="conge-alerts-section">
+              <div class="section-title">
+                📅 Alertes congés
+              </div>
+              
+              @for (alert of congeAlerts; track alert. id) {
+                <div class="conge-alert-item"
+                     [ngClass]="alert.colorClass"
+                     (click)="onCongeAlertClick(alert)">
                   
-                  <div class="conge-alert-body">
-                    <div class="conge-alert-title">{{ alert.titre }}</div>
-                    <div class="conge-alert-message">{{ alert.message }}</div>
-                    <div class="conge-alert-dates">
-                      <span class="badge bg-light text-dark">
-                        <i class="bi bi-calendar3 me-1"></i>
-                        {{ formatDateShort(alert.dateDebut) }} → {{ formatDateShort(alert.dateFin) }}
-                      </span>
-                      <span class="badge bg-light text-dark ms-1">
-                        {{ getTypeCongeLabel(alert.typeConge) }}
-                      </span>
-                    </div>
+                  <div class="conge-alert-content">
+                    <div class="conge-alert-icon" [innerHTML]="getCongeAlertIconSvg(alert. type)"></div>
                     
-                    <!-- Barre de progression pour congé en cours -->
-                    @if (alert.type === 'CONGE_EN_COURS' && alert.dureeTotal) {
-                      <div class="progress-mini">
-                        <div class="progress" style="height: 4px;">
-                          <div class="progress-bar bg-success" 
-                               [style.width.%]="((alert.jourActuel || 0) / alert.dureeTotal) * 100">
+                    <div class="conge-alert-body">
+                      <div class="conge-alert-title">{{ alert.titre }}</div>
+                      <div class="conge-alert-message">{{ alert. message }}</div>
+                      <div class="conge-alert-dates">
+                        <span class="badge bg-light text-dark">
+                          {{ formatDateShort(alert.dateDebut) }} → {{ formatDateShort(alert.dateFin) }}
+                        </span>
+                        <span class="badge bg-light text-dark ms-1">
+                          {{ getTypeCongeLabel(alert.typeConge) }}
+                        </span>
+                      </div>
+                      
+                      @if (alert.type === 'CONGE_EN_COURS' && alert.dureeTotal) {
+                        <div class="progress-mini">
+                          <div class="progress" style="height: 4px;">
+                            <div class="progress-bar bg-success" 
+                                 [style.width.%]="((alert. jourActuel || 0) / alert.dureeTotal) * 100">
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    }
+                      }
+                    </div>
+
+                    <button class="btn-close-alert" 
+                            (click)="dismissCongeAlert($event, alert)"
+                            title="Fermer">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Séparateur -->
+          @if (congeAlerts.length > 0 && notifications.length > 0) {
+            <div class="section-divider"></div>
+          }
+
+          <!-- Liste des notifications -->
+          <div class="notification-list">
+            @if (notifications.length > 0) {
+              <div class="section-title">
+                📬 Messages
+              </div>
+            }
+
+            @if (notifications.length === 0 && congeAlerts.length === 0) {
+              <div class="notification-empty">
+                <div style="font-size:  3rem; margin-bottom: 1rem;">🔔</div>
+                <p class="text-muted mb-1">Aucune notification</p>
+                <small class="text-muted">Vous serez notifié ici des nouveautés</small>
+              </div>
+            }
+
+            @for (notification of notifications; track notification.id) {
+              <div class="notification-item"
+                   [class.unread]="! notification.lu"
+                   (click)="onNotificationClick(notification)">
+
+                <div class="notification-content">
+                  <div class="notification-icon" [innerHTML]="getNotificationIconSvg(notification.type)"></div>
+
+                  <div class="notification-body">
+                    <div class="notification-item-title">{{ notification.titre }}</div>
+                    <p class="notification-message">{{ notification.message }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <small class="notification-time text-muted">
+                        {{ getTimeAgo(notification.dateCreation) }}
+                      </small>
+                      @if (! notification.lu) {
+                        <span class="badge bg-primary" style="font-size: 0.6rem;">Nouveau</span>
+                      }
+                    </div>
                   </div>
 
-                  <button class="btn-close-alert" 
-                          (click)="dismissCongeAlert($event, alert)"
-                          title="Fermer">
-                    <i class="bi bi-x"></i>
-                  </button>
+                  @if (! notification.lu) {
+                    <div class="notification-status">
+                      <span class="unread-indicator"></span>
+                    </div>
+                  }
                 </div>
               </div>
             }
           </div>
-        }
-
-        <!-- Séparateur -->
-        @if (congeAlerts.length > 0 && notifications.length > 0) {
-          <div class="section-divider"></div>
-        }
-
-        <!-- Liste des notifications normales -->
-        <div class="notification-list">
-          @if (congeAlerts.length > 0 && notifications.length > 0) {
-            <div class="section-title">
-              <i class="bi bi-bell me-1"></i>
-              Notifications
-            </div>
-          }
-
-          @if (notifications.length === 0 && congeAlerts.length === 0) {
-            <div class="notification-empty">
-              <i class="bi bi-bell-slash text-muted display-6"></i>
-              <p class="text-muted mb-0 mt-2">Aucune notification</p>
-              <small class="text-muted">Vous serez notifié ici des nouveautés</small>
-            </div>
-          }
-
-          @for (notification of notifications; track trackByNotificationId($index, notification)) {
-            <div class="notification-item"
-                 [class.unread]="!notification.lu"
-                 (click)="onNotificationClick(notification)">
-
-              <div class="notification-content">
-                <!-- Icône de notification SVG -->
-                <div class="notification-icon" [innerHTML]="getNotificationIconSvg(notification.type)"></div>
-
-                <div class="notification-body">
-                  <h6 class="notification-item-title">{{ notification.titre }}</h6>
-                  <p class="notification-message">{{ notification.message }}</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <small class="notification-time text-muted">
-                      {{ getTimeAgo(notification.dateCreation) }}
-                    </small>
-                    <span class="notification-type-badge badge bg-light text-dark">
-                      {{ notification.type.replace('_', ' ') }}
-                    </span>
-                  </div>
-                </div>
-
-                @if (!notification.lu) {
-                  <div class="notification-status">
-                    <span class="unread-indicator"></span>
-                  </div>
-                }
-              </div>
-            </div>
-          }
         </div>
 
-        <!-- Footer -->
-        @if (notifications.length > 0) {
-          <div class="notification-footer">
-            <a routerLink="/dashboard/notifications"
-               class="btn btn-sm btn-outline-primary w-100 rounded-pill"
-               (click)="closeDropdown()">
-              <i class="bi bi-list me-2"></i>
-              Voir l'historique complet
-            </a>
-          </div>
-        }
+        <!-- Footer fixe -->
+        <div class="notification-footer">
+          <a routerLink="/dashboard/notifications"
+             class="btn btn-sm btn-outline-primary w-100"
+             (click)="closeDropdown()">
+            📋 Voir tout l'historique
+          </a>
+        </div>
       </div>
     }
   </div>

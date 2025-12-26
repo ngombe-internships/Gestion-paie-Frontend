@@ -4,10 +4,11 @@
 
 /* Conteneur principal */
 .mes-conges-container {
-  padding: 1.5rem;
-  background: #f5f6fa;
+  padding: 1. 5rem;
+  background:  #f5f6fa;
   font-family: 'Segoe UI', Roboto, sans-serif;
   color: #333;
+  min-height: 100vh;
 }
 
 /* ----- En-tête ----- */
@@ -16,12 +17,12 @@
   color: #fff;
   border-radius: 10px;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1. 5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .header-content {
-  display: flex;
+  display:  flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
@@ -46,7 +47,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom:  1.5rem;
 }
 
 .stat-card {
@@ -58,7 +59,7 @@
 }
 
 .stat-value {
-  font-size: 1.6rem;
+  font-size:  1.6rem;
   font-weight: bold;
   margin-bottom: 0.3rem;
 }
@@ -69,22 +70,27 @@
 }
 
 .stat-card.total {
-  background: #ffffff;
+  background:  #ffffff;
 }
 
 .stat-card.pending {
-  background: #fff4e5;
+  background:  #fff4e5;
   color: #d98b00;
 }
 
 .stat-card.approved {
-  background: #e8f7e8;
+  background:  #e8f7e8;
   color: #1e7e34;
 }
 
 .stat-card.rejected {
-  background: #fdecea;
-  color: #b02a37;
+  background:  #fdecea;
+  color:  #b02a37;
+}
+
+.stat-card.cancelled {
+  background:  #f0f0f0;
+  color: #6c757d;
 }
 
 /* ----- Filtres ----- */
@@ -92,27 +98,34 @@
   background: #ffffff;
   padding: 1rem;
   border-radius: 10px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  align-items: center;
+  align-items: flex-end;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+  display:  flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .filter-group label {
   font-weight: 600;
-  margin-right: 0.5rem;
+  font-size: 0.85rem;
+  color: #555;
 }
 
 .filter-buttons {
-  display: flex;
+  display:  flex;
   flex-wrap: wrap;
   gap: 0.4rem;
 }
 
 .filter-btn {
-  padding: 0.35rem 0.8rem;
+  padding:  0.35rem 0.8rem;
   border-radius: 6px;
   border: 1px solid #ccc;
   background: #f8f9fa;
@@ -122,18 +135,19 @@
 }
 
 .filter-btn:hover {
-  background: #e2e6ea;
+  background:  #e2e6ea;
 }
 
 .filter-btn.active {
   border-color: #0d6efd;
   background: #0d6efd;
-  color: white;
+  color:  white;
 }
 
 .filter-btn.pending.active {
   background: #ffc107;
   border-color: #e0a800;
+  color:  #000;
 }
 
 .filter-btn.approved.active {
@@ -143,7 +157,92 @@
 
 .filter-btn.rejected.active {
   background: #dc3545;
-  border-color: #b02a37;
+  border-color:  #b02a37;
+}
+
+.filter-btn.cancelled.active {
+  background: #6c757d;
+  border-color: #5a6268;
+}
+
+/* ✅ NOUVEAU :  Filtre année amélioré */
+.filter-annee .annee-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-annee select {
+  min-width: 160px;
+}
+
+.btn-annee-actuelle {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap:  0.3rem;
+}
+
+.btn-toutes-annees {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ✅ NOUVEAU :  Filtres actifs (badges) */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #e3f2fd;
+  border-radius:  8px;
+  border: 1px solid #90caf9;
+}
+
+.filter-badge {
+  display:  inline-flex;
+  align-items:  center;
+  padding: 0.25rem 0.6rem;
+  background: #ffffff;
+  border:  1px solid #90caf9;
+  border-radius:  20px;
+  font-size: 0.85rem;
+  color: #1565c0;
+}
+
+.filter-badge i {
+  font-size: 0.8rem;
+}
+
+.btn-remove-filter {
+  background: none;
+  border: none;
+  padding: 0 0 0 0.4rem;
+  margin-left: 0.2rem;
+  cursor: pointer;
+  color: #1565c0;
+  font-size: 0.9rem;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.btn-remove-filter:hover {
+  opacity:  1;
+  color: #d32f2f;
+}
+
+/* Filtre recherche */
+.filter-search {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-search .input-group {
+  max-width: 300px;
 }
 
 /* ----- États de chargement et erreur ----- */
@@ -151,15 +250,18 @@
 .error-state,
 .empty-state {
   text-align: center;
-  padding: 2rem;
+  padding: 3rem 2rem;
   color: #555;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .loading-state .spinner {
-  border: 4px solid #e0e0e0;
+  border:  4px solid #e0e0e0;
   border-top: 4px solid #0d6efd;
   border-radius: 50%;
-  width: 40px;
+  width:  40px;
   height: 40px;
   margin: 0 auto 1rem;
   animation: spin 1s linear infinite;
@@ -175,10 +277,48 @@
   margin-bottom: 0.5rem;
 }
 
-.empty-state i {
-  font-size: 2rem;
+/* ✅ NOUVEAU : Empty state amélioré */
+.empty-state .empty-icon {
+  width: 80px;
+  height:  80px;
+  border-radius: 50%;
+  background:  #f0f4f8;
+  display: flex;
+  align-items:  center;
+  justify-content: center;
+  margin: 0 auto 1. 5rem;
+}
+
+.empty-state .empty-icon i {
+  font-size: 2. 5rem;
   color: #6c757d;
+}
+
+.empty-state .empty-icon.warning {
+  background: #fff3cd;
+}
+
+.empty-state .empty-icon.warning i {
+  color: #856404;
+}
+
+.empty-state h3 {
+  font-size: 1.3rem;
   margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.empty-state p {
+  color: #666;
+  margin-bottom: 1. 5rem;
+}
+
+.empty-state .empty-actions {
+  display:  flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 /* ----- Liste des demandes ----- */
@@ -189,7 +329,7 @@
 }
 
 .demande-card {
-  background: #ffffff;
+  background:  #ffffff;
   padding: 1rem;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -200,7 +340,6 @@
   transform: translateY(-2px);
 }
 
-/* Couleurs selon statut */
 .demande-card.en-attente {
   border-left: 4px solid #ffc107;
 }
@@ -213,7 +352,6 @@
   border-left: 4px solid #dc3545;
 }
 
-/* Boutons d’action */
 .demande-actions {
   margin-top: 1rem;
 }
@@ -221,7 +359,8 @@
 .demande-actions .btn {
   font-size: 0.8rem;
 }
-/* Styles pour le tableau */
+
+/* ----- Tableau ----- */
 .table-section {
   background: white;
   border-radius: 8px;
@@ -230,18 +369,25 @@
 }
 
 .table-header {
-  padding: 1rem 1.5rem;
+  padding: 1rem 1. 5rem;
   background: #f8f9fa;
   border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .table-header h5 {
   margin: 0;
   color: #495057;
+  display: flex;
+  align-items: center;
 }
 
 .table-responsive {
-  margin: 0;
+  margin:  0;
 }
 
 .table th {
@@ -252,7 +398,7 @@
 
 .table td {
   vertical-align: middle;
-  padding: 1rem 0.75rem;
+  padding: 1rem 0. 75rem;
 }
 
 .periode-info strong {
@@ -271,8 +417,6 @@
   word-break: break-word;
   white-space: normal;
 }
-
-
 
 .motif-rejet-text {
   background: #fff5f5;
@@ -294,31 +438,14 @@
   font-size: 0.8rem;
 }
 
-/* Responsive du tableau */
-@media (max-width: 768px) {
-  .table-responsive {
-    font-size: 0.8rem;
-  }
-
-  .raison-cell-full {
-    max-width: none;
-    width: 100%;
-  }
-
-  .raison-cell {
-    max-width: 150px;
-  }
-}
-
-/* ✅ NOUVEAU : Styles pour le modal d'annulation */
-
+/* ----- Modal ----- */
 .modal.show {
   background: rgba(0, 0, 0, 0.5);
 }
 
 .demande-details {
-  border: 1px solid #dee2e6;
-  background-color: #f8f9fa !important;
+  border:  1px solid #dee2e6;
+  background-color: #f8f9fa ! important;
 }
 
 .demande-details .row {
@@ -335,11 +462,10 @@
 
 .btn-outline-danger:hover {
   background-color: #dc3545;
-  border-color: #dc3545;
-  color: white;
+  border-color:#dc3545;
+  color:white;
 }
 
-/* ✅ Animation du modal */
 .modal {
   transition: opacity 0.3s ease;
 }
@@ -349,17 +475,97 @@
 }
 
 .modal.show .modal-dialog {
-  transform: translateY(0);
+  transform:  translateY(0);
 }
 
-/* ✅ Responsive pour la colonne Actions */
+/* ----- Responsive ----- */
+@media (max-width: 992px) {
+  .filters-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .filter-annee .annee-selector {
+    flex-wrap: wrap;
+  }
+  
+  .filter-search .input-group {
+    max-width:  100%;
+  }
+}
+
 @media (max-width: 768px) {
+  .mes-conges-container {
+    padding:  1rem;
+  }
+  
+  .page-header {
+    padding: 1rem;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .header-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .table-responsive {
+    font-size: 0.8rem;
+  }
+
+  .raison-cell-full {
+    max-width: none;
+    width: 100%;
+  }
+
   .table td:last-child {
-    text-align: center !important;
+    text-align: center ! important;
   }
 
   .btn-sm {
     font-size: 0.75rem;
     padding: 0.25rem 0.5rem;
+  }
+  
+  .active-filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .empty-state .empty-actions {
+    flex-direction: column;
+  }
+  
+  .empty-state .empty-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-buttons {
+    flex-direction: column;
+  }
+  
+  .filter-btn {
+    width: 100%;
+    text-align: center;
   }
 }

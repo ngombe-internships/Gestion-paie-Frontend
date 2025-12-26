@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../../model/ApiResponse';
 import { AuthService } from '../../services/auth.service';
-import { environment } from '../../../environment';
+import { environment } from '../../../environments/environment';
 import { JourFerieUpdateDto } from '../models/jour-ferie.model';
 
 // =============================================

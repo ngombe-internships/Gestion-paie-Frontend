@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpStatusCode } from '@ang
 import { inject, Injectable } from '@angular/core';
 import { BulletinPaie, BulletinPaieCreateDto } from '../model/bulletin';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { environment } from '../../environment';
+import { environment } from '../../environments/environment';
 import { Employe } from '../model/employe';
 import { FormuleCalculType } from '../model/enum/enum';
 

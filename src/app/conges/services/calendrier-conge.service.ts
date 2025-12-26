@@ -7,7 +7,7 @@ import {
   AbsenceJourneeDto,
   EffectifJournalierDto
 } from '../models/calendrier-conge.model';
-import { environment } from '../../../environment';
+import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../model/ApiResponse';
 
 

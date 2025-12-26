@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build: staging",
+  "outputDirectory": "dist/maalipo/browser",
+  "framework": "angular",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

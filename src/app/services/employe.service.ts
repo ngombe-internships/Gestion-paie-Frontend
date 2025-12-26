@@ -4,7 +4,7 @@ import { HttpClient, HttpParams, HttpStatusCode } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, of } from 'rxjs';
 import { EmployeCreate } from '../model/employeCreate';
-import { environment } from '../../environment';
+import { environment } from '../../environments/environment';
 import { PagedResponse } from './bulletin.service';
 
 @Injectable({

@@ -1,6 +1,6 @@
 import { EmployeurList } from './../model/employeurList';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../environment';
+import { environment } from '../../environments/environment';
 import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Entreprise } from '../model/entreprise';

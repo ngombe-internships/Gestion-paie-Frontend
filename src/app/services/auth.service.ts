@@ -6,7 +6,7 @@ import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { LoginDto } from '../model/loginDto'; // Assuming you create these interfaces
 import { RegisterDto } from '../model/registerDto'; // Assuming you create these interfaces
-import { environment } from '../../environment';
+import { environment } from '../../environments/environment';
 import { RegisterEmployeeDto } from '../model/registerEmployeeDto';
 import { NotificationService } from '../conges/services/notification.service';
 

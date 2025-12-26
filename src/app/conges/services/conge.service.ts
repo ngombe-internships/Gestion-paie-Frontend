@@ -12,7 +12,7 @@ import { SoldeCongeDto, HistoriqueCongeDto } from '../models/solde-conge.model';
 import { ApiResponse } from '../../model/ApiResponse';
 import { AuthService } from '../../services/auth.service';
 import { EmployeService } from '../../services/employe.service';
-import { environment } from '../../../environment';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

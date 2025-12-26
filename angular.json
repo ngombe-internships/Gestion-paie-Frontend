@@ -14,7 +14,7 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/maalipo",
-            "index": "src/index.html",
+            "index":  "src/index. html",
             "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
@@ -22,28 +22,25 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
-                "glob": "**/*",
+                "glob":  "**/*",
                 "input": "public",
                 "output": "/"
-
               },
               "src/favicon.ico",
               "src/assets"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
-
               "src/styles.css"
-
             ],
             "scripts": []
           },
           "configurations": {
             "production": {
               "optimization": {
-                "scripts": true,
-                 "styles": true // <-- C'est ça qui active la minification et la purge basique
-                },
+                "scripts":  true,
+                "styles": true
+              },
               "budgets": [
                 {
                   "type": "initial",
@@ -52,11 +49,42 @@
                 },
                 {
                   "type": "anyComponentStyle",
+                  "maximumWarning":  "25kB",
+                  "maximumError": "35kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "staging": {
+              "optimization": {
+                "scripts": true,
+                "styles": true
+              },
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1.5MB",
+                  "maximumError": "2.0MB"
+                },
+                {
+                  "type":  "anyComponentStyle",
                   "maximumWarning": "25kB",
                   "maximumError": "35kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing":  "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -64,7 +92,7 @@
               "sourceMap": true
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration":  "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -72,7 +100,10 @@
             "production": {
               "buildTarget": "maalipo:build:production"
             },
-            "development": {
+            "staging": {
+              "buildTarget": "maalipo:build:staging"
+            },
+            "development":  {
               "buildTarget": "maalipo:build:development"
             }
           },
@@ -85,17 +116,17 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "polyfills": [
-              "zone.js",
+              "zone. js",
               "zone.js/testing"
             ],
-            "tsConfig": "tsconfig.spec.json",
+            "tsConfig":  "tsconfig.spec.json",
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
               }
             ],
-            "styles": [
+            "styles":  [
               "src/styles.css"
             ],
             "scripts": []
@@ -104,7 +135,7 @@
       }
     }
   },
-  "cli": {
+  "cli":  {
     "analytics": false
   }
 }

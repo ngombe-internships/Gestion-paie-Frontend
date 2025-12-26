@@ -112,49 +112,79 @@ export class NotificationService implements OnDestroy {
       });
   }
 
-  /**
-   * ✅ Charge les demandes de congés approuvées via l'endpoint qui fonctionne
-   */
-  private loadCongeAlerts(): void {
-    const role = localStorage.getItem('user_role') || '';
-    
-    // Seulement pour les employés
-    if (role !== 'EMPLOYE') {
-      this.congeAlertsSubject.next([]);
-      return;
-    }
-
-    // D'abord récupérer le profil employé pour avoir l'ID
-    this.http.get<any>(`${this.employeApiUrl}/me`).pipe(
-      switchMap((employe: any) => {
-        if (! employe || !employe.id) {
-          console.error('Profil employé non trouvé');
-          return of({ content: [] });
-        }
-        
-        // ✅ Utiliser l'endpoint qui fonctionne :  /api/conge/employe/{id}
-        return this.http.get<any>(`${this.congeApiUrl}/employe/${employe.id}`, {
-          params: { 
-            statut: 'APPROUVEE', 
-            size:  '50' 
-          }
-        });
-      }),
-      catchError((err) => {
-        console.error('Erreur chargement congés pour alertes:', err);
-        return of({ content: [] });
-      })
-    ).subscribe({
-      next: (response: any) => {
-        const demandes = response?. content || response?.data?.content || response?.data || [];
-        console.log('📋 Demandes pour alertes:', demandes. length, demandes);
-        
-        const alerts = this.generateCongeAlerts(demandes);
-        this.congeAlertsSubject. next(alerts);
-        console.log('🔔 Alertes congés générées:', alerts.length, alerts);
-      }
-    });
+ /**
+ * ✅ Charge les demandes de congés approuvées pour générer les alertes
+ */
+private loadCongeAlerts(): void {
+  const role = localStorage.getItem('user_role') || '';
+  
+  // Seulement pour les employés
+  if (role !== 'EMPLOYE') {
+    this.congeAlertsSubject.next([]);
+    return;
   }
+
+  // Récupérer l'ID de l'employé depuis le localStorage ou le token
+  const userId = localStorage.getItem('user_id');
+  const employeId = localStorage.getItem('employe_id');
+  
+  // Si on a l'employe_id directement, l'utiliser
+  if (employeId) {
+    this.fetchCongesForEmploye(parseInt(employeId, 10));
+    return;
+  }
+
+  // Sinon, essayer de récupérer via l'endpoint /api/employes/profile
+  this.http.get<any>(`${this.employeApiUrl}/profile`).pipe(
+    catchError(() => {
+      // Fallback :  essayer /api/employes/me
+      return this.http.get<any>(`${this.employeApiUrl}/me`).pipe(
+        catchError(() => of(null))
+      );
+    })
+  ).subscribe({
+    next: (employe:  any) => {
+      if (employe && employe.id) {
+        // Sauvegarder pour la prochaine fois
+        localStorage.setItem('employe_id', employe.id. toString());
+        this.fetchCongesForEmploye(employe.id);
+      } else {
+        console.warn('Impossible de récupérer le profil employé pour les alertes');
+        this.congeAlertsSubject.next([]);
+      }
+    },
+    error: () => {
+      console.warn('Erreur récupération profil employé');
+      this.congeAlertsSubject.next([]);
+    }
+  });
+}
+
+/**
+ * ✅ Récupère les congés pour un employé donné
+ */
+private fetchCongesForEmploye(employeId: number): void {
+  this. http.get<any>(`${this.congeApiUrl}/employe/${employeId}`, {
+    params: { 
+      statut: 'APPROUVEE', 
+      size: '50' 
+    }
+  }).pipe(
+    catchError((err) => {
+      console.error('Erreur chargement congés:', err);
+      return of({ content: [] });
+    })
+  ).subscribe({
+    next: (response:  any) => {
+      const demandes = response?. content || response?.data?. content || response?.data || [];
+      console.log('📋 Demandes pour alertes:', demandes. length, demandes);
+      
+      const alerts = this.generateCongeAlerts(demandes);
+      this.congeAlertsSubject.next(alerts);
+      console.log('🔔 Alertes congés générées:', alerts.length, alerts);
+    }
+  });
+}
 
   /**
    * ✅ Génère les alertes à partir des demandes de congés

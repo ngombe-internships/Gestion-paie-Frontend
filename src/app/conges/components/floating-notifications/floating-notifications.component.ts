@@ -393,7 +393,12 @@ export class FloatingNotificationsComponent implements OnInit, OnDestroy {
     this.notificationService.closeDropdown();
   }
 
-
-  
+  /**
+   * Ferme une alerte de congé et la sauvegarde dans le localStorage
+   */
+  dismissAlert(event: Event, alert: CongeAlertDto): void {
+    event.stopPropagation();
+    this.notificationService.dismissAlert(alert.id);
+  }
 
 }

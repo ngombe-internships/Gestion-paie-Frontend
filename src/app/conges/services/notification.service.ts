@@ -277,6 +277,13 @@ export class NotificationService implements OnDestroy {
   }
 
   /**
+   * ✅ Alias pour dismissCongeAlert (pour compatibilité avec le composant)
+   */
+  dismissAlert(alertId: string): void {
+    this.dismissCongeAlert(alertId);
+  }
+
+  /**
    * ✅ Sauvegarder les alertes fermées
    */
   private saveDismissedAlerts(data: Record<string, string>): void {

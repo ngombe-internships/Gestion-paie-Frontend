@@ -12,7 +12,7 @@ export interface NotificationDto {
   type: string;
   lu: boolean;
   dateCreation: string;
-  referenceId?: number;
+  referenceId?:  number;
   referenceType?: string;
   lienAction?: string;
 }
@@ -23,7 +23,7 @@ export interface CongeAlertDto {
   titre: string;
   message: string;
   dateDebut: string;
-  dateFin:  string;
+  dateFin: string;
   typeConge: string;
   demandeId:  number;
   dureeTotal?:  number;
@@ -36,7 +36,7 @@ export interface CongeAlertDto {
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
-  totalPages: number;
+  totalPages:  number;
   size: number;
   number: number;
 }
@@ -57,7 +57,7 @@ export class NotificationService implements OnDestroy {
   private congeAlertsSubject = new BehaviorSubject<CongeAlertDto[]>([]);
   private showDropdownSubject = new BehaviorSubject<boolean>(false);
   
-  private pollingSubscription:  Subscription | null = null;
+  private pollingSubscription: Subscription | null = null;
   private isInitialized = false;
   private cachedEmployeId: number | null = null;
 
@@ -93,7 +93,7 @@ export class NotificationService implements OnDestroy {
   }
 
   private refreshCount(): void {
-    this.http. get<any>(`${this.apiUrl}/count-non-lues`)
+    this.http.get<any>(`${this.apiUrl}/count-non-lues`)
       .pipe(retry(1))
       .subscribe({
         next: (response:  any) => {
@@ -109,7 +109,7 @@ export class NotificationService implements OnDestroy {
       .pipe(retry(1))
       .subscribe({
         next: (response: any) => {
-          const list = response.data?. content ??  response.data ??  response.content ??  [];
+          const list = response.data?. content ??  response.data ??  response. content ??  [];
           this. notificationsSubject.next(list);
         },
         error: () => {}
@@ -120,7 +120,7 @@ export class NotificationService implements OnDestroy {
     const role = localStorage.getItem('user_role') || '';
     
     if (role !== 'EMPLOYE') {
-      this.congeAlertsSubject.next([]);
+      this.congeAlertsSubject. next([]);
       return;
     }
 
@@ -140,7 +140,7 @@ export class NotificationService implements OnDestroy {
       map((response: any) => response.data || response),
       catchError(() => of(null))
     ).subscribe({
-      next:  (employe: any) => {
+      next: (employe:  any) => {
         if (employe?. id) {
           this.cachedEmployeId = employe.id;
           localStorage.setItem('employe_id', employe.id.toString());
@@ -154,7 +154,7 @@ export class NotificationService implements OnDestroy {
 
   private fetchCongesForEmploye(employeId: number): void {
     this.http.get<any>(`${this.congeApiUrl}/employe/${employeId}`, {
-      params: { statut: 'APPROUVEE', size: '50' }
+      params:  { statut: 'APPROUVEE', size: '50' }
     }).pipe(
       catchError(() => of({ content: [] }))
     ).subscribe({
@@ -166,7 +166,7 @@ export class NotificationService implements OnDestroy {
     });
   }
 
-  private generateCongeAlerts(demandes: any[]): CongeAlertDto[] {
+  private generateCongeAlerts(demandes:  any[]): CongeAlertDto[] {
     const alerts: CongeAlertDto[] = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -182,8 +182,8 @@ export class NotificationService implements OnDestroy {
       dateDebut.setHours(0, 0, 0, 0);
       dateFin.setHours(0, 0, 0, 0);
 
-      const diffDebut = Math.ceil((dateDebut.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      const diffFin = Math.ceil((dateFin.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const diffDebut = Math.ceil((dateDebut. getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const diffFin = Math. ceil((dateFin.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
       let alert: CongeAlertDto | null = null;
 
@@ -198,26 +198,26 @@ export class NotificationService implements OnDestroy {
           'C\'est le début de votre congé.  Bon repos !',
           'bi-rocket-takeoff-fill', 'alert-info');
       } else if (diffDebut < 0 && diffFin > 0) {
-        const dureeTotal = Math.ceil((dateFin. getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const dureeTotal = Math. ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         const jourActuel = Math.abs(diffDebut) + 1;
         alert = {
           id: `CONGE_EN_COURS-${demande.id}`,
           type: 'CONGE_EN_COURS',
           titre: '🏖️ Vous êtes en congé',
           message: `Jour ${jourActuel} sur ${dureeTotal}.  Il vous reste ${diffFin} jour(s).`,
-          dateDebut: demande.dateDebut,
+          dateDebut:  demande.dateDebut,
           dateFin: demande. dateFin,
           typeConge:  demande.typeConge,
           demandeId: demande.id,
           jourActuel,
           dureeTotal,
-          joursRestants:  diffFin,
+          joursRestants: diffFin,
           icon: 'bi-umbrella-fill',
           colorClass: 'alert-success'
         };
       } else if (diffFin === 0 && diffDebut <= 0) {
         alert = this. createAlert('CONGE_SE_TERMINE_AUJOURD_HUI', demande,
-          '🎉 Dernier jour de congé ! ',
+          '🎉 Dernier jour de congé !',
           'Votre congé se termine aujourd\'hui.  Bon retour demain ! ',
           'bi-calendar-check-fill', 'alert-primary');
       } else if (diffFin === -1) {
@@ -228,7 +228,7 @@ export class NotificationService implements OnDestroy {
       }
 
       // ✅ Vérifier si l'alerte n'a pas été fermée
-      if (alert && !dismissedAlerts.includes(alert. id)) {
+      if (alert && ! dismissedAlerts. includes(alert.id)) {
         alerts.push(alert);
       }
     });
@@ -249,10 +249,10 @@ export class NotificationService implements OnDestroy {
       type,
       titre,
       message,
-      dateDebut: demande. dateDebut,
-      dateFin:  demande.dateFin,
+      dateDebut: demande.dateDebut,
+      dateFin: demande.dateFin,
       typeConge: demande.typeConge,
-      demandeId: demande. id,
+      demandeId: demande.id,
       icon,
       colorClass
     };
@@ -273,7 +273,7 @@ export class NotificationService implements OnDestroy {
     
     // Mettre à jour l'affichage
     const currentAlerts = this. congeAlertsSubject.value;
-    this. congeAlertsSubject.next(currentAlerts.filter(a => a. id !== alertId));
+    this.congeAlertsSubject.next(currentAlerts.filter(a => a.id !== alertId));
   }
 
   /**
@@ -292,7 +292,7 @@ export class NotificationService implements OnDestroy {
    */
   private getDismissedAlertIds(): string[] {
     const data = this.getDismissedAlertsData();
-    return Object. keys(data);
+    return Object.keys(data);
   }
 
   /**
@@ -301,14 +301,14 @@ export class NotificationService implements OnDestroy {
   private getDismissedAlertsData(): Record<string, string> {
     try {
       const stored = localStorage.getItem(DISMISSED_ALERTS_KEY);
-      if (!stored) return {};
+      if (! stored) return {};
       
       const parsed = JSON.parse(stored);
       
       // Si c'est un tableau (ancien format), convertir en objet
       if (Array.isArray(parsed)) {
         const converted: Record<string, string> = {};
-        parsed.forEach((id:  string) => {
+        parsed.forEach((id: string) => {
           converted[id] = new Date().toISOString();
         });
         this.saveDismissedAlerts(converted);
@@ -362,7 +362,7 @@ export class NotificationService implements OnDestroy {
     const currentNotifs = this.notificationsSubject.value;
     const updatedNotifs = currentNotifs.map(n => n.id === id ?  { ...n, lu: true } : n);
     this.notificationsSubject.next(updatedNotifs);
-    this.countSubject.next(Math.max(0, this.countSubject. value - 1));
+    this.countSubject.next(Math.max(0, this.countSubject.value - 1));
 
     return this.http.put(`${this.apiUrl}/${id}/marquer-lu`, {}).pipe(
       catchError(() => {
@@ -387,7 +387,7 @@ export class NotificationService implements OnDestroy {
   }
 
   toggleDropdown(): void {
-    this. showDropdownSubject.next(!this. showDropdownSubject.value);
+    this. showDropdownSubject.next(! this.showDropdownSubject.value);
   }
 
   closeDropdown(): void {

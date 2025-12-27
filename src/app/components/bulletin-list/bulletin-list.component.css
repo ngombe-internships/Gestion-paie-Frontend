@@ -1,4 +1,4 @@
- .table-hover tbody tr:hover {
+.table-hover tbody tr:hover {
     background-color: rgba(99, 102, 241, 0.05);
     transform: translateX(5px);
     transition: all 0.2s ease;
@@ -76,46 +76,76 @@
     font-size: 0.9rem;
   }
 
+  /* ==========================================
+     FORCER L'AFFICHAGE DU TABLEAU SUR MOBILE
+     ========================================== */
   .table-responsive {
-    overflow-x: auto;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    display: block !important;
+    visibility: visible !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    display: table !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+  }
+
+  .table thead {
+    display: table-header-group !important;
+  }
+
+  .table tbody {
+    display: table-row-group !important;
+  }
+
+  .table tr {
+    display: table-row !important;
   }
 
   .table thead th {
     font-size: 0.75rem;
     padding: 0.5rem !important;
     white-space: nowrap;
+    display: table-cell !important;
   }
 
   .table tbody td {
     font-size: 0.8rem;
     padding: 0.5rem !important;
+    display: table-cell !important;
   }
 
   /* Masquer certaines colonnes sur mobile */
   .table th:nth-child(1),
   .table td:nth-child(1) {
-    display: none;
+    display: none !important;
   }
 
   .table th:nth-child(4),
   .table td:nth-child(4) {
-    display: none;
+    display: none !important;
   }
 
   .table th:nth-child(5),
   .table td:nth-child(5) {
-    display: none;
+    display: none !important;
   }
 
-  /* Réorganiser les boutons d'actions */
+  /* Colonne Actions - forcer l'affichage */
   .table td:last-child {
-    width: 100% !important;
+    width: auto !important;
+    min-width: 120px !important;
+    display: table-cell !important;
   }
 
   .btn-sm-lg {
     font-size: 0.7rem;
     padding: 0.25rem 0.5rem;
     margin: 0.1rem;
+    display: inline-block !important;
   }
 
   .btn-sm-lg i {
@@ -124,7 +154,7 @@
 
   /* Stacker les boutons sur mobile */
   .table td:last-child .btn-sm-lg {
-    display: block;
+    display: block !important;
     width: 100%;
     margin-bottom: 0.25rem;
   }
@@ -172,46 +202,40 @@
     padding: 0.2rem 0.3rem;
   }
 
-  /* Format carte pour mobile */
+  /* ==========================================
+     SOLUTION RADICALE - FORCER L'AFFICHAGE DU TABLEAU
+     ========================================== */
+  
+  /* NE PAS masquer le tableau - le forcer à s'afficher */
   .table-responsive {
-    display: none;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .mobile-card-view {
-    display: block;
+  /* Forcer l'affichage du tableau */
+  .table {
+    display: table !important;
+    width: 100% !important;
   }
 
-  .bulletin-card {
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  .table thead {
+    display: table-header-group !important;
   }
 
-  .bulletin-card h6 {
-    color: #6366f1;
-    margin-bottom: 0.5rem;
+  .table tbody {
+    display: table-row-group !important;
   }
 
-  .bulletin-card .info-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.25rem;
-    font-size: 0.8rem;
+  .table tr {
+    display: table-row !important;
   }
 
-  .bulletin-card .actions {
-    margin-top: 0.75rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-  }
-
-  .bulletin-card .actions .btn {
-    flex: 1;
-    min-width: calc(50% - 0.125rem);
-    font-size: 0.7rem;
+  .table th,
+  .table td {
+    display: table-cell !important;
   }
 }

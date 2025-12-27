@@ -167,21 +167,16 @@
 
   /* Groupe de boutons d'actions */
   .btn-group {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 4px;
+    flex-direction: column;
+    width: 100%;
   }
 
   .btn-group .btn {
-    display: block !important;
     margin: 2px 0;
-    padding: 8px 10px;
-    font-size: 0.75rem;
+    padding: 6px 8px;
+    font-size: 0.7rem;
     border-radius: 4px !important;
-    width: 100% !important;
-    white-space: nowrap;
-    text-align: center;
+    width: 100%;
   }
 
   .btn-group .btn i {
@@ -365,28 +360,20 @@
     display: none;
   }
 
-  /* Simplifier les boutons d'actions MAIS GARDER LES BOUTONS VISIBLES */
+  /* Simplifier les boutons d'actions */
   .btn-group .btn {
-    padding: 6px 8px;
-    font-size: 0.7rem;
+    padding: 4px;
+    font-size: 0.6rem;
   }
 
-  /* NE PAS masquer les icônes des boutons - commenté
   .btn-group .btn i {
     display: none;
   }
-  */
 
   /* Réduire encore plus les espaces */
   .table thead th,
   .table tbody td {
     padding: 6px 2px;
-  }
-  
-  /* Ajuster la colonne Actions pour qu'elle soit plus large */
-  .table td:nth-child(7) {
-    width: auto !important;
-    min-width: 100px !important;
   }
 }
  .table-hover tbody tr:hover {
